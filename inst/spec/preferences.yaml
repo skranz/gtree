@@ -1,0 +1,40 @@
+payoff:
+	class: payoff
+
+envy_99:
+	class: envy
+	params:
+	  alpha: 0.99 # the degree of envy
+
+ineq99_49:
+	class: ineqAv
+	params:
+	  alpha: 0.99 # the degree of envy
+	  beta: 0.49 # the degree of guilt
+
+lossAvCenter:
+  class: lossAv
+  params:
+    r: '(min(payoff_i)+max(payoff_i))/2'
+    lambda: 2
+
+unifLossAvMinMax:
+  class: unifLossAv
+  params:
+    rmin: 'min(payoff_i)'
+    rmax: 'max(payoff_i)'
+    lambda: 2
+
+# all players want to maximize the
+# welfare function W=sum(payoff_i) + min(payoff_i)
+WSumMin_1:
+  class: WSumMin
+  params:
+    min_weight: 1
+
+# all players want to maximize the sum
+# of all players payoffs
+WSum:
+  class: WSumMin
+  params:
+    min_weight: 0

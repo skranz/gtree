@@ -1,0 +1,72 @@
+---
+title: "GTREE - Quantity Competition"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gtreeCore)
+```
+
+## Specifying a game
+
+First, we load the `gtree` library that contains all functions to use gtree from R, but no shiny GUI. We also define a simple Stackelberg game with the function `new.game`.
+
+```{r}
+library(gtreeCore)
+sb = new.game(
+  gameId = "Stackelberg",
+  params = list(numPlayers=2, a=100, qMax=100),
+  stages = list(
+    stage("q1Stage",
+      player=1,
+      actions = list(
+        action("q1",~0:qMax)
+      )
+    ),
+    stage("q2Stage",
+      player=2,
+      observe = "q1",
+      actions = list(
+        action("q2",~0:qMax)
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        Q ~ q1+q2,
+        P ~ a-Q,
+        payoff_1 ~ P*q1,
+        payoff_2 ~ P*q2
+      )
+    )
+  )
+)
+```
+We define three parameters that can be referenced to in later definitions. Note that you must *always* specify a parameter called `numPlayers`.
+
+We then specify 3 `stages`, generating each stage with the function `stage`.
+
+1. In the first stage, player 1 chooses her action `q1`. We always specify a list of `actions` and each action is created with the function `action`. We first specify an action name `q1` and then the action `set`, which is a vector of all possible values the action can take. We specify the set as an R formula starting with `~`. This means the set will be computed using the values of earlier specified parameters or realized variables. Instead of a formula, we could also provide a quoted call `quote(0:qMax)`.<br>
+We could also provide a fixed action set, e.q. `0:100`, which does not make use of parameters or variable realizations of the game. Then we don't need to quote the expression or start with `~`.
+
+2. In the second stage player 2 chooses his quantity `q2`. We also specify that player 2 observes the variable `q1` that player 1 has chosen in the first stage. Based on which variables are observed or not, information sets of the extensive form game will be determined.
+
+3. The third stage just computes variables as specified by the list provided for the field `compute`. You can briefly specify a computation with the formula syntax `name ~ formula`.  Note that for each player `i` you must specify a field `payoff_i`, like `payoff_1` and `payoff_2` that specifies the (monetary) payoff for that player. We can later easily transform these monetary payoffs, using some alternative outcome based utility function, e.g. to account for inequality aversion or loss aversion.
+<br>You can use any vectorized, deterministic R function to specify a computed variable. Random variables must be declared separately, as a move of nature, however (see example further below).<br>For computing equilibria, it does not really matter which players you specify in such a stage in which no action takes place. However, `gtree` also has (currently rudimentary) features to run a game as a web-based experiment. When running as an experiment, a stage will be shown to all players that are specified in the `players` field.
+
+We can get a short overview of a specified game by typing its variable name in the R console.
+```{r}
+sb
+```
+
+## Table-form representation and solving for equilibria
+
+Before we can solve for equilibria of the game, we have to create a table-form representation of the game using the function `vg.to.tg`.
+
+```{r}
+sb.tg = vg.to.tg(vg=sb)
+sb.tg
+```
+Briefly spoken
+ 

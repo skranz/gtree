@@ -1,0 +1,20 @@
+Package: gtree
+Type: Package
+Title: gtree basic functionality to model and solve games 
+Version: 0.0.1
+Date: 2018-06-11
+Author: Sebastian Kranz
+Maintainer: Sebastian Kranz <sebastian.kranz@uni-ulm.de>
+Description:
+  gtree basic functionality to model and solve games 
+License: GPL >= 2.0
+Depends:
+  restorepoint,stringtools, yaml,
+  data.table,dplyr, dplyrExtras, 
+  codeUtils, tidyr, digest,
+  sys, lubridate, jsonlite, whisker,
+  matrixStats, lazyeval
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

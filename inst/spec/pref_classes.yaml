@@ -1,0 +1,74 @@
+# preference classes
+payoff:
+	descr: 'Risk-neutral payoff maximizer.'
+	defaultName: payoff 
+	params:
+	fun: payoffUtil
+
+envy:
+	descr: 'Fehr-Schmidt inequality aversion with envy only (no guilt).' 
+	defaultName: 'envy_99'
+	params:
+		alpha:
+			descr: 'the degree of envy'
+			default: 0.99
+	fun: envyUtil
+
+ineqAv:
+	descr: 'Fehr-Schmidt inequality aversion.' 
+	defaultName: 'ineq_99_49'
+	params:
+		alpha:
+			descr: 'the degree of envy'
+			default: 0.99
+		beta:
+			descr: 'the degree of guilt'
+			default: 0.49
+	fun: ineqAvUtil
+
+lossAv:
+	descr: 'Loss aversion with a single reference point.'
+	defaultName: 'lossAvCenter'
+	params:
+		r:
+			descr: 'Reference point. Can be a formula'
+			default: '(min(payoff_i)+max(payoff_i))/2'
+		lambda:
+			descr: degree of loss aversion
+			default: 2
+	fun: lossAvUtil
+
+unifLossAv:
+	descr: > 
+		Loss aversion with a continuum of reference points 
+		that are uniformely distributed between rmin and rmax.
+		Between rmin and rmax, the resulting utility function has 
+		a quadratic form, while beyond rmin or rmax it is linear.
+	defaultName: 'unifLossAv_min_max'
+	params:
+		rmin:
+			descr: the lowest reference point
+			default: 'min(payoff_i)'
+		rmax:
+			descr: the highest reference point
+			default: 'max(payoff_i)'	
+		lambda:
+			descr: degree of loss aversion
+			default: 2
+	fun: unifLossAvUtil
+
+WSumMin:
+	descr: > 
+		All players maximize total welfare W
+		defined as the sum of all payoffs plus
+		min_weight times the minimal payoff
+	defaultName: 'WSumMin_1'
+	params:
+		min_weight:
+			descr: |
+				The weight on the minimal payoff.
+				The sum of payoffs always gets a weight of 1.
+				For min_weight = 0, we have pure utiltarian
+				welfare (given payoff pref)
+			default: 1
+	fun: WSumMin
