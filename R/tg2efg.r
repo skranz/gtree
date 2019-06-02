@@ -68,7 +68,7 @@ set.tg.util = function(tg,util.funs=payoffUtil(1:tg$params$numPlayers), symmetri
 }
 
 
-tg.to.efg = function(tg, path=get.efg.dir(gameId=tg$gameId), file = paste0(tg$tg.id,".efg"), verbose=TRUE) {
+tg.to.efg = function(tg, path=get.efg.dir(gameId=tg$gameId), file = paste0(tg$tg.id,".efg"), file.with.dir=NULL, verbose=TRUE, util.funs=NULL) {
   restore.point("tg2efg")
 
   oco.df = tg$oco.df
@@ -131,7 +131,15 @@ tg.to.efg = function(tg, path=get.efg.dir(gameId=tg$gameId), file = paste0(tg$tg
   header.txt = paste0('EFG 2 R "',tg$gameId,'" { ',paste0('"', player.names, '"', collapse=" "),' }')
 
   txt = c(header.txt, body.txt)
-  if (!is.null(file) & !is.null(path)) {
+
+
+
+  if (!is.null(file.with.dir)) {
+    writeLines(txt, file.with.dir)
+    if (verbose)
+      display("Written to ", file.with.dir)
+    return(invisible(file.with.dir))
+  } else if (!is.null(file) & !is.null(path)) {
     if (!dir.exists(path))
       dir.create(path, recursive = TRUE)
     writeLines(txt, paste0(path,"/",file))

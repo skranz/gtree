@@ -1,3 +1,0 @@
-game.deparse = function(game) {
-
-}

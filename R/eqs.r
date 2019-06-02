@@ -11,11 +11,11 @@
 #' @param keep.keys relevant if reduce.tables=TRUE. A character vector of columns that will always be kept as keys and not be reduced. May be helpful when merging or comparing equilibria.
 #' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
 #' @export
-eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables = TRUE, keep.keys=NULL,ignore.keys = names(tg$params), actions = NULL) {
+eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables = TRUE, keep.keys=NULL,ignore.keys = names(tg$params), actions = NULL, ignore.li =NULL) {
   restore.point("eq.li.tables")
 
   res = lapply(seq_along(eq.li), function(eq.ind) {
-    eq.tables(eq.li[[eq.ind]],tg=tg, keep.keys=keep.keys, ignore.keys = ignore.keys, reduce.tables=reduce.tables & combine < 2, eq.ind = if (add.eq.ind) eq.ind)
+    eq.tables(eq.li[[eq.ind]],tg=tg, keep.keys=keep.keys, ignore.keys = ignore.keys, ignore.li = ignore.li, reduce.tables=reduce.tables & combine < 2, eq.ind = if (add.eq.ind) eq.ind)
   })
   if (combine>0) {
     if (length(res)==0) return(NULL)
@@ -28,10 +28,10 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
     if (combine>1) {
       comb = lapply(vars, function(var) {
         dat = comb[[var]]
-        cols = setdiff(colnames(dat),"eq.ind")
+        cols = setdiff(colnames(dat),c("eq.ind", ignore.li[[var]]))
         dat = dat %>%
           group_by_at(cols) %>%
-          summarize(eq.inds = paste0(eq.ind, collapse=","))
+          summarize(eq.inds = paste0(sort(unique(eq.ind)), collapse=","))
         if (reduce.tables)
           dat = reduce.key.table(dat, keep.keys = keep.keys)
         dat
@@ -59,7 +59,7 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
 #' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
 #' @param eq.ind An index of the equilibrium that shall be added to the key table. If NULL (default) no column will be added.
 #' @export
-eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = names(tg$params), eq.ind = NULL, actions=NULL) {
+eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = names(tg$params), eq.ind = NULL, actions=NULL, ignore.li = NULL) {
   restore.point("eq.tables")
 
   all.keep.keys = keep.keys
@@ -83,7 +83,7 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
     if (length(know.var.groups)>1) {
       key.df = bind_rows(lapply(know.var.groups, function(.know.var.group) {
         know.vars = lev$know.var.li[[.know.var.group]]
-        cols = union(setdiff(know.vars, ignore.keys), action)
+        cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), action)
         rows = which(lev.df$.know.var.group == .know.var.group)
         table = lev.df[rows,cols]
         if (reduce.tables) table = reduce.key.table(table, keep.keys = keep.keys)
@@ -93,7 +93,7 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
     } else {
       .know.var.group = know.var.groups
       know.vars = lev$know.var.li[[.know.var.group]]
-      cols = union(setdiff(know.vars, ignore.keys), action)
+      cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), action)
       key.df = lev.df[, cols]
       if (reduce.tables) key.df = reduce.key.table(key.df, keep.keys = keep.keys)
 

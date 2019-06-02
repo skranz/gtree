@@ -1,5 +1,5 @@
 ---
-title: "gtree - Introduction a Simple Ultimatum Game"
+title: "gtree - Exploring Reciprocity Preferences"
 output: html_document
 ---
 
@@ -8,21 +8,31 @@ knitr::opts_chunk$set(echo = TRUE, error=TRUE)
 library(gtree)
 ```
 
-## Specifying a game
-
-First, we load the `gtree` library amd then define a simple Ultimatum game with the function `new_game`.
+## An Ultimatum Game with possibility of random offer
 
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "UltimatumGame",
+  gameId = "UG_RandomOffer",
   options = make_game_options(verbose=TRUE),
-  params = list(numPlayers=2,cake=4),
+  params = list(numPlayers=2,natureProb = 0.5),
   stages = list(
+    stage("whoOffers",
+      nature = list(
+        natureMove("offerType",c("nature","player"), probs = ~c(natureProb, 1-natureProb))
+      )  
+    ),
+    stage("randomOffer",
+      condition = ~ offerType == "nature"
+      nature = list(
+        natureMove("natureOffer",0:1)
+      )
+    ),
     stage("proposerStage",
       player=1,
+      condition = ~ offerType == "player",
       actions = list(
-        action("offer",~0:cake)
+        action("playerOffer",0:1)
       )
     ),
     stage("responderStage",

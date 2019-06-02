@@ -5,7 +5,7 @@
 
 
 example.classify.vg.vars = function() {
-  vg = new.vg(
+  game = new_game(
     gameId = "RandomCostCournot",
     params = list(numPlayers=2, a=100, qMax=40,qMin=10,
       c2=0, c1Low=0, c1High=10),
@@ -41,7 +41,8 @@ example.classify.vg.vars = function() {
     )
   )
 
-  vg$vars.info = compute.vg.vars.info(vg)
+
+  vg$vars.info = compute.vg.vars.info(game$vg)
 
 }
 

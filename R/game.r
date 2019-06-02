@@ -29,7 +29,6 @@ example.game = function() {
       )
     )
   )
-  game_set_preferences(game, "ineqAv", alpha=0.5, beta=0.4)
   game_solve_spe(game)
   game
 
@@ -178,11 +177,18 @@ new_game = function(gameId, params=game_params(), options=make_game_options(), s
 
 game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE, add.sg=for.internal.solver, add.spi=for.internal.solver, add.spo=for.internal.solver, force=FALSE, verbose=game$options$verbose,...) {
   # Create all required addition
-  compile = is.null(game[["tg"]]) | game$needs.recompile | force
+  compile = is.null(game[["tg"]]) | isTRUE(game$needs.recompile) | force
   if (compile) {
     game$tg = vg.to.tg(game$vg,branching.limit = branching.limit, add.sg=add.sg, add.spi=add.spi, add.spo=add.spo,verbose = verbose)
     game$needs.recompile = FALSE
   }
+  if (!is.null(game$prefs)) {
+    set.tg.prefs(game$tg, game$prefs)
+  } else {
+    set.tg.util(game$tg)
+  }
+
+
   invisible(game)
 }
 
@@ -191,12 +197,7 @@ game_solve_spe = function(game,...) {
   restore.point("game_solve_spe")
   game_compile(game)
 
-  compute.tg.fields.for.internal.solver(game$tg)
-  if (!is.null(game$prefs)) {
-    set.tg.prefs(game$tg, game$prefs)
-  } else {
-    set.tg.util(game$tg)
-  }
+  compute.tg.fields.for.internal.solver(game$tg, verbose=!isTRUE(!game$options$verbose))
 
   eq.li = gtree.solve.spe(tg = game$tg)
   game$eq.li = eq.li
@@ -221,9 +222,40 @@ game_set_preferences = function(game, prefs) {
   invisible(game)
 }
 
+game_copy = function(game) {
+  ngame = as.environment(as.list(game))
+  class(ngame) = class(game)
+  ngame$vg = as.environment(as.list(ngame$vg))
+  ngame$tg = as.environment(as.list(ngame$tg))
+  ngame
+}
 
-game.eq.tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ...) {
-  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ...)
+game_add_tremble = function(game, action=NULL, stage=NULL, tremble.prob = 0.0001) {
+  clear.non.vg(game)
+  game$vg = vg.add.tremble(game$vg, action=action, stage=stage, tremble.prob = tremble.prob)
+  invisible(game)
+}
+
+#' Write game as a Gambit efg file
+#'
+#' @param game The game object
+#' @param file The file with full path. If NULL create a default name
+#' @param
+game_write_efg = function(game, file=NULL, dir=getwd()) {
+  game_compile(game)
+  if (is.null(file)) {
+    file = file.path(dir, paste0(game$tg$tg.id,".efg"))
+  }
+  game$efg.file =  tg.to.efg(game$tg, file.with.dir = file, verbose=!isTRUE(!game$options$verbose))
+  invisible(game)
+}
+
+game.eq.tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.cols = NULL, ...) {
+  if (is.null(game$unknown.vars.at.actions)) {
+    game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
+  }
+
+  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.cols), ignore.li = game$unknown.vars.at.actions, ...)
 }
 
 game.outcomes = function(game,..., reduce.cols=FALSE) {
@@ -397,5 +429,27 @@ update.vg.stage = function(vg, name, player, condition, observe, compute, nature
 clear.non.vg = function(game, keep=c("gameId","vg","players", "options","prefs")) {
   restore.point("clear.non.vg")
   fields = setdiff(ls(game), keep)
-  remove(fields)
+  remove(list=fields,pos = game)
+  invisible(game)
+}
+
+#' Return for each action all variables that are never
+#' known when choosing the action
+#'
+find.unknown.vars.at.actions = function(tg) {
+  vars = setdiff(tg$vars, names(tg$params))
+  lev.actions = sapply(tg$lev.li[tg$action.levels], function(lev) lev$var)
+
+  actions = unique(lev.actions)
+  res = lapply(actions, function(action) {
+    levs =tg$lev.li[tg$action.levels][lev.actions == action]
+    known = NULL
+    for (lev in levs) {
+      cs = colSums(lev$know.mat)
+      known = union(known, names(cs)[cs>0])
+    }
+    setdiff(vars, known)
+  })
+  names(res) = actions
+  res
 }
