@@ -1,3 +1,20 @@
+#' Change a call object like call = quote(c(x+1,x+2))
+#' into a list of calls list(quote(x+1), quote(x+2))
+list.call.to.call.list = function(call) {
+  sym = as.character(call[[1]])
+  if (sym=="c" | sym=="list") {
+    call[[1]] = as.symbol("expression")
+  } else {
+    return(call)
+  }
+  as.list(eval(call))
+}
+
+remove.from.list = function(li, names) {
+  use = setdiff(names(li), names)
+  li[use]
+}
+
 
 name.by.name = function(li) {
   names = sapply(li, function(x) x$name)
@@ -36,6 +53,14 @@ is.empty = function(x) {
   FALSE
 }
 
+# Create a data frame quickly
+quick.df = function (...)
+{
+  df = list(...)
+  attr(df, "row.names") <- 1:length(df[[1]])
+  attr(df, "class") <- "data.frame"
+  df
+}
 
 # converts an R list to a css style string
 list.to.style = function(x) {

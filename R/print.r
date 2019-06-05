@@ -13,8 +13,8 @@ print.gtree_game = function(game,..., show.stages = TRUE, show.size = TRUE, show
     cat("\n\nSize Information:")
     print.gtree_tg(game$tg, show.title=FALSE)
   }
-  if (!is.null(game$prefs)) {
-    cat(paste0("\nPreferences: ", paste0(game$prefs$label), collapse=", "))
+  if (!is.null(game$pref)) {
+    cat(paste0("\nPreferences: ", paste0(game$pref$label), collapse=", "))
   }
   if (!is.null(game$eq.li) & show.eq) {
     cat(paste0("\n\n", length(game$eq.li), " Equilibria:\n"))

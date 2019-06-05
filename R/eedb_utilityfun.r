@@ -4,7 +4,7 @@ examples.utility.fun = function() {
 }
 
 
-pref_payoff = payoffUtil = function(player=1,n=NULL,...) {
+payoffUtil = function(player=1,n=NULL,...) {
 	util = paste0("payoff_",player)
   attr(util, "util.param") = list(util.type="payoff")
   util

@@ -177,32 +177,34 @@ new_game = function(gameId, params=game_params(), options=make_game_options(), s
 
 game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE, add.sg=for.internal.solver, add.spi=for.internal.solver, add.spo=for.internal.solver, force=FALSE, verbose=game$options$verbose,...) {
   # Create all required addition
+  restore.point("game_compile")
+
   compile = is.null(game[["tg"]]) | isTRUE(game$needs.recompile) | force
   if (compile) {
     game$tg = vg.to.tg(game$vg,branching.limit = branching.limit, add.sg=add.sg, add.spi=add.spi, add.spo=add.spo,verbose = verbose)
     game$needs.recompile = FALSE
   }
-  if (!is.null(game$prefs)) {
-    set.tg.prefs(game$tg, game$prefs)
+
+  if (!is.null(game[["pref"]])) {
+    set.tg.pref(game$tg, game$pref)
   } else {
     set.tg.util(game$tg)
   }
-
 
   invisible(game)
 }
 
 
-game_solve_spe = function(game,...) {
+game_solve_spe = function(game, verbose=isTRUE(game$options$verbose>=1),...) {
   restore.point("game_solve_spe")
-  game_compile(game)
+  game_compile(game,verbose=verbose)
 
-  compute.tg.fields.for.internal.solver(game$tg, verbose=!isTRUE(!game$options$verbose))
+  compute.tg.fields.for.internal.solver(game$tg, verbose=verbose)
 
-  eq.li = gtree.solve.spe(tg = game$tg)
+  eq.li = gtree.solve.spe(tg = game$tg, verbose=verbose)
   game$eq.li = eq.li
-  game$eqo.li = eq.li.outcomes(eq.li = eq.li, tg=game$tg)
-  game$eeqo.li = eq.li.expected.outcomes(eq.li = eq.li, tg=game$tg)
+  game$eqo.df = eq.li.outcomes(eq.li = eq.li, tg=game$tg)
+  game$eeqo.df = eq.li.expected.outcomes(eq.li = eq.li, tg=game$tg)
   invisible(game)
 }
 
@@ -216,11 +218,12 @@ game_solve_spe = function(game,...) {
 #' @param type The preference type "payoff", "ineqAv","envy","lossAv", "unifLossAv"
 #' @param ... Parameters of that preference type
 #' @param players which players shall have this preference. By default all players
-game_set_preferences = function(game, prefs) {
+game_set_preferences = function(game, pref) {
   restore.point("game_set_preferences")
-  game$prefs = prefs
+  game$pref = pref
   invisible(game)
 }
+
 
 game_copy = function(game) {
   ngame = as.environment(as.list(game))
@@ -271,7 +274,7 @@ game.eq.li = function(game,...) {
   game$eq.li
 }
 game.eq.outcomes = function(game,...) {
-  game$eqo.li
+  game$eqo.df
 }
 game.expected.eq.outcomes = function(game,...) {
   game$eeqo.df
@@ -426,7 +429,7 @@ update.vg.stage = function(vg, name, player, condition, observe, compute, nature
   vg
 }
 
-clear.non.vg = function(game, keep=c("gameId","vg","players", "options","prefs")) {
+clear.non.vg = function(game, keep=c("gameId","vg","players", "options","pref")) {
   restore.point("clear.non.vg")
   fields = setdiff(ls(game), keep)
   remove(list=fields,pos = game)

@@ -44,9 +44,9 @@ get.util.funs.name = function(util.funs) {
 	return(paste0(names, collapse="_"))
 }
 
-set.tg.prefs = function(tg, prefs) {
-  utils = prefs$utils
-  names(utils) = rep(prefs$label, length(utils))
+set.tg.pref = function(tg, pref) {
+  utils = pref$utils
+  names(utils) = rep(pref$label, length(utils))
   set.tg.util(tg, utils)
 }
 

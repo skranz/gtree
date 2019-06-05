@@ -490,7 +490,7 @@ compute.action.level = function(tg,stage, action,lev.df, know.li, kel) {
   # it has been defined before
 
   # don't remove .player etc!
-  lev.df = remove.cols(lev.df,c(var,".move.prob", ".info.set",".move.ind"))
+  lev.df = remove.cols(lev.df,c(var,".move.prob", ".info.set",".move.ind", ".prev.prob"))
 
   lev.df$.node.ind = seq.int(NROW(lev.df))
 
@@ -628,6 +628,7 @@ compute.nature.level = function(tg,stage, randomVar, lev.df, know.li, kel) {
   lev.df = eval.randomVar.to.df(randomVar$set,randomVar$prob,df = lev.df, var=var,kel = kel,prob.col = ".move.prob", params=tg$params)
 
   # adapt outcome probs
+  lev.df$.prev.prob = lev.df$.prob
 	lev.df$.prob = lev.df$.prob * lev.df$.move.prob
 
 
@@ -765,7 +766,6 @@ eval.randomVar.to.df = function(set.call, prob.call, df, var, kel, prob.col = ".
 
 compute.transformation.level = function(tg,stage, vg.stage, trans, lev.df, know.li,kel) {
   restore.point("compute.transformation.level")
-  lev.num = length(tg$lev.li)+1
   var = trans$name
   check.var.name(var, kel)
 
@@ -804,11 +804,14 @@ compute.transformation.level = function(tg,stage, vg.stage, trans, lev.df, know.
   # facilitate later modifications of the tg game
   cond = vg.stage$cond
   if (!is.name(cond) | is.call(cond)) cond = NULL
-  tg$transformations[[length(tg$transformations)+1]] = list(var=var,cond=cond, formula=trans$formula, tables=trans$tables )
+
+  lev.num = length(tg$lev.li)+1
+
+  tg$transformations[[length(tg$transformations)+1]] = list(var=var,cond=cond, formula=trans$formula, tables=trans$tables, lev.num = lev.num)
 
   lev = nlist(
     type="transformation",
-    lev.num,
+    lev.num = lev.num,
     stage.num = stage$stage.num,
     var,
     player=0,
@@ -817,7 +820,7 @@ compute.transformation.level = function(tg,stage, vg.stage, trans, lev.df, know.
   )
   # We don't save transformations
   # in order to save memory
-  #tg$lev.li[[lev.num]] = lev
+  # tg$lev.li[[lev.num]] = lev
   lev
 }
 

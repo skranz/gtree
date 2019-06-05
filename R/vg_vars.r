@@ -86,7 +86,7 @@ compute.vg.vars.info = function(vg) {
   # probabilities or the game structure
   # (sets, conditions, observations, players)
   n = length(vars)
-  affects.payoff = rep(FALSE, n)
+  affects.payoff = affects.compute = rep(FALSE, n)
   names(affects.payoff) = vars
   affects.prob = affects.set = affects.structure = affects.payoff
 
@@ -119,6 +119,7 @@ compute.vg.vars.info = function(vg) {
     }
     for (x in rev(stage$compute)) {
       ivars = find.vg.formula.vars(x$formula)
+      affects.compute[ivars] = TRUE
       if (length(ivars)>0) {
         imat[ivars,x$name] = TRUE
       }
@@ -146,6 +147,7 @@ compute.vg.vars.info = function(vg) {
     ivars = vars[imat[,var]]
 
     if (length(ivars)>0) {
+      affects.compute[ivars] = affects.compute[ivars] | affects.compute[var]
       affects.payoff[ivars] = affects.payoff[ivars] | affects.payoff[var]
       affects.prob[ivars] = affects.prob[ivars] | affects.prob[var]
       affects.set[ivars] = affects.set[ivars] | affects.set[var]

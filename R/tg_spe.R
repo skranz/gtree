@@ -39,11 +39,11 @@ examples.make.tg.spe = function() {
 }
 
 
-gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId), save.eq=FALSE, keep.weakly.dominated=TRUE) {
+gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId), save.eq=FALSE, keep.weakly.dominated=TRUE, verbose=TRUE) {
 	restore.point("solve.all.tg.spe")
 
 
-	compute.tg.fields.for.internal.solver(tg)
+	compute.tg.fields.for.internal.solver(tg,verbose = verbose)
 
 	start.time = Sys.time()
 
