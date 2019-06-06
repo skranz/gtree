@@ -153,15 +153,20 @@ example.game = function() {
 }
 
 #' Create a new game in stage form
-new_game = function(gameId, params=game_params(), options=make_game_options(), stages, variant="") {
+new_game = function(gameId, params=game_params(), options=make_game_options(), stages, variant="", check=TRUE) {
   restore.point("new.game")
   vg = as.environment(list(
     gameId = gameId,
     variant = variant,
     params = params,
-    stages = stages
+    stages = stages,
+    kel = keyErrorLog(stop=TRUE)
   ))
+  # Extract additional information
+  # and check vg
+  if (check) check.vg(vg)
   class(vg) = c("gtree_vg","environment")
+
 
   game = as.environment(list(
     gameId = gameId,
@@ -195,16 +200,39 @@ game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE,
 }
 
 
-game_solve_spe = function(game, verbose=isTRUE(game$options$verbose>=1),...) {
+game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gambit = mixed | !just.spe, verbose=isTRUE(game$options$verbose>=1),...) {
   restore.point("game_solve_spe")
+  if (use.gambit) {
+    game_gambit_solve(game, mixed=mixed, just.spe=just.spe, verbose=verbose, ...)
+  } else if (mixed | !just.spe) {
+    stop("You must set use.gambit=TRUE or call game_gambit_solve if you want to solve for mixed stratetgy equilibria or for all pure NE, including NE that are not subgame perfect.")
+  }
+
   game_compile(game,verbose=verbose)
+
+
 
   compute.tg.fields.for.internal.solver(game$tg, verbose=verbose)
 
   eq.li = gtree.solve.spe(tg = game$tg, verbose=verbose)
   game$eq.li = eq.li
-  game$eqo.df = eq.li.outcomes(eq.li = eq.li, tg=game$tg)
-  game$eeqo.df = eq.li.expected.outcomes(eq.li = eq.li, tg=game$tg)
+  game$eqo.df = game$eeqo.df = NULL
+  invisible(game)
+}
+
+game_gambit_solve = function(game, mixed=FALSE, just.spe=TRUE, efg.file=NULL, efg.dir = NULL, gambit.dir="", verbose=isTRUE(game$options$verbose>=1), solver=NULL,...) {
+  restore.point("game_solve_with_gambit")
+  game_compile(game, verbose=verbose)
+
+  if (is.null(efg.file)) {
+    efg.file = tg.efg.file.name(game$tg)
+  }
+  if (!is.null(efg.dir)) {
+    game_write_efg(game,file.with.dir = file.path(efg.dir, efg.file))
+  }
+
+  game$eq.li = gambit.solve.eq(tg=tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=solver)
+  game$eqo.df = game$eeqo.df = NULL
   invisible(game)
 }
 
@@ -244,12 +272,10 @@ game_add_tremble = function(game, action=NULL, stage=NULL, tremble.prob = 0.0001
 #' @param game The game object
 #' @param file The file with full path. If NULL create a default name
 #' @param
-game_write_efg = function(game, file=NULL, dir=getwd()) {
+game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg.file.name(game$tg), dir=getwd(),  verbose = !isTRUE(game$options$verbose==0)) {
   game_compile(game)
-  if (is.null(file)) {
-    file = file.path(dir, paste0(game$tg$tg.id,".efg"))
-  }
-  game$efg.file =  tg.to.efg(game$tg, file.with.dir = file, verbose=!isTRUE(!game$options$verbose))
+  game$efg.file = file.with.dir
+  tg.to.efg(game$tg, file.with.dir = file.with.dir, verbose=verbose)
   invisible(game)
 }
 
@@ -274,9 +300,15 @@ game.eq.li = function(game,...) {
   game$eq.li
 }
 game.eq.outcomes = function(game,...) {
+  if (is.null(game$eqo.df))
+    game$eqo.df = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
+
   game$eqo.df
 }
 game.expected.eq.outcomes = function(game,...) {
+  if (is.null(game$eeqo.df))
+    game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg)
+
   game$eeqo.df
 }
 

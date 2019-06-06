@@ -7,7 +7,7 @@ examples.tg_recompute = function() {
   game = new_game(
     gameId = "UG_RandomOffer",
     options = make_game_options(verbose=TRUE),
-    params = list(numPlayers=2,natureProb = 0.5, highOfferProb = 0.3),
+    params = list(numPlayers=2,natureProb = 0.9, highOfferProb = 0.01),
     stages = list(
       stage("who_offers",
         nature = list(
@@ -18,13 +18,18 @@ examples.tg_recompute = function() {
         player=1,
         condition = ~ offerType == "player",
         actions = list(
-          action("offer",0:1)
+          action("offerPlayer",0:1)
         )
       ),
       stage("randomOffer",
         condition = ~ offerType == "nature",
         nature = list(
-          natureMove("offer",0:1,~c(1-highOfferProb, highOfferProb))
+          natureMove("offerNature",0:1,~c(1-highOfferProb, highOfferProb))
+        )
+      ),
+      stage("computeOffer",
+        compute = list(
+          offer ~ ifelse(offerType=="nature", offerNature, offerPlayer)
         )
       ),
       stage("responderStage",
@@ -45,13 +50,30 @@ examples.tg_recompute = function() {
   )
   game %>%
     game_solve_spe() %>%
-    game_write_efg("D:/libraries/gtree/UG_Random_Offer.efg")
+    game.eq.outcomes() -> res
+
+  game %>%
+    game_change_param(natureProb = 0.99,highOfferProb = 0.99) %>%
+    game_solve_spe(mixed=TRUE, efg.dir=getwd()) %>%
+    game.expected.eq.outcomes() -> eqo.df
+
+
+
+
+  game %>%
+    game_solve_spe() %>%
     game.eq.tables()
 
   game %>%
-    game_change_param(highOfferProb = 0.8) %>%
-    game_solve_spe() %>%
-    game.expected.eq.outcomes()
+    game_gambit_solve(efg.dir = "D:/libraries/gtree") %>%
+    game.eq.tables()
+
+  game.eq.li(game)
+  game.eq.outcomes(game)
+
+  game %>% game.eq.li() %>% .[[1]]
+  game.outcomes(game)
+
 
   game %>% game.eq.tables()
 
@@ -159,6 +181,8 @@ recompute.tg.probs = function(tg,vg, params = tg$params, changed.par = names(par
     # oco.df has same ordering as stage.df
     tg$oco.df$.prob = tg$stage.df$.prob
   }
+  compute.tg.et.mat(tg)
+  invisible(tg)
 }
 
 # Get a column of a lev.df from previous lev.df

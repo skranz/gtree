@@ -60,7 +60,7 @@ example.gambit.solve.eq = function() {
 
 
 #' Finds one or all mixed strategy equilibria
-gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.name(tg), efg.dir=get.efg.dir(tg$gameId), gambit.dir="", solver=NULL, eq.dir = get.eq.dir(tg$gameId), save.eq = FALSE, solvemode=NULL) {
+gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.name(tg), efg.dir=NULL, gambit.dir="", solver=NULL, eq.dir = get.eq.dir(tg$gameId), save.eq = FALSE, solvemode=NULL, efg.file.with.dir = file.path(efg.dir,efg.file)) {
 
   restore.point("gambit.solve.eq")
 
@@ -76,16 +76,19 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
 	# Create temporary efg.file
   # if efg file does not exist
 	use.temp.dir = FALSE
-	if (!file.exists(file.path(efg.dir, efg.file))) {
+  if (length(efg.file.with.dir)==0) {
 	  efg.dir = tempdir()
 	  use.temp.dir = TRUE
-	  tg.to.efg(tg, path=efg.dir,file = efg.file)
+    efg.file.with.dir = file.path(efg.dir, efg.file)
+  }
+	if (!isTRUE(file.exists(efg.file.with.dir)) | use.temp.dir) {
+	  tg.to.efg(tg, file.with.dir = efg.file.with.dir)
 	}
 
 	#solver = "gambit-enumpure -q -P -D"
   start.time = Sys.time()
 
-	com = paste0(gambit.dir, solver," ",file.path(efg.dir,efg.file))
+	com = paste0(gambit.dir, solver," ",efg.file.with.dir)
   res  = system(com, intern=TRUE)
   status = attr(res,"status")
   if (isTRUE(status==1)) {
@@ -96,7 +99,7 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
   if (length(res)==0)
     return(NULL)
 
-  eq.li = gambit.out.txt.to.eq.li(res, tg=tg, efg.move.inds=compute.efg.move.inds(tg=tg, efg.file=file.path(efg.dir,efg.file)))
+  eq.li = gambit.out.txt.to.eq.li(res, tg=tg, efg.move.inds=compute.efg.move.inds(tg=tg, efg.file=efg.file.with.dir))
 
   solve.time = Sys.time()-start.time
   attr(eq.li,"solve.time") = solve.time
@@ -107,7 +110,7 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
   }
 
   if (use.temp.dir) {
-    file.remove(file.path(efg.dir,efg.file))
+    file.remove(efg.file.with.dir)
   }
 
   eq.li

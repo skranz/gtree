@@ -1,4 +1,4 @@
-keyErrorLog = function(stop=FALSE, append.char="<br>", line.break.char="<br>") {
+keyErrorLog = function(stop=FALSE, append.char="<br>", line.break.char="<br>", verbose=FALSE) {
   kel = new.env(parent = emptyenv())
 
   kel$terminate = FALSE
@@ -7,6 +7,7 @@ keyErrorLog = function(stop=FALSE, append.char="<br>", line.break.char="<br>") {
   kel$log = list()
   kel$count = 0
   kel$key = ""
+  kel$verbose = verbose
   kel$params = list()
   kel$stop = stop
   kel$withKey = function(expr, key=paste0(kel$key,",",sub.key), sub.key="", envir=parent.frame()) {
@@ -50,7 +51,7 @@ keyErrorLog = function(stop=FALSE, append.char="<br>", line.break.char="<br>") {
     emsg = paste0("\nkel ", kel$count," ",kel$key, ": ",message)
     if (do.stop) {
       stop(emsg)
-    } else {
+    } else if (verbose) {
       cat(emsg)
     }
     kel$terminate = terminate | kel$terminate

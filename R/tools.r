@@ -1,3 +1,7 @@
+does.intersect = function(A,B) {
+  length(intersect(A,B))>0
+}
+
 #' Change a call object like call = quote(c(x+1,x+2))
 #' into a list of calls list(quote(x+1), quote(x+2))
 list.call.to.call.list = function(call) {

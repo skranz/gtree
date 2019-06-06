@@ -73,7 +73,7 @@ extract.vg.vars.info = function(vg, kel=vg$kel) {
   	cond = stage$condition
 	  if (!is.call(cond) &!is.name(cond)) {
 	    # no condition
-	    if (!identical(str.trim(cond), "")) {
+	    if (!is.empty(cond)) {
 	    	kel$write("Either you specify no stage condition, or you write an R formula starting with '=', which evaluates as TRUE or FALSE.")
 	    }
 	  } else {
@@ -196,6 +196,8 @@ eval.strategyMethodDomain = function(action,vg, stage.num, kel) {
 
 	smd = action$strategyMethodDomain
 	domain.var = action$domain.var
+
+	if (is.empty(smd)) return(NULL)
 
 	if (is.character(smd)) {
 		if (nchar(smd)==0) return(NULL)

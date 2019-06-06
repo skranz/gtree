@@ -68,6 +68,7 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
   lev.actions = sapply(tg$action.levels, function(lev.num) tg$lev.li[[lev.num]]$var)
   lev.num = tg$action.levels[1]
   tr = lapply(tg$action.levels, function(lev.num) {
+    restore.point("hhfiehiufhriuf")
     lev = tg$lev.li[[lev.num]]
     action = lev$var
     if (is.list(all.keep.keys))
@@ -304,9 +305,11 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) 
 				return(df[[var]][1])
 			}
 
-			if (is.numeric(df[[var]]) | is.logical(df[[var]]))
-				return(sum(df[[var]] * df$.prob) / sum(df$.prob))
-
+			if (is.numeric(df[[var]]) | is.logical(df[[var]])) {
+			  #restore.point("huihfuidhfid")
+			  rows = !is.na(df[[var]])
+				return(sum(df[[var]][rows] * df$.prob[rows]) / sum(df$.prob[rows]))
+			}
 			return(NULL)
 		})
 		names(vals) = vars

@@ -175,12 +175,49 @@ compute.tg.et.oco.etc = function(tg) {
   tg$lev.vars = unique(sapply(tg$lev.li, function(lev) lev$var))
   tg$vars = unique(c(names(tg$params), tg$lev.vars))
 
-  # Equilibrium template matrix
-  # one column for each action variable
-  # and move of nature variable
-  # one row for each outcome
-  # for action variables the value is the
-  # negative
+  # # Equilibrium template matrix
+  # # one column for each action variable
+  # # and move of nature variable
+  # # one row for each outcome
+  # # for action variables the value is the
+  # # negative
+  # et.mat = matrix(1,NROW(df),length(tg$lev.vars))
+  # colnames(et.mat) = tg$lev.vars
+  # for (lev.num in seq_along(tg$lev.li)) {
+  #   lev = tg$lev.li[[lev.num]]
+  #   lev.df = lev$lev.df
+  #   row.col = paste0(".row.",lev.num)
+  #   rows = match(df[[row.col]],lev.df[[row.col]])
+  #
+  #   set.rows = !is.na(rows)
+  #   if (lev$type == "action") {
+  #     et.mat[set.rows,lev$var] = - lev.df$.info.set.move.ind[rows[set.rows]]
+  #   } else {
+  #     et.mat[set.rows,lev$var] = lev.df$.move.prob[rows[set.rows]]
+  #   }
+  # }
+  # tg$et.mat = et.mat
+  compute.tg.et.mat(tg)
+
+
+  # reorder helper cols that are only interesting
+  # in lev.li
+  cols = colnames(df)
+  cols = c(unique(c(cols[!str.starts.with(cols,".")])),".prob")
+  df = df[,cols, drop=FALSE]
+  df$.outcome = seq.int(NROW(df))
+  tg$oco.df = df
+
+}
+
+# Equilibrium template matrix
+# one column for each action variable
+# and move of nature variable
+# one row for each outcome
+# for action variables the value is the
+# negative
+compute.tg.et.mat = function(tg) {
+  df = tg$stage.df
   et.mat = matrix(1,NROW(df),length(tg$lev.vars))
   colnames(et.mat) = tg$lev.vars
   for (lev.num in seq_along(tg$lev.li)) {
@@ -197,16 +234,7 @@ compute.tg.et.oco.etc = function(tg) {
     }
   }
   tg$et.mat = et.mat
-
-
-  # reorder helper cols that are only interesting
-  # in lev.li
-  cols = colnames(df)
-  cols = c(unique(c(cols[!str.starts.with(cols,".")])),".prob")
-  df = df[,cols, drop=FALSE]
-  df$.outcome = seq.int(NROW(df))
-  tg$oco.df = df
-
+  invisible(tg)
 }
 
 compute.tg.stage = function(stage.num, tg, vg, kel) {
