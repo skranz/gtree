@@ -187,7 +187,7 @@ compute.tg.subgames = function(tg) {
 	# to do for earlier levels
 	# good vectorized method to find all descendant information sets
 
-	lev.num = 2
+	lev.num = 3
 	li = lapply(rev(tg$action.levels)[-1], function(lev.num) {
 		restore.point("compute.subgame.inner")
 		lev = tg$lev.li[[lev.num]]

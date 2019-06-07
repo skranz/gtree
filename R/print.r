@@ -1,5 +1,13 @@
 
-
+game_print_eq_tables = function(game, ...) {
+  print.gtree_game(game=game, show.stages=FALSE, show.size=FALSE, show.eq=TRUE)
+  invisible(game)
+}
+game_print_size_info = function(game, add.sg=TRUE, verbose=FALSE) {
+  game_compile(game,add.sg = add.sg, verbose=verbose)
+  print.gtree_game(game=game, show.stages=FALSE, show.size=TRUE, show.eq=FALSE)
+  invisible(game)
+}
 
 print.gtree_game = function(game,..., show.stages = TRUE, show.size = TRUE, show.eq = TRUE) {
   restore.point("print.gtree_game")
@@ -24,6 +32,8 @@ print.gtree_game = function(game,..., show.stages = TRUE, show.size = TRUE, show
       #cat(paste0("\n",var,":\n"))
       cat("\n")
       df = as.data.frame(tabs[[var]])
+      if (has.col(df,".prob"))
+        df$.prob = round(df$.prob,3)
       print.data.frame(df,row.names = FALSE)
     }
 

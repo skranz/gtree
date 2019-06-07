@@ -81,7 +81,7 @@ As a game tree our game looks as follows:
 ![ug.svg](ug.svg)
 
 
-Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. For finding pure strategy equilibria, usually (but not always) the internal `gtree` solver is faster. It will compute some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
+Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. Gambit has a larger selection of solvers and for many cases, you have to use Gambit. E.g. when finding a mixed strategy equilibrium. Only for finding all pure strategy SPE, `gtree` has an internal solver (it is often faster than the corresponding `gambit-enumpure` solver of Gambit). The internal solver computes some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
 
 Remark 2: To generate an image of the game tree, we can export the game to a [Gambit](http://www.gambit-project.org/) extensive form game format using the following command:
 ```{r eval=FALSE}
@@ -242,16 +242,26 @@ We also see that every possible offer between 0 and 4 is accepted in half of the
 Let us take a look at the game structure:
 ```{r}
 # Show size information only 
-print(game, show.stages=FALSE, show.eq=FALSE)
+game %>% game_print_size_info()
 ```
 
 We only have a single subgame. The reason is that a new subgame only begins if a player perfectly knows the outcomes of all previous moves of natures and all previous actions. Since no player observes the initial realization of `autoAccept` the only "subgame", is the complete game. This means the set of SPE is equal to the set of Nash equilibria and backward induction does not help to compute SPE. You may recall that the ultimatum game has a lot of Nash equilibria supported by out-off-equilibrium threats to reject out-off-equilibrium offers.
 
 (As a test question you can ask yourself why in our game there is no SPE in which the proposer offers the whole cake, even though that is a NE in the original ultimatum game.)
 
-Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. Unfortunately, I don't know a fast algorithm to compute sequential, trembling-hand perfect or perfect Bayesian algorithms (neither is there a Gambit command line tool for it).
+Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. 
 
-We can however modify the game to manually add trembles in order to select equilibria that will usually coincide with trembling-hand perfect equilbria. The call to function `game_add_tremble` in the following code changes the game structure such that with probability 0.01%, the proposer trembles and picks a random offer.
+Gambit has the command line solver `gambit-logit` [documentation](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) that tries to find one sequential equilibrium using a homotopy method based on quantal response equilibria. The following code solves for an equilibrium using the `gambit-logit` solver:
+
+```{r}
+game %>%
+  game_gambit_solve("gambit-logit -q -e") %>%
+  game.eq.tables()
+```
+We get one equilibrium that is sequentially rational. Interesting this is a mixed strategy equilibrium, in which the responder is equally likely to accept or rejet a zero offer.
+
+
+Another approach is to modify the game to manually add trembles in order to select equilibria that will usually coincide with trembling-hand perfect equilbria. The call to function `game_add_tremble` in the following code changes the game structure such that with probability 0.01%, the proposer trembles and picks a random offer.
 ```{r}
 game %>%
   # make deep copy since game structure will be changed  
@@ -266,15 +276,15 @@ The stages `proposerStage` and `proposeStage_performTremble` have a `condition` 
 
 The number of possible outcomes naturally increases, but the number of strategy profiles has not increased by the possibility of trembles.
 
-Looking at the equilibria, we see that only the two intuitive equilibria where the proposer offers 0 or 1 survive.  
+Looking at the equilibria, we see that only the two intuitive pure strategy equilibria where the proposer offers 0 or 1 survive.  
 
 ## Optimal position of moves of nature in stage game
 
-Instead of adding trembles there would be a much simpler modification to reduce the number of equilibria that follows a simple rule:
+In our example there is a much simpler approach to get fewer equilibria. Follow a simple rule:
 
     Define moves of nature as late as possible in the game.
 
-Since the variable `autoAccept` is first and only used in the last stage, we should not specify before that last stage. So consider the following modification of our game. 
+Since the variable `autoAccept` is first and only used in the last stage, we should not specify it before that last stage. So consider the following modification of our game. 
 
 ```{r}
 game = new_game(
@@ -313,6 +323,6 @@ game %>%
   print(show.stages = FALSE)
 ```
 
-We now have again 6 subgames and subgame perfection has bite again. Only the two equilibria where 0 or 1 is offered are selected.
+We now have again 6 subgames and subgame perfection has bite again. Only the two pure equilibria where 0 or 1 is offered are selected.
 
-Note that in a stage first move of natures are computed, then deterministic variables are computated and then actions take place. This means the payoffs in the `PayoffStage` can use the value of `autoAccept`. Otherwise, we simply had to add a separate stage.
+Remark on the order of nature, compute and actions: In a stage, first move of natures are computed, then deterministic computations and then actions take place. This means the formulas of the computed payoffs in the `PayoffStage` can use the value of the move of nature `autoAccept` in the same stage. So here we can put both variables in the same stage. Sometimes one has to add an extra computation stage, however.

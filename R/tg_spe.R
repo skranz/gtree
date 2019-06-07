@@ -39,7 +39,7 @@ examples.make.tg.spe = function() {
 }
 
 
-gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId), save.eq=FALSE, keep.weakly.dominated=TRUE, verbose=TRUE) {
+gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId), save.eq=FALSE, keep.weakly.dominated=TRUE, verbose=TRUE, max.sp = first.non.null(getOption("gtree.max.sp",1000000))) {
 	restore.point("solve.all.tg.spe")
 
 
@@ -71,22 +71,32 @@ gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId)
 }
 
 
-compute.tg.fields.for.internal.solver = function(tg, verbose=TRUE) {
-  if (is.null(tg$sg.df)) {
+compute.tg.fields.for.internal.solver = function(tg, verbose=TRUE, add.sg = TRUE, add.spi = TRUE, add.spo = TRUE, max.sp = first.non.null(getOption("gtree.max.sp",1000000))) {
+  if (is.null(tg$sg.df) & add.sg) {
   	if (verbose) cat("\nCompute subgames...")
     compute.tg.subgames(tg)
     if (verbose) cat("...", NROW(tg$sg.df), " subgames found.")
   }
-  if (is.null(tg$spi.li)) {
+
+  if (add.spi | add.spo) {
+    num.sp = sum(tg$sg.df$.num.strats.without.desc)
+    if (num.sp > max.sp) {
+      stop(paste0("Even using subgames there are ", num.sp, " relevant strategy profile. Yet as an upper bound the internal gtree solver only attempts to fully compile and solve the game if there are fewer than ", max.sp, " relevant strategy profiles. You can change this bound e.g. to 2 Mio by calling \n\noptions(gtree.max.sp = 2000000)\n\nSome Gambit solvers, like gambit-logit, use algorithms that can still find one equilibrium in reasonable time for certain but not all games with a very large number of strategy profiles. So try out game_gambit_solve with a fitting Gambit command line tool (see Gambit documention)." ))
+    }
+  }
+
+  if (is.null(tg$spi.li) & add.spi) {
     make.tg.spi.li(tg)
   }
 
-  if (is.null(tg$spo.li)) {
+  if (is.null(tg$spo.li) & add.spo) {
+
+
     start.time = Sys.time()
   	if (verbose) cat("\nCompute mapping between strategy profiles and outcome probabilities for each subgame...")
     make.tg.spo.li(tg)
     if (verbose)
-      cat("done in", format(Sys.time()-start.time), " mapping size =", format(object.size(tg$spo.li),units="auto"))
+      cat("done in", format(Sys.time()-start.time), " mapping size =", format(object.size(tg$spo.li),units="auto"),"\n")
   }
 }
 

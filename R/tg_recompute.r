@@ -3,7 +3,6 @@
 
 examples.tg_recompute = function() {
   library(gtree)
-
   game = new_game(
     gameId = "UG_RandomOffer",
     options = make_game_options(verbose=TRUE),
@@ -52,11 +51,13 @@ examples.tg_recompute = function() {
     game_solve_spe() %>%
     game.eq.outcomes() -> res
 
+
   game %>%
     game_change_param(natureProb = 0.99,highOfferProb = 0.99) %>%
-    game_solve_spe(mixed=TRUE, efg.dir=getwd()) %>%
-    game.expected.eq.outcomes() -> eqo.df
+    game_solve_spe(mixed=TRUE, efg.dir=getwd(), solver="gambit-enummixed") %>%
+    game.eq.li() -> res
 
+  eqo.df = game.eq.outcomes(game)
 
 
 

@@ -22,6 +22,10 @@ check.vg = function(vg) {
     stop(paste0("Actions can only specified once in a single stage. The same variable name cannot be used elsewhere. Your actions(s) ", paste0(intersect(action.vars, dupl.vars), collapse=", ")," violate(s) this condition."))
   }
 
+  if (does.intersect(names(vg$params), vars)) {
+    stop(paste0("You cannot name an actions, move of natures or computed variable like a parameter. This is violated for your variable(s) ", paste0(intersect(names(vg$params), vars), collapse=", "),"."))
+  }
+
 
   vg$kel = keyErrorLog(stop = FALSE)
   # I was so far to lazy to adapt the checking code in the function
@@ -30,8 +34,9 @@ check.vg = function(vg) {
   if (length(vg$kel$log)>0) {
     txt = vg$kel$log
     txt = gsub("<br>","\n",txt,fixed = TRUE)
-    cat(txt)
-    stop("Errors when checking your game (see above).", call.=FALSE, domain=NA)
+
+    txt = paste0("Errors found when checking your game:\n",txt)
+    stop(txt, call.=FALSE, domain=NA)
   }
 
 }

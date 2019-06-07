@@ -1,0 +1,236 @@
+---
+title: "A Sender Receiver Game"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error=TRUE)
+library(gtree)
+```
+
+[Here is a jupyter notebook](https://nbviewer.jupyter.org/github/gambitproject/gambit/blob/master/contrib/samples/sendrecv.ipynb) by Valeria Burdea that creates a sender-receive game using the Python interface of Gambit. For a comparison I show, how one can create the same game using `gtree`.
+
+I just copy the game description from the Jupyter notebook:
+
+"This is a 2-player sequential game the structure of which is inspired by Glazer and Rubinstein (2004, 2006).
+
+In the first stage, the sender is dealt 2 cards - one card orange, one card blue. Each card can take a value between 1 and 9; each combination of values is equally likely. A hand is good if the sum of the two cards is at least 9; a hand is bad otherwise.
+
+Upon observing the two cards, the sender chooses one to reveal to the receiver.
+
+The receiver observes the revealed card and chooses an action between 'Accept' and 'Reject'.
+
+The incentives are such that the sender would always want the receiver to accept, while the receiver would only want to accept if the hand is good and reject otherwise."
+
+Here is the implementation of the game using `gtree` (the exact payoffs were taken from the Python code):
+```{r}
+library(gtree)
+game = new_game(
+  gameId = "Sender-Receiver",
+  params = list(numPlayers=2, maxVal=9),
+  options = make_game_options(verbose=1),
+  stages = list(
+    stage("DrawStage",
+      nature = list(
+        natureMove("orange", ~1:maxVal),
+        natureMove("blue", ~1:maxVal)
+      )
+    ),
+    stage("RevealStage",
+      player=1,
+      observe = c("orange","blue"),
+      actions = list(
+        action("reveal",c("orange","blue"))
+      )
+    ),
+    stage("AcceptStage",
+      player=2,
+      compute = list(
+        shownVal ~ ifelse(reveal=="orange", orange, blue)
+      ),
+      observe = c("shownVal"),
+      actions = list(
+        action("accept",c(TRUE, FALSE))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        hand ~ ifelse(orange+blue>=maxVal, "good","bad"), 
+        payoff_1 ~ ifelse(accept, 1,0), # Sender wants accept
+        payoff_2 ~ case_distinction(
+          accept & hand=="good", 1,
+          accept & hand=="bad", 0,
+          !accept & hand=="good",0,
+          !accept & hand=="bad", 1
+        )
+      )
+    )
+  )
+) 
+```
+
+I would argue that gtree's game definition using stages follows in a straightforward and relatively simple fashion the verbal game description. For comparison, take a look at the implementation using Gambit's Python API that directly constructs the game tree [here](https://nbviewer.jupyter.org/github/gambitproject/gambit/blob/master/contrib/samples/sendrecv.ipynb).
+
+Shall we try to compute all pure SPE?
+```{r}
+game %>% game_solve()
+```
+Ups... looks like the game is too large to be solved. Here is some additional size information.
+```{r}
+# Get some size information about the game
+game %>% 
+  game_print_size_info()
+```
+The game has a gigantic number of strategy profiles. Interestingly, it also has only 1 subgame, even though player 1 perfectly observes the values of the orange and blue card.
+
+For an illustration, why there is only one subgame, we export a smaller version of the game in which cards only take values of 1 or 2 to a Gambit efg file.
+```{r}
+game %>%
+  game_change_param(maxVal = 2) %>%
+  game_write_efg("sender_receiver.efg")
+```
+I have manually opened the efg file with Gambit and exported the following game tree as graphics file:
+![sender receiver gametree](sender_receiver.svg)
+
+Recall the defintion of a subgame, e.g. from [Wikipedia](https://en.wikipedia.org/wiki/Subgame):
+
+1. It has a single initial node that is the only member of that node's information set (i.e. the initial node is in a singleton information set).
+2. If a node is contained in the subgame then so are all of its successors.
+3. If a node in a particular information set is in the subgame then all members of that information set belong to the subgame.
+
+Even though the moves of player 1 start at singleton information sets (Condition 1), candidate subgames starting at these nodes violate Condition 3.
+
+If we cannot reduce the number of relevant strategy profiles by subgames, our internal gtree solver cannot practically solve games with so many strategy profiles. However, Gambit has solvers that can find at least one equilibrium of this game. Here we let `gambit-logit` do its magic (you can fetch a cup of coffee until its finished):
+```{r}
+game %>%
+  game_change_param(maxVal = 9) %>%
+  game_print_size_info() %>%
+  game_gambit_solve(mixed=TRUE,gambit.command = "gambit-logit -q -e")
+
+game %>% game.eq.tables()
+```
+The results seem intutive: Player 2 only accepts if and only if the shown card is at least a 6. Player 1 always shows a card that is at least 6 if he has one.
+
+```{r}
+library(gtree)
+game = new_game(
+  gameId = "Sender-Receiver-Fixed-Sender",
+  params = list(numPlayers=2, maxVal=9, trembleProb = 0.4),
+  options = make_game_options(verbose=1),
+  stages = list(
+    stage("DrawStage",
+      nature = list(
+        natureMove("orange", ~1:maxVal),
+        natureMove("blue", ~1:maxVal)
+      )
+    ),
+    stage("RevealStage",
+      player=1,
+      observe = c("orange","blue"),
+      nature = list(
+        natureMove("tremble", c(FALSE,TRUE), ~c(1-trembleProb,trembleProb))
+      ),
+      compute = list(
+        #reveal ~ ifelse( 
+        #  ((blue >= orange) & !tremble) | 
+        #  ((orange > blue) & tremble),
+        #  "blue", "orange"
+        #)
+        reveal ~ "blue"
+      )
+    ),
+    stage("AcceptStage",
+      player=2,
+      compute = list(
+        shownVal ~ ifelse(reveal=="orange", orange, blue)
+      ),
+      observe = c("shownVal"),
+      actions = list(
+        action("accept",c(TRUE, FALSE))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        hand ~ ifelse(orange+blue>=maxVal, "good","bad"), 
+        payoff_1 ~ ifelse(accept, 1,0), # Sender wants accept
+        payoff_2 ~ case_distinction(
+          accept & hand=="good", 1,
+          accept & hand=="bad", 0,
+          !accept & hand=="good",0,
+          !accept & hand=="bad", 1
+        )
+      )
+    )
+  )
+)
+
+game %>%
+  game_print_size_info() %>%
+  game_solve() %>%
+  game_print_eq_tables() %>%
+  game.outcomes() -> oco
+
+```
+
+```{r}
+library(gtree)
+game = new_game(
+  gameId = "Sender-Receiver-Fixed-Sender",
+  params = list(numPlayers=2, maxVal=9, trembleProb = 0.4),
+  options = make_game_options(verbose=1),
+  stages = list(
+    stage("DrawStage",
+      nature = list(
+        natureMove("orange", ~1:maxVal),
+        natureMove("blue", ~1:maxVal)
+      )
+    ),
+    stage("RevealStage",
+      player=1,
+      observe = c("orange","blue"),
+      nature = list(
+        natureMove("tremble", c(FALSE,TRUE), ~c(1-trembleProb,trembleProb))
+      ),
+      compute = list(
+        #reveal ~ ifelse( 
+        #  ((blue >= orange) & !tremble) | 
+        #  ((orange > blue) & tremble),
+        #  "blue", "orange"
+        #)
+        reveal ~ "blue"
+      )
+    ),
+    stage("AcceptStage",
+      player=2,
+      compute = list(
+        shownVal ~ ifelse(reveal=="orange", orange, blue)
+      ),
+      observe = c("shownVal"),
+      actions = list(
+        action("accept",c(TRUE, FALSE))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        hand ~ ifelse(orange+blue>=maxVal, "good","bad"), 
+        payoff_1 ~ ifelse(accept, 1,0), # Sender wants accept
+        payoff_2 ~ case_distinction(
+          accept & hand=="good", 1,
+          accept & hand=="bad", 0,
+          !accept & hand=="good",0,
+          !accept & hand=="bad", 1
+        )
+      )
+    )
+  )
+)
+
+game %>%
+  game_print_size_info() %>%
+  game_solve() %>%
+  game_print_eq_tables() %>%
+  game.outcomes() -> oco
+```

@@ -60,7 +60,7 @@ example.gambit.solve.eq = function() {
 
 
 #' Finds one or all mixed strategy equilibria
-gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.name(tg), efg.dir=NULL, gambit.dir="", solver=NULL, eq.dir = get.eq.dir(tg$gameId), save.eq = FALSE, solvemode=NULL, efg.file.with.dir = file.path(efg.dir,efg.file)) {
+gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.name(tg), efg.dir=NULL, gambit.dir="", solver=NULL, eq.dir = get.eq.dir(tg$gameId), save.eq = FALSE, solvemode=NULL, efg.file.with.dir = file.path(efg.dir,efg.file), verbose=TRUE) {
 
   restore.point("gambit.solve.eq")
 
@@ -89,6 +89,9 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
   start.time = Sys.time()
 
 	com = paste0(gambit.dir, solver," ",efg.file.with.dir)
+  if (verbose)
+    cat("\nSolve with command", solver, "...")
+
   res  = system(com, intern=TRUE)
   status = attr(res,"status")
   if (isTRUE(status==1)) {
@@ -103,6 +106,9 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
 
   solve.time = Sys.time()-start.time
   attr(eq.li,"solve.time") = solve.time
+  if (verbose)
+    cat(" done in", format(solve.time),"\n")
+
 
   if (save.eq) {
 	 eq.id = get.eq.id(tg=tg, just.spe = just.spe, mixed=mixed, solvemode=solvemode)

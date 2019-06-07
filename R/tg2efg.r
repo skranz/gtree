@@ -137,14 +137,14 @@ tg.to.efg = function(tg, path=get.efg.dir(gameId=tg$gameId), file = paste0(tg$tg
   if (!is.null(file.with.dir)) {
     writeLines(txt, file.with.dir)
     if (verbose)
-      display("Written to ", file.with.dir)
+      display("\nWritten to ", file.with.dir)
     return(invisible(file.with.dir))
   } else if (!is.null(file) & !is.null(path)) {
     if (!dir.exists(path))
       dir.create(path, recursive = TRUE)
     writeLines(txt, paste0(path,"/",file))
     if (verbose)
-      display("Written to ", path,"/", file )
+      display("\nWritten to ", path,"/", file )
     return(invisible(file.path(path, file)))
   } else {
     return(txt)

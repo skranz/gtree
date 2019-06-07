@@ -196,11 +196,23 @@ game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE,
     set.tg.util(game$tg)
   }
 
+  if (add.sg | add.spi | add.spo)
+    compute.tg.fields.for.internal.solver(game$tg, add.sg=add.sg,add.spi=add.spi,add.spo=add.spo)
+
+
   invisible(game)
 }
 
-
-game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gambit = mixed | !just.spe, verbose=isTRUE(game$options$verbose>=1),...) {
+#' Solve equilibria of a game
+#'
+#' With the default arguments the internal gtree solver is used
+#' to find all pure strategy subgame perfect equilibria of the game.
+#'
+#' @param game the game object created with new_game
+#' @param verbose
+#' @param use.gambit solve via Gambit. Changing \code{mixed} or \code{just.spe} or specifying a \code{gambit.command} has only impact if \code{use.gambit=TRUE}.  See \code{\link{game_gambit_solve}} for details.
+#' @export
+game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gambit = mixed | !just.spe, verbose=isTRUE(game$options$verbose>=1), gambit.command = NULL,...) {
   restore.point("game_solve_spe")
   if (use.gambit) {
     game_gambit_solve(game, mixed=mixed, just.spe=just.spe, verbose=verbose, ...)
@@ -210,17 +222,26 @@ game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gam
 
   game_compile(game,verbose=verbose)
 
-
-
-  compute.tg.fields.for.internal.solver(game$tg, verbose=verbose)
-
   eq.li = gtree.solve.spe(tg = game$tg, verbose=verbose)
   game$eq.li = eq.li
   game$eqo.df = game$eeqo.df = NULL
   invisible(game)
 }
 
-game_gambit_solve = function(game, mixed=FALSE, just.spe=TRUE, efg.file=NULL, efg.dir = NULL, gambit.dir="", verbose=isTRUE(game$options$verbose>=1), solver=NULL,...) {
+#' Solve equilibria of a game using Gambit
+#'
+#' You need to install Gambit \url{http://www.gambit-project.org} to
+#' use this function.
+#'
+#' @param game the game object created with new_game
+#' @param mixed if FALSE (default) only pure strategy equilibria will be computed
+#' @param just.spe if TRUE compute only SPE. If FALSE all NE will be computed.
+#' @param gambit.command if NULL (default) a default gambit command line solver with appropriate arguments will be chosen. Otherwise you can enter a Gambit command with options but not file name. For example \code{"gambit-enummixed -q"} to compute all extrem point mixed equilibria. The different Gambit command line solvers are described here:
+#' \url{http://www.gambit-project.org/gambit16/16.0.0/tools.html}
+#' You should always add the option -q such that gtree can approbiately parse the results.
+#' @param gambit.dir The directory of the Gambit command line libraries. Ideally, you put this directory into the search path of your system and can keep the default \code{gambit.dir = ""}
+#' @export
+game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1), ...) {
   restore.point("game_solve_with_gambit")
   game_compile(game, verbose=verbose)
 
@@ -231,21 +252,21 @@ game_gambit_solve = function(game, mixed=FALSE, just.spe=TRUE, efg.file=NULL, ef
     game_write_efg(game,file.with.dir = file.path(efg.dir, efg.file))
   }
 
-  game$eq.li = gambit.solve.eq(tg=tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=solver)
+  game$eq.li = gambit.solve.eq(tg=game$tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=gambit.command)
   game$eqo.df = game$eeqo.df = NULL
   invisible(game)
 }
 
-#' Set players preferences
+game_gambit_solve_qre = function(game, gambit.command = "gambit-logit -q -l",gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1), max.lambda = 1e6 )
+
+#' Set players' preferences
 #'
 #' This function sets players preferences to a parametrized preference
 #' type. To specify completely custom preferences use game_set_util_fun
 #' instead.
 #'
 #' @param game The game object
-#' @param type The preference type "payoff", "ineqAv","envy","lossAv", "unifLossAv"
-#' @param ... Parameters of that preference type
-#' @param players which players shall have this preference. By default all players
+#' @param pref A preference created with a function starting with \code{pref_}, like e.g. \code{pref_ineqAv(alpha=1, beta=0.5)}. Use \code{pref_custom} to specify custom preferences.
 game_set_preferences = function(game, pref) {
   restore.point("game_set_preferences")
   game$pref = pref

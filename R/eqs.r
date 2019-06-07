@@ -33,7 +33,7 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
           group_by_at(cols) %>%
           summarize(eq.inds = paste0(sort(unique(eq.ind)), collapse=","))
         if (reduce.tables)
-          dat = reduce.key.table(dat, keep.keys = keep.keys)
+          dat = reduce.key.table.with.probs(dat, keep.keys = keep.keys)
         dat
       })
       names(comb) =vars
@@ -59,7 +59,7 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
 #' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
 #' @param eq.ind An index of the equilibrium that shall be added to the key table. If NULL (default) no column will be added.
 #' @export
-eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = names(tg$params), eq.ind = NULL, actions=NULL, ignore.li = NULL) {
+eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = names(tg$params), eq.ind = NULL, actions=NULL, ignore.li = NULL, min.prob=1e-8) {
   restore.point("eq.tables")
 
   all.keep.keys = keep.keys
@@ -74,29 +74,37 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
     if (is.list(all.keep.keys))
       keep.keys = all.keep.keys[[action]]
 
+    mixed = any(eq[,action]>0 & eq[,action]<1)
 
-    oco.rows = which(eq[,action] == 1)
+    oco.rows = which(eq[,action] > min.prob)
     lev.rows = unique(stage.df[[paste0(".row.", lev.num)]][oco.rows])
 
     lev.df = lev$lev.df[lev.rows,]
+
+    # TO DO: Add .eq.move.prob COLUMN to lev.df
+    if (mixed) {
+      unique.rows = oco.rows[!duplicated(stage.df[[paste0(".row.", lev.num)]][oco.rows])]
+      lev.df$.prob = eq[unique.rows,action]
+    }
+
     know.var.groups = unique(lev.df$.know.var.group)
 
     if (length(know.var.groups)>1) {
       key.df = bind_rows(lapply(know.var.groups, function(.know.var.group) {
         know.vars = lev$know.var.li[[.know.var.group]]
-        cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), action)
+        cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), c(action, if (mixed) ".prob"))
         rows = which(lev.df$.know.var.group == .know.var.group)
         table = lev.df[rows,cols]
-        if (reduce.tables) table = reduce.key.table(table, keep.keys = keep.keys)
+        if (reduce.tables) table = reduce.key.table.with.probs(table, keep.keys = keep.keys)
         table
 
       }))
     } else {
       .know.var.group = know.var.groups
       know.vars = lev$know.var.li[[.know.var.group]]
-      cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), action)
-      key.df = lev.df[, cols]
-      if (reduce.tables) key.df = reduce.key.table(key.df, keep.keys = keep.keys)
+      cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), c(action, if (mixed) ".prob"))
+      key.df = lev.df[, cols] %>% unique
+      if (reduce.tables) key.df = reduce.key.table.with.probs(key.df, keep.keys = keep.keys)
 
     }
     if (!is.null(eq.ind))
@@ -424,6 +432,23 @@ cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.n
 	ceo.df$is.eqo[is.na(ceo.df$is.eqo)] = FALSE
 
   xs.col.order(ceo.df,tg)
+}
+
+reduce.key.table.with.probs = function(table, var=colnames(table)[NCOL(table)-(colnames(table)[NCOL(table)]==prob.col)], keep.keys=NULL, prob.col = ".prob", sep="°") {
+  if (!has.col(table, prob.col))
+    return(reduce.key.table(table, var, keep.keys))
+  restore.point("reduce.key.table.with.probs")
+
+
+  class = class(table[[var]])
+  table[[var]] = paste0(table[[var]],sep,table[[prob.col]] )
+  res = reduce.key.table(table, var, keep.keys)
+  vals = str.left.of(res[[var]],sep) %>% as(class)
+  probs = as.numeric(str.right.of(res[[var]], sep))
+  res[[var]] = vals
+  res[[prob.col]] = probs
+  res
+
 }
 
 #' Helper function to reduce the key columns of
