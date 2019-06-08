@@ -234,14 +234,18 @@ game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gam
 #' use this function.
 #'
 #' @param game the game object created with new_game
-#' @param mixed if FALSE (default) only pure strategy equilibria will be computed
-#' @param just.spe if TRUE compute only SPE. If FALSE all NE will be computed.
-#' @param gambit.command if NULL (default) a default gambit command line solver with appropriate arguments will be chosen. Otherwise you can enter a Gambit command with options but not file name. For example \code{"gambit-enummixed -q"} to compute all extrem point mixed equilibria. The different Gambit command line solvers are described here:
+#' @param gambit.command  A Gambit command line command with options but not file name. For example \code{"gambit-enummixed -q"} to compute all extreme point mixed equilibria. The different Gambit command line solvers are described here:
 #' \url{http://www.gambit-project.org/gambit16/16.0.0/tools.html}
-#' You should always add the option -q such that gtree can approbiately parse the results.
-#' @param gambit.dir The directory of the Gambit command line libraries. Ideally, you put this directory into the search path of your system and can keep the default \code{gambit.dir = ""}
+#' If left as NULL a default gambit command line solver with appropriate arguments will be chosen, depending on your arguments for mixed and just.spe
+#' @param mixed relevant if no explicit gambit.command is given. If FALSE (default) only pure strategy equilibria will be computed, otherwise try to compute one mixed equilibrium.
+#' @param just.spe if TRUE compute only SPE. If FALSE all NE will be computed.
+#' @param add.q.flag The gambit command line solver should always be called with the option "-q" for gtree to be able to parse the returned output. If add.q.flag is TRUE we will add this flag if you have not yet added it to your \code{gambit.command}
+#' @param gambit.dir The directory where to find the Gambit command line solvers. Ideally, you put this directory into the search path of your system and can keep the default \code{gambit.dir = ""}. To globally change the default directory adapt the following code \code{options(gtree.gambit.dir = "/PATH/TO/GAMBIT")}
+#' @param efg.dir To solve via Gambit we first write the game tree into an .efg file. If \code{efg.dir} is NULL (default), the file will be written to a temporary directory. But you can also specify a custom directory here, e.g. if you want to take a look at the file.
+#' @param efg.file If NULL a default file name for the efg file will be generated based on the name of the game and the specified preferences. But you can specify a custom name here.
+#' @param verbose if TRUE show some extra information
 #' @export
-game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1), ...) {
+game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,gambit.dir=first.non.null(getOption("gtree.gambit.dir"),""),efg.dir = NULL, efg.file=NULL,  verbose=isTRUE(game$options$verbose>=1), add.q.flag = TRUE,  ...) {
   restore.point("game_solve_with_gambit")
   game_compile(game, verbose=verbose)
 
@@ -252,12 +256,25 @@ game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=T
     game_write_efg(game,file.with.dir = file.path(efg.dir, efg.file))
   }
 
+  if (!is.null(gambit.command)) {
+    if (!has.substr(gambit.command,"-q") & add.q.flag) {
+      gambit.command = paste0(gambit.command, " -q")
+    }
+  }
+
   game$eq.li = gambit.solve.eq(tg=game$tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=gambit.command)
   game$eqo.df = game$eeqo.df = NULL
   invisible(game)
 }
 
-game_gambit_solve_qre = function(game, gambit.command = "gambit-logit -q -l",gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1), max.lambda = 1e6 )
+#' Solve for quantal response equilibria using Gambit
+#'
+#' This function computes logit agent quantal response equilibria using the Gambit solver gambit-logit. For a short description see the \href{https://en.wikipedia.org/wiki/Quantal_response_equilibrium}{Wikipedia article} and the gambit-logit solver's \href{documentation}{https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria}. Details are in the article \href{Using Quantal Response to Compute Nash and Sequential Equilibria}{https://link.springer.com/article/10.1007/s00199-009-0443-3} by Theodore Turocy. But unfortunately, the article can only be found behind a pay wall.
+#'
+#' For a description of the arguments see \code{\link{game_gambit_solve}}
+game_gambit_solve_qre = function(game, gambit.command = "gambit-logit -q -l",gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1)) {
+
+}
 
 #' Set players' preferences
 #'
