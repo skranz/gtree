@@ -1,16 +1,16 @@
 
-#' Transform a list of pure equilibria into a key-value tables representation.
-#'
-#' We have one table for each action variable
-#'
-#' @param eq.li a list of equilibria
-#' @param tg the game in table form
-#' @param combine if FALSE (default) generate separate tables for each equilibrium in eq.li. Otherwise we combine the tables of each variable over all equilibria.
-#' @param add.eq.ind Shall the index of the equilibrium added to the key table? Default TRUE if combine is TRUE, otherwise FALSE.
-#' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
-#' @param keep.keys relevant if reduce.tables=TRUE. A character vector of columns that will always be kept as keys and not be reduced. May be helpful when merging or comparing equilibria.
-#' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
-#' @export
+# Transform a list of pure equilibria into a key-value tables representation.
+#
+# We have one table for each action variable
+#
+# @param eq.li a list of equilibria
+# @param tg the game in table form
+# @param combine if FALSE (default) generate separate tables for each equilibrium in eq.li. Otherwise we combine the tables of each variable over all equilibria.
+# @param add.eq.ind Shall the index of the equilibrium added to the key table? Default TRUE if combine is TRUE, otherwise FALSE.
+# @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
+# @param keep.keys relevant if reduce.tables=TRUE. A character vector of columns that will always be kept as keys and not be reduced. May be helpful when merging or comparing equilibria.
+# @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
+# @export
 eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables = TRUE, keep.keys=NULL,ignore.keys = names(tg$params), actions = NULL, ignore.li =NULL) {
   restore.point("eq.li.tables")
 
@@ -19,27 +19,36 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
   })
   if (combine>0) {
     if (length(res)==0) return(NULL)
-    if (length(res)==1) return(res[[1]])
-    vars = names(res[[1]])
-    comb = lapply(vars, function(var) {
-      bind_rows(lapply(res, function(li) li[[var]]))
-    })
-    names(comb) =vars
-    if (combine>1) {
+    if (length(res)==1) {
+      if (combine == 1) return(res[[1]])
+      vars = names(res[[1]])
+      comb = res[[1]]
+    } else {
+      vars = names(res[[1]])
       comb = lapply(vars, function(var) {
+        bind_rows(lapply(res, function(li) li[[var]]))
+      })
+      names(comb) =vars
+    }
+    if (combine>1) {
+      comb2 = lapply(vars, function(var) {
         dat = comb[[var]]
         cols = setdiff(colnames(dat),c("eq.ind", ignore.li[[var]]))
         dat = dat %>%
           group_by_at(cols) %>%
           summarize(eq.inds = paste0(sort(unique(eq.ind)), collapse=","))
-        if (reduce.tables)
-          dat = reduce.key.table.with.probs(dat, keep.keys = keep.keys)
+        if (reduce.tables) {
+          dat = reduce.key.table.with.probs(dat, var=var, keep.keys = c(keep.keys, "eq.inds"))
+          cols = setdiff(colnames(dat),"eq.inds") %>% c("eq.inds")
+          dat = dat[,cols]
+        }
         dat
       })
-      names(comb) =vars
+      names(comb2) =vars
+      return(comb2)
+    } else {
+      return(comb)
     }
-
-    return(comb)
   } else {
     return(res)
   }
@@ -48,17 +57,17 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
 
 
 
-#' Transform a pure equilibrium into a key-value tables representation.
-#'
-#' We have one table for each action variable
-#'
-#' @param eq a single equilibrium
-#' @param tg the game in table form
-#' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
-#' @param keep.keys relevant if reduce.tables=TRUE. A character vector of columns that will always be kept as keys and not be reduced. May be helpful when merging or comparing equilibria.
-#' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
-#' @param eq.ind An index of the equilibrium that shall be added to the key table. If NULL (default) no column will be added.
-#' @export
+# Transform a pure equilibrium into a key-value tables representation.
+#
+# We have one table for each action variable
+#
+# @param eq a single equilibrium
+# @param tg the game in table form
+# @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
+# @param keep.keys relevant if reduce.tables=TRUE. A character vector of columns that will always be kept as keys and not be reduced. May be helpful when merging or comparing equilibria.
+# @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not. By default all parameters of tg are removed, since they are always constant and would only unneccessarily bloat the table.
+# @param eq.ind An index of the equilibrium that shall be added to the key table. If NULL (default) no column will be added.
+# @export
 eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = names(tg$params), eq.ind = NULL, actions=NULL, ignore.li = NULL, min.prob=1e-8) {
   restore.point("eq.tables")
 
@@ -81,7 +90,6 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
 
     lev.df = lev$lev.df[lev.rows,]
 
-    # TO DO: Add .eq.move.prob COLUMN to lev.df
     if (mixed) {
       unique.rows = oco.rows[!duplicated(stage.df[[paste0(".row.", lev.num)]][oco.rows])]
       lev.df$.prob = eq[unique.rows,action]
@@ -90,6 +98,7 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
     know.var.groups = unique(lev.df$.know.var.group)
 
     if (length(know.var.groups)>1) {
+      know.var.groups = na.omit(know.var.groups)
       key.df = bind_rows(lapply(know.var.groups, function(.know.var.group) {
         know.vars = lev$know.var.li[[.know.var.group]]
         cols = union(setdiff(know.vars, c(ignore.keys, ignore.li[[action]])), c(action, if (mixed) ".prob"))
@@ -131,11 +140,11 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
 
 }
 
-#' Transform a pure equilibrium into a table-rules representation
-#'
-#' table-rules are helpful for setting the equilibrium behavior
-#' as a fixed rule for a related game, e.g. in order to
-#' reduce dimensionality.
+# Transform a pure equilibrium into a table-rules representation
+#
+# table-rules are helpful for setting the equilibrium behavior
+# as a fixed rule for a related game, e.g. in order to
+# reduce dimensionality.
 eq.table.rules = function(eq, tg, ignore.keys = names(tg$params), add.stage=TRUE, fixed=FALSE, reduce.tables=TRUE) {
   restore.point("pure.eq.to.table.rules")
   ise.df = tg$ise.df
@@ -178,14 +187,14 @@ eq.table.rules = function(eq, tg, ignore.keys = names(tg$params), add.stage=TRUE
 }
 
 
-#' Get equilibrium outcomes from a list of equilibria
-#'
-#' @param eq.li a list of equilibria
-#' @param tg the table form game
-#' @param compress if TRUE (default) remove duplicated outcomes from different equilibria
-#' @param combine if TRUE (default) combine all outcomes to a single data frame. If FALSE have a list of the different outcomes. If combine=FALSE and compress=TRUE the list only contains unique equilibrium outcomes and may thus have fewer elements than the number of equilibria. Set both combine=FALSE and compress=FALSE to have a list that maps one to one equilibrium outcomes to equilibria.
-#' @param cond if not NULL, we compute conditional equilibrium outcomes, see cond.eq.outcome
-#' @export
+# Get equilibrium outcomes from a list of equilibria
+#
+# @param eq.li a list of equilibria
+# @param tg the table form game
+# @param compress if TRUE (default) remove duplicated outcomes from different equilibria
+# @param combine if TRUE (default) combine all outcomes to a single data frame. If FALSE have a list of the different outcomes. If combine=FALSE and compress=TRUE the list only contains unique equilibrium outcomes and may thus have fewer elements than the number of equilibria. Set both combine=FALSE and compress=FALSE to have a list that maps one to one equilibrium outcomes to equilibria.
+# @param cond if not NULL, we compute conditional equilibrium outcomes, see cond.eq.outcome
+# @export
 eq.li.outcomes = function(eq.li,  tg=NULL, compress=TRUE, combine=TRUE,cond=NULL, oco.df = tg$oco.df) {
   restore.point("eq.li.outcomes")
   eqo.li = lapply(eq.li, eq.outcome, oco.df=oco.df, tg=tg, cond=cond)
@@ -211,23 +220,23 @@ eq.li.outcomes = function(eq.li,  tg=NULL, compress=TRUE, combine=TRUE,cond=NULL
   return(eqo.li)
 }
 
-#' Return the equilibrium outcome of an equilibrium
-#'
-#' The equilibrium outcome is returned as a data frame. If
-#' there are no moves of nature and we have
-#' a pure equilbrim it always has a single row.
-#'
-#' If there are moves of nature or we have a mixed strategy,
-#' we get one row for every possible realization of the random
-#' variables.
-#'
-#' You can call eq.expected.outcome to get an expected outcome
-#' that will be a single row only.
-#'
-#' @param eq a single equilibrium
-#' @param tg the table form game
-#' @param cond if not NULL, we compute conditional equilibrium outcomes, see cond.eq.outcome
-#' @export
+# Return the equilibrium outcome of an equilibrium
+#
+# The equilibrium outcome is returned as a data frame. If
+# there are no moves of nature and we have
+# a pure equilbrim it always has a single row.
+#
+# If there are moves of nature or we have a mixed strategy,
+# we get one row for every possible realization of the random
+# variables.
+#
+# You can call eq.expected.outcome to get an expected outcome
+# that will be a single row only.
+#
+# @param eq a single equilibrium
+# @param tg the table form game
+# @param cond if not NULL, we compute conditional equilibrium outcomes, see cond.eq.outcome
+# @export
 eq.outcome = function(eq,tg=NULL, cond=NULL, oco.df=tg$oco.df) {
   restore.point("eq.outcome")
   if (is.null(oco.df)) stop("You must provide a table-form game tg.")
@@ -241,13 +250,13 @@ eq.outcome = function(eq,tg=NULL, cond=NULL, oco.df=tg$oco.df) {
 }
 
 
-#' Get expected equilibrium outcomes from a list of equilibria
-#'
-#' @param eq.li a list of equilibria
-#' @param tg the table form game
-#' @param compress if TRUE (default) remove duplicated outcomes from different equilibria
-#' @param combine if TRUE (default) combine all outcomes to a single data frame. If FALSE have a list of the different outcomes. If combine=FALSE and compress=TRUE the list only contains unique equilibrium outcomes and may thus have fewer elements than the number of equilibria. Set both combine=FALSE and compress=FALSE to have a list that maps one to one equilibrium outcomes to equilibria.
-#' @export
+# Get expected equilibrium outcomes from a list of equilibria
+#
+# @param eq.li a list of equilibria
+# @param tg the table form game
+# @param compress if TRUE (default) remove duplicated outcomes from different equilibria
+# @param combine if TRUE (default) combine all outcomes to a single data frame. If FALSE have a list of the different outcomes. If combine=FALSE and compress=TRUE the list only contains unique equilibrium outcomes and may thus have fewer elements than the number of equilibria. Set both combine=FALSE and compress=FALSE to have a list that maps one to one equilibrium outcomes to equilibria.
+# @export
 eq.li.expected.outcomes = function(eq.li, tg, compress=TRUE, combine=TRUE) {
   if (!combine) {
     eqo.li = eq.li.outcomes(eq.li, tg=tg, compress=compress, combine=combine)
@@ -259,21 +268,21 @@ eq.li.expected.outcomes = function(eq.li, tg, compress=TRUE, combine=TRUE) {
   return(res)
 }
 
-#' Get expected equilibrium outcome from a single equilibrium
-#'
-#' @param eq an equilibrium
-#' @param tg the tableform game
+# Get expected equilibrium outcome from a single equilibrium
+#
+# @param eq an equilibrium
+# @param tg the tableform game
 eq.expected.outcome = function(eq, tg) {
   eqo.df = eq.outcome(eq, tg)
   expected.outcomes(eqo.df, tg=tg)
 }
 
-#' Takes a data frame of equilibrium outcomes and computes
-#' expected equilibrium outcomes.
-#'
-#' @param eqo.df A data frame of equilibrium outcomes as returned by eq.outcome or eq.li.outcomes (with combine=TRUE)
-#' @param tg the table-form game
-#' @export
+# Takes a data frame of equilibrium outcomes and computes
+# expected equilibrium outcomes.
+#
+# @param eqo.df A data frame of equilibrium outcomes as returned by eq.outcome or eq.li.outcomes (with combine=TRUE)
+# @param tg the table-form game
+# @export
 expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) {
 	restore.point("expected.eq.outcomes")
 
@@ -336,14 +345,14 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) 
 }
 
 
-#' Return a conditional equilibrium outcome
-#'
-#' @param eq.li The computed equilibria in gtree form
-#' @param cond is a list with variable names and their assumed value
-#' we only pick rows from oco.df in which the condition is satisfied
-#' we set the probabilities of the conditioned variable values to 1
-#' @param expected return expected conditional equilibrium outcomes
-#' @param remove.duplicate.eq remove conditional outcomes that are duplicates but arise in different equilibria (who differ off the conditional path)
+# Return a conditional equilibrium outcome
+#
+# @param eq.li The computed equilibria in gtree form
+# @param cond is a list with variable names and their assumed value
+# we only pick rows from oco.df in which the condition is satisfied
+# we set the probabilities of the conditioned variable values to 1
+# @param expected return expected conditional equilibrium outcomes
+# @param remove.duplicate.eq remove conditional outcomes that are duplicates but arise in different equilibria (who differ off the conditional path)
 eq.li.cond.outcomes = function(eq.li, cond, tg=NULL,oco.df=tg$oco.df, expected=FALSE, remove.duplicate.eq=TRUE) {
   restore.point("cond.eq.outcomes")
 	li = lapply(seq_along(eq.li), function(i) {
@@ -370,9 +379,9 @@ eq.li.cond.outcomes = function(eq.li, cond, tg=NULL,oco.df=tg$oco.df, expected=F
 	return(ceqo)
 }
 
-#' Expected outcomes from a conditional equilibrium outcome
-#'
-#' @param ceqo.df The conditional equilibrium outcomes
+# Expected outcomes from a conditional equilibrium outcome
+#
+# @param ceqo.df The conditional equilibrium outcomes
 cond.expected.outcomes = function(ceqo.df) {
   restore.point("expected.cond.eq.outcomes")
   if (!"eqo.ind" %in% colnames(ceqo.df))
@@ -383,11 +392,11 @@ cond.expected.outcomes = function(ceqo.df) {
 }
 
 
-#' Return a conditional equilibrium outcome
-#'
-#' cond is a list with variable names and their assumed value
-#' we only pick rows from oco.df in which the condition is satisfied
-#' we set the probabilities of the conditioned variable values to 1
+# Return a conditional equilibrium outcome
+#
+# cond is a list with variable names and their assumed value
+# we only pick rows from oco.df in which the condition is satisfied
+# we set the probabilities of the conditioned variable values to 1
 cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.non.null(attr(eq,"eq.ind"),NA), eo.df = eq.outcome(eq=eq, oco.df=oco.df, tg=tg), ceqo.ind=1) {
   restore.point("cond.eq.outcome")
 	cond.df = as_data_frame(cond)
@@ -451,15 +460,15 @@ reduce.key.table.with.probs = function(table, var=colnames(table)[NCOL(table)-(c
 
 }
 
-#' Helper function to reduce the key columns of
-#' a key-value table
-#'
-#' @param table the key value table
-#' @param var the column name that holds the value.
-#'        By default the last column.
-#' @param keep.keys a character vector of key columns that
-#'        shall never be removed.
-#' @export
+# Helper function to reduce the key columns of
+# a key-value table
+#
+# @param table the key value table
+# @param var the column name that holds the value.
+#        By default the last column.
+# @param keep.keys a character vector of key columns that
+#        shall never be removed.
+# @export
 reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=NULL) {
   restore.point("reduce.key.table")
 

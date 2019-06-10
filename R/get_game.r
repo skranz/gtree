@@ -8,13 +8,13 @@ gtree.stop.on.error = function(..., xs=get.xs()) {
   is.null(xs)
 }
 
-#' Get the gtree project directory
-#'
-#' If the gtreeGUI is running use the project.dir specified
-#' there.
-#' Otherwise check getOptions("gtree.project.dir).
-#' If that is null return the current working directory
-#' @export
+# Get the gtree project directory
+#
+# If the gtreeGUI is running use the project.dir specified
+# there.
+# Otherwise check getOptions("gtree.project.dir).
+# If that is null return the current working directory
+# @export
 get.project.dir = function(xs=get.xs()) {
 	if (!is.null(xs$project.dir)) return(xs$project.dir)
 	project.dir = getOption("gtree.project.dir")
@@ -23,10 +23,10 @@ get.project.dir = function(xs=get.xs()) {
 }
 
 
-#' Set the gtree project directory
-#'
-#' By default the current working directory
-#' @export
+# Set the gtree project directory
+#
+# By default the current working directory
+# @export
 set.project.dir = function(project.dir=getwd(), xs=get.xs()) {
   if (!is.null(xs)) {
     xs$project.dir = project.dir
@@ -34,18 +34,18 @@ set.project.dir = function(project.dir=getwd(), xs=get.xs()) {
   options(gtree.project.dir=project.dir)
 }
 
-#' Get the gtree games directory
-#'
-#' The subdirectory "games" under get.project.dir()
-#' @export
+# Get the gtree games directory
+#
+# The subdirectory "games" under get.project.dir()
+# @export
 get.games.dir = function(project.dir = get.project.dir()) {
 	file.path(project.dir,"games")
 }
 
-#' Get the gtree jobs directory
-#'
-#' The subdirectory "jobs" under get.project.dir()
-#' @export
+# Get the gtree jobs directory
+#
+# The subdirectory "jobs" under get.project.dir()
+# @export
 get.jobs.dir = function(project.dir = get.project.dir()) {
 	file.path(project.dir,"jobs")
 }
@@ -67,10 +67,10 @@ get.pages.dir = function(gameId, project.dir = get.project.dir()) {
 	file.path(project.dir,"games",gameId,"pages")
 }
 
-#' Create a directory structure for a new game
-#'
-#' includes the subdirectories eq, gambit and pages
-#' @export
+# Create a directory structure for a new game
+#
+# includes the subdirectories eq, gambit and pages
+# @export
 make.game.dir = function(gameId, games.dir = file.path(project.dir,"games"), project.dir=get.project.dir()) {
 	if (length(gameId)!=1) return()
 	if (nchar(gameId)==0) return()
@@ -90,10 +90,10 @@ get.jg.hash = function(jg.hash=NULL, jg=NULL, rg=NULL,vg=NULL, tg=NULL) {
 	hash
 }
 
-#' Get a game in jg format by its gameId
-#'
-#' Looks in the current project directory by default
-#' and parses the json file
+# Get a game in jg format by its gameId
+#
+# Looks in the current project directory by default
+# and parses the json file
 get.jg = function(gameId,json.file = paste0(game.dir,"/",gameId,".json"), game.dir=file.path(games.dir,gameId), games.dir = get.games.dir(project.dir), project.dir = get.project.dir(), jg=NULL) {
 	restore.point("get.jg")
 	if (!is.null(jg)) return(jg)
@@ -103,10 +103,10 @@ get.jg = function(gameId,json.file = paste0(game.dir,"/",gameId,".json"), game.d
 	content$game
 }
 
-#' Get a game in rg format by its gameId
-#'
-#' If the json file has not changed return old .rg file
-#' otherwise generate new rg file from json source
+# Get a game in rg format by its gameId
+#
+# If the json file has not changed return old .rg file
+# otherwise generate new rg file from json source
 get.rg = function(gameId = jg$gameId, jg.hash = get.jg.hash(jg=jg),jg=NULL,rg=NULL, games.dir = get.games.dir(project.dir), project.dir = get.project.dir(), save.new = TRUE) {
 	if (!is.null(rg)) return(rg)
 	restore.point("get.rg")
@@ -134,11 +134,11 @@ get.rg = function(gameId = jg$gameId, jg.hash = get.jg.hash(jg=jg),jg=NULL,rg=NU
 	rg
 }
 
-#' Get a game in vg format by its gameId
-#'
-#' If the json file has not use exsisting .rg file to extract
-#' the vg format.
-#' Otherwise first generate new rg files from json source
+# Get a game in vg format by its gameId
+#
+# If the json file has not use exsisting .rg file to extract
+# the vg format.
+# Otherwise first generate new rg files from json source
 get.vg = function(variant=1, gameId = first.non.null(jg$gameId,rg$gameId), jg.hash = get.jg.hash(jg=jg, rg=rg),jg=NULL,rg=NULL, vg=NULL, games.dir = get.games.dir(project.dir), project.dir = get.project.dir(), save.new = FALSE, always.new=FALSE) {
 	if (!is.null(vg)) return(vg)
 	restore.point("get.vg")
@@ -170,7 +170,7 @@ get.vg = function(variant=1, gameId = first.non.null(jg$gameId,rg$gameId), jg.ha
 	vg
 }
 
-#' Load tg without any checks
+# Load tg without any checks
 load.tg = function(variant=first.non.null(vg$variant,1), gameId = first.non.null(vg$gameId,jg$gameId,rg$gameId),jg=NULL,rg=NULL, vg=NULL, tg=NULL, tg.id=tg$tg.id, games.dir = get.games.dir(project.dir), project.dir = get.project.dir(), filename= if(!is.null(tg.id)) paste0(tg.id,".tg") else NULL) {
 
 	if (is.null(filename))
@@ -181,10 +181,10 @@ load.tg = function(variant=first.non.null(vg$variant,1), gameId = first.non.null
   tg
 }
 
-#' Get a game in tg format by its gameId
-#'
-#' If the json file has not changed return old .tg file
-#' otherwise generate new rg and tg files from json source
+# Get a game in tg format by its gameId
+#
+# If the json file has not changed return old .tg file
+# otherwise generate new rg and tg files from json source
 get.tg = function(variant=first.non.null(vg$variant,1), gameId = first.non.null(vg$gameId,jg$gameId,rg$gameId), jg.hash = get.jg.hash(jg=jg, rg=rg,vg=vg),jg=NULL,rg=NULL, vg=NULL, tg=NULL, games.dir = get.games.dir(project.dir), project.dir = get.project.dir(), save.new = TRUE,branching.limit = 10000,msg.fun=NULL, never.load = FALSE, filename=NULL) {
 	if (!is.null(tg)) return(tg)
 	restore.point("get.tg")
@@ -269,10 +269,10 @@ has.uptodate.eq = function(tg,util.funs=NULL, just.spe=TRUE, mixed=FALSE, eq.dir
 
 }
 
-#' Compute or return previously computed equilibria
-#'
-#' Uses cached equilibria if json file of the game has not
-#' changed. Otherwise solve new equilibrium via gambit.eq.solve
+# Compute or return previously computed equilibria
+#
+# Uses cached equilibria if json file of the game has not
+# changed. Otherwise solve new equilibrium via gambit.eq.solve
 get.eq = function(tg, util.funs=NULL, just.spe=TRUE, mixed=FALSE, eq.dir = get.eq.dir(tg$gameId,project.dir), efg.dir = get.efg.dir(tg$gameId, project.dir), project.dir = get.project.dir(), save.new = TRUE, solvemode=NULL, solver=NULL, only.load=FALSE,create.efg.even.for.only.load=TRUE,never.load=FALSE,...) {
 	restore.point("get.eq")
 	if (!is.null(util.funs))

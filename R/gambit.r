@@ -59,7 +59,7 @@ example.gambit.solve.eq = function() {
 
 
 
-#' Finds one or all mixed strategy equilibria
+# Finds one or all mixed strategy equilibria
 gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.name(tg), efg.dir=NULL, gambit.dir="", solver=NULL, eq.dir = get.eq.dir(tg$gameId), save.eq = FALSE, solvemode=NULL, efg.file.with.dir = file.path(efg.dir,efg.file), verbose=TRUE) {
 
   restore.point("gambit.solve.eq")

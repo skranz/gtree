@@ -152,7 +152,9 @@ example.game = function() {
   gambit.solve.eq(tg)
 }
 
-#' Create a new game in stage form
+#' Create a new gtree game
+#'
+#' See the examples on gtree website.
 new_game = function(gameId, params=game_params(), options=make_game_options(), stages, variant="", check=TRUE) {
   restore.point("new.game")
   vg = as.environment(list(
@@ -179,7 +181,7 @@ new_game = function(gameId, params=game_params(), options=make_game_options(), s
   game
 }
 
-
+#' Compile a game defined with new_game
 game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE, add.sg=for.internal.solver, add.spi=for.internal.solver, add.spo=for.internal.solver, force=FALSE, verbose=game$options$verbose,...) {
   # Create all required addition
   restore.point("game_compile")
@@ -290,7 +292,7 @@ game_set_preferences = function(game, pref) {
   invisible(game)
 }
 
-
+#' Make a deep copy of a game
 game_copy = function(game) {
   ngame = as.environment(as.list(game))
   class(ngame) = class(game)
@@ -299,17 +301,21 @@ game_copy = function(game) {
   ngame
 }
 
-game_add_tremble = function(game, action=NULL, stage=NULL, tremble.prob = 0.0001) {
+# Note the tremble code must be changed since action names
+# must be unique in the game. Also a pure uniform tremble is
+# not very insightful...
+game_add_tremble = function(game, action=NULL, tremble.prob = 0.0001) {
   clear.non.vg(game)
-  game$vg = vg.add.tremble(game$vg, action=action, stage=stage, tremble.prob = tremble.prob)
+  game$vg = vg.add.tremble(game$vg, action=action, tremble.prob = tremble.prob)
   invisible(game)
 }
 
 #' Write game as a Gambit efg file
 #'
 #' @param game The game object
-#' @param file The file with full path. If NULL create a default name
-#' @param
+#' @param file.with.dir The file with full path. If NULL create a default name
+#' @param file The file name without directory
+#' @param dir The directory of a file
 game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg.file.name(game$tg), dir=getwd(),  verbose = !isTRUE(game$options$verbose==0)) {
   game_compile(game)
   game$efg.file = file.with.dir
@@ -317,15 +323,30 @@ game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg
   invisible(game)
 }
 
-game.eq.tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.cols = NULL, ...) {
+#' Return solved equilibrium in a table format
+#'
+#' Best take a look at the Vignettes to understand this format.
+#'
+#' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
+#' @param combine if 0 generate separate tables for each equilibrium. If 1 bind the tables of each variable over all equilibria. If 2 (default) also collapse the rows that are the same for different equilibria and add a column eq.inds that contains all equilibrium numbers as a comma separated string
+#' @param eq.ind Vector of integers specifying the indices of all equilibria that shall be considered. By default all equilibria.
+#' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not.
+game.eq.tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, ...) {
   if (is.null(game$unknown.vars.at.actions)) {
     game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
   }
 
-  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.cols), ignore.li = game$unknown.vars.at.actions, ...)
+  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.keys), ignore.li = game$unknown.vars.at.actions,  ...)
 }
 
+#' Return a data frame of all possible outcomes
+#' @param game the game object defined with \code{new_game} and being compiled with \code{game_compile} or after a call of \code{game_solve}.
+#' @param reduce.cols if TRUE remove some technical columns
 game.outcomes = function(game,..., reduce.cols=FALSE) {
+  if (is.null(game[["tg"]])) {
+    warning("You first must have compiled the games to see the outcomes.\n")
+    return(NULL)
+  }
   oco.df = game$tg$oco.df
   if (reduce.cols) {
     ignore.cols = c(names(game$vg$params),".prob",".outcome")
@@ -334,15 +355,22 @@ game.outcomes = function(game,..., reduce.cols=FALSE) {
   }
   oco.df
 }
+
+#' Return the computed equilibria using the internal representation
 game.eq.li = function(game,...) {
   game$eq.li
 }
+
+#' Return a data frame of all equilibrium outcomes
+#' @param game the game object for which previously equilibria were computed e.g. with \code{game_solve}.
 game.eq.outcomes = function(game,...) {
   if (is.null(game$eqo.df))
     game$eqo.df = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
 
   game$eqo.df
 }
+#' Return a data frame of expected equilibrium outcomes
+#' @param game the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.
 game.expected.eq.outcomes = function(game,...) {
   if (is.null(game$eeqo.df))
     game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg)
@@ -353,12 +381,14 @@ game.expected.eq.outcomes = function(game,...) {
 
 
 
-# Specify the game parameters
+#' Specify the game parameters
+#'
+#' This function is only to be used inside \code{new_game}. To change the parameters of an existing game call \code{game_change_params}.
 make_game_params = function(numPlayers=2,...) {
   list(numPlayers=numPlayers,...)
 }
 
-#' Specify the game options in new_game
+#' Specify the game options in \code{new_game}
 make_game_options = function(verbose=TRUE,...) {
   list(verbose=verbose,...)
 }
@@ -443,11 +473,8 @@ stage = function(name, player=NULL, condition=NULL, observe=NULL, compute=NULL, 
   nlist(name,player,condition,observe, compute,nature, actions,...)
 }
 
-copy.game = function(game) {
-  as.environment(as.list(game))
-}
 
-
+# Function to change a stage of an existing game
 update.vg.stage = function(vg, name, player, condition, observe, compute, nature, actions,...) {
   restore.point("update.vg.stage")
 
@@ -499,6 +526,7 @@ update.vg.stage = function(vg, name, player, condition, observe, compute, nature
   vg
 }
 
+# Delete all fields except those of a vg
 clear.non.vg = function(game, keep=c("gameId","vg","players", "options","pref")) {
   restore.point("clear.non.vg")
   fields = setdiff(ls(game), keep)
@@ -506,9 +534,8 @@ clear.non.vg = function(game, keep=c("gameId","vg","players", "options","pref"))
   invisible(game)
 }
 
-#' Return for each action all variables that are never
-#' known when choosing the action
-#'
+# Return for each action all variables that are never
+# known when choosing the action
 find.unknown.vars.at.actions = function(tg) {
   vars = setdiff(tg$vars, names(tg$params))
   lev.actions = sapply(tg$lev.li[tg$action.levels], function(lev) lev$var)

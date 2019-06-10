@@ -46,11 +46,11 @@ eval.set.to.df = function(call, df, var, expand=TRUE, params=NULL) {
   res
 }
 
-#' Eval a call on a data.frame df
-#'
-#' params can be a list of parameters (each of length 1)
-#' that will be substituted into the call
-#' before the evaluation takes place
+# Eval a call on a data.frame df
+#
+# params can be a list of parameters (each of length 1)
+# that will be substituted into the call
+# before the evaluation takes place
 eval.on.df = function(call, df, params=NULL) {
   if (length(params)>0)
     call = substitute.call(call, params)
@@ -67,10 +67,10 @@ eval.key.tables.to.df = function(df, tables, rows=NULL,...) {
   return(df)
 }
 
-#' The last column of table is the variable that shall be assigned to df
-#'
-#' The other columns (possible none) are keys that are used to match the rows
-#' of df, where the table variable shall be assigned to.
+# The last column of table is the variable that shall be assigned to df
+#
+# The other columns (possible none) are keys that are used to match the rows
+# of df, where the table variable shall be assigned to.
 eval.key.table.to.df = function(df, table, var = colnames(table)[NCOL(table)], rows=NULL) {
   restore.point("eval.key.table.on.df")
   if (!is.null(rows))

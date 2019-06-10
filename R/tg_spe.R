@@ -72,6 +72,8 @@ gtree.solve.spe = solve.all.tg.spe = function(tg, eq.dir = get.eq.dir(tg$gameId)
 
 
 compute.tg.fields.for.internal.solver = function(tg, verbose=TRUE, add.sg = TRUE, add.spi = TRUE, add.spo = TRUE, max.sp = first.non.null(getOption("gtree.max.sp",1000000))) {
+  restore.point("compute.tg.fields.for.internal.solver")
+
   if (is.null(tg$sg.df) & add.sg) {
   	if (verbose) cat("\nCompute subgames...")
     compute.tg.subgames(tg)
@@ -496,9 +498,9 @@ spo.to.speu = function(spo.df, tg=NULL, add.outcomes = FALSE, as.data.table = FA
 
 }
 
-#' solve all spe of subgame .sg.ind
-#' assumes that descendent subgames have already been solved
-#' and uses backward induction
+# solve all spe of subgame .sg.ind
+# assumes that descendent subgames have already been solved
+# and uses backward induction
 solve.sg.spe = function(.sg.ind=1, tg, keep.weakly.dominated=TRUE) {
 
 	# 1. We first generate a grid of all children

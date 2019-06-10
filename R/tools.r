@@ -2,8 +2,8 @@ does.intersect = function(A,B) {
   length(intersect(A,B))>0
 }
 
-#' Change a call object like call = quote(c(x+1,x+2))
-#' into a list of calls list(quote(x+1), quote(x+2))
+# Change a call object like call = quote(c(x+1,x+2))
+# into a list of calls list(quote(x+1), quote(x+2))
 list.call.to.call.list = function(call) {
   sym = as.character(call[[1]])
   if (sym=="c" | sym=="list") {
@@ -27,7 +27,7 @@ name.by.name = function(li) {
 }
 
 
-#' Transform a pure rhs formula like ~x+2 to a quoted call
+# Transform a pure rhs formula like ~x+2 to a quoted call
 f2c = function(x) {
   if (is(x,"formula")) return(x[[length(x)]])
   x
@@ -98,7 +98,7 @@ deparse1 = function (call, collapse = "")
     paste0(deparse(call, width = 500), collapse = collapse)
 }
 
-#' Like paste0 but returns an empty vector if some string is empty
+# Like paste0 but returns an empty vector if some string is empty
 sc = function(..., sep="", collapse=NULL) {
   str = list(...)
   restore.point("str.combine")

@@ -74,12 +74,12 @@ vg.to.complier.vg = function(vg, complierProb = 0.5) {
   vg
 }
 
-#' Transform a vg to a tg that can be used to quickly compute a first best
-#' strategy profile.
-#'
-#' Essentially the player in each stage will be set to player 1 and then
-#' a tg is created. This means player 1 chooses all actions and she
-#' knows what all player know.
+# Transform a vg to a tg that can be used to quickly compute a first best
+# strategy profile.
+#
+# Essentially the player in each stage will be set to player 1 and then
+# a tg is created. This means player 1 chooses all actions and she
+# knows what all player know.
 vg.to.first.best.tg = function(vg,..., tg.id=paste0(vg$gameId,"_FirstBest_", vg$variant), add.sg=FALSE, add.spi=FALSE, add.spo=FALSE) {
   restore.point("vg.to.first.best.tg")
 

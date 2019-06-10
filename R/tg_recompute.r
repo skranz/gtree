@@ -183,6 +183,11 @@ recompute.tg.probs = function(tg,vg, params = tg$params, changed.par = names(par
     tg$oco.df$.prob = tg$stage.df$.prob
   }
   compute.tg.et.mat(tg)
+  for (i in seq_along(tg[["spo.li"]])) {
+    tg$spo.li[[i]]$.prob = tg$oco.df$.prob[tg$spo.li[[i]]$.outcome]
+  }
+
+
   invisible(tg)
 }
 

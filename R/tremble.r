@@ -1,3 +1,6 @@
+# Note the tremble code must be changed since action names
+# must be unique in the game. Also a pure uniform tremble is
+# not very insightful...
 vg.add.tremble = function(vg, action = NULL, stage = NULL, tremble.prob = 0.0001) {
   restore.point("vg.add.tremble")
 
@@ -14,6 +17,7 @@ vg.add.tremble = function(vg, action = NULL, stage = NULL, tremble.prob = 0.0001
   vg
 }
 
+# TO DO: Need to change names. Action name must be different
 add.tremble.to.stage = function(stage, tremble.prob=0.0001) {
   if (length(stage$actions)==0)
     return(list(stage))

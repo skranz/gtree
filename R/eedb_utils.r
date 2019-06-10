@@ -23,7 +23,7 @@ quote.char = function(val, quote='"') {
   return(paste0(quote,val,quote))
 }
 
-#' Paste together columns of a matrix or data.frame
+# Paste together columns of a matrix or data.frame
 paste.matrix.cols = function(mat,cols=1:NCOL(mat),sep="|",...) {
 	restore.point("paste.matrix.cols")
 	if (!is.matrix(mat))
@@ -46,7 +46,7 @@ paste.matrix.cols = function(mat,cols=1:NCOL(mat),sep="|",...) {
 }
 
 
-#' Find groups of identical rows (OLD VERSION NO DATA.TABLE)
+# Find groups of identical rows (OLD VERSION NO DATA.TABLE)
 identical.rows.groups.old = function(df) {
   #df = data.frame(a=sample(1:2,6, replace=TRUE), b = sample(c("x","y"),6, replace=TRUE))
   restore.point("identical.rows.groups")
@@ -71,8 +71,8 @@ identical.rows.groups.old = function(df) {
   group
 }
 
-#' Find groups of identical rows
-#' Uses data.table for speed
+# Find groups of identical rows
+# Uses data.table for speed
 identical.rows.groups = function(df) {
   #df = data.frame(a=sample(1:2,6, replace=TRUE), b = sample(c("x","y"),6, replace=TRUE))
   restore.point("identical.rows.groups")
@@ -244,7 +244,7 @@ rows_along = function(x) {
 }
 
 
-#' Like paste0 but returns an empty vector if some string is empty
+# Like paste0 but returns an empty vector if some string is empty
 sc = function(..., sep="", collapse=NULL) {
   str = list(...)
   restore.point("str.combine")
@@ -278,7 +278,7 @@ nlist = function (...)
   li
 }
 
-#' Like paste0 but returns an empty vector if some string is empty
+# Like paste0 but returns an empty vector if some string is empty
 str.combine = function(..., sep="", collapse=NULL) {
   str = list(...)
   restore.point("str.combine")
@@ -301,7 +301,7 @@ remove.list.elements = function(li, remove=NULL) {
   return(li[-remove])
 }
 
-#' Does an environment / list contain the objects named as names
+# Does an environment / list contain the objects named as names
 contains = function(env,names, inherits=FALSE,...) {
   if (is.environment(env))
     return(sapply(names, exists, where=env, inherits=inherits, ...))
@@ -313,7 +313,7 @@ str.ends.with = function(txt,pattern) {
   substring(txt,nchar(txt)-nchar(pattern)+1,)==pattern
 }
 
-#' Returns a string constisting of times spaces, vectorized over times
+# Returns a string constisting of times spaces, vectorized over times
 str.space = function(times, space=" ") {
   space.str = paste0(rep(space,max(times)),collapse="")
   substring(space.str,1,last=times)
@@ -323,7 +323,7 @@ example.str.space = function() {
   str.space(0:4)
 }
 
-#' An operator that is true if the string str starts with the substring key
+# An operator that is true if the string str starts with the substring key
 str.starts.with = function(str,key) {
   substring(str,1,nchar(key))==key
 }
@@ -349,7 +349,7 @@ path.parts = function(path,sep=".") {
   str.split(path,sep)
 }
 
-#'
+#
 common.and.distinct.path.parts = function(opath, npath,sep=".") {
   restore.point("common.and.distinct.path.parts")
   op = str.split(opath,sep)[[1]]
@@ -381,13 +381,13 @@ examples.common.and.distinct.path.parts = function() {
 
 }
 
-#' Cuts away early stuff from a tree path
+# Cuts away early stuff from a tree path
 cut.to.sub.tree.path = function(tree.path, after) {
   pos = str.locate.first(tree.path, after)
   substring(tree.path,pos[,2]+1)
 }
 
-#' Index a list tree with a tree path
+# Index a list tree with a tree path
 at.tree.path = function(li, tree.path) {
   restore.point("get.from.tree.path")
   tree.path = str.replace(tree.path,".","$")
@@ -395,7 +395,7 @@ at.tree.path = function(li, tree.path) {
   return(eval(parse(text=code,srcfile=NULL)))
 }
 
-#'
+#
 intersect.vector.list = function(li, init) {
   if (missing(init))
     return(Reduce(intersect,li))
@@ -404,7 +404,7 @@ intersect.vector.list = function(li, init) {
 
 }
 
-#' Gets game variants that correspond to a tree path
+# Gets game variants that correspond to a tree path
 variants.from.tree.path = function(tree.path) {
   restore.point("variants.from.tree.path")
   variants = str.extract.all(tree.path,"_if_variant_.*`")
@@ -416,7 +416,7 @@ variants.from.tree.path = function(tree.path) {
   variants
 }
 
-#' Adapts whisker render for different whisker formats
+# Adapts whisker render for different whisker formats
 custom.whisker.render = function(template,data,...,whiskers=c("<<",">>")) {
   library(whisker)
   if (!is.null(whiskers)) {
@@ -426,7 +426,7 @@ custom.whisker.render = function(template,data,...,whiskers=c("<<",">>")) {
   whisker.render(template,data,...)
 }
 
-#' Comverts a list of vectors into a matrix, shorter vectors will be filled up
+# Comverts a list of vectors into a matrix, shorter vectors will be filled up
 vec.list.to.matrix = function(li,fill=NA, transpose=TRUE) {
   restore.point("vec.list.to.matrix")
   cols = max(sapply(li,length))
@@ -436,7 +436,7 @@ vec.list.to.matrix = function(li,fill=NA, transpose=TRUE) {
   return(ret)
 }
 
-#' fill a vector up to a specified length with fill
+# fill a vector up to a specified length with fill
 fill.vec = function(vec,len=length(vec),fill=NA) {
   if (len == length(vec))
     return(vec)
@@ -445,7 +445,7 @@ fill.vec = function(vec,len=length(vec),fill=NA) {
   return(vec)
 }
 
-#' Returns all variable names in an R expression
+# Returns all variable names in an R expression
 var.in.expr.str = function(expr.str, envir=baseenv(), union = TRUE) {
   if (length(expr.str)>1) {
     vars = lapply(expr.str,var.in.expr.str,envir=envir)
@@ -463,7 +463,7 @@ union.of.list = function(li) {
   unique(unlist(li))
 }
 
-#' Returns all variable names in an R expression
+# Returns all variable names in an R expression
 var.in.expr = function(expr,expr.str, envir=baseenv()) {
   library(codetools)
   if (!missing(expr.str)) {
@@ -484,7 +484,7 @@ examples.var.in.expr = function() {
 }
 
 
-#' Names lists are used to recursively store order of columns
+# Names lists are used to recursively store order of columns
 as.names.list = function(names) {
   li = vector("list",length(names))
   names(li) = names
@@ -492,7 +492,7 @@ as.names.list = function(names) {
 }
 
 
-#' Names lists are used to recursively store order of columns
+# Names lists are used to recursively store order of columns
 flatten.names.list = function(li,name="") {
   if (length(li)==0)
     return(name)

@@ -18,20 +18,20 @@ example.first.best = function() {
   out
 }
 
-#' Given a tg that has been created with vg.to.first.best
-#' compute one or all first best strategy profile(s)
+# Given a tg that has been created with vg.to.first.best
+# compute one or all first best strategy profile(s)
 compute.first.best = function(tg.fb, find.all.eq=FALSE) {
   restore.point("compute.first.best")
   tg.fb = set.tg.welfare(tg.fb)
   compute.single.player.eq(tg.fb, player=1, find.all.eq=find.all.eq,util.col = ".welfare")
 }
 
-#' Transform a vg to a tg that can be used to quickly compute a first best
-#' strategy profile.
-#'
-#' Essentially the player in each stage will be set to player 1 and then
-#' a tg is created. This means player 1 chooses all actions and she
-#' knows what all player know.
+# Transform a vg to a tg that can be used to quickly compute a first best
+# strategy profile.
+#
+# Essentially the player in each stage will be set to player 1 and then
+# a tg is created. This means player 1 chooses all actions and she
+# knows what all player know.
 vg.to.first.best.tg = function(vg,..., tg.id=paste0(vg$gameId,"_FirstBest_", vg$variant), add.sg=FALSE, add.spi=FALSE, add.spo=FALSE) {
   restore.point("vg.to.first.best.tg")
 

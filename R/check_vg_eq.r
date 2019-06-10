@@ -612,14 +612,14 @@ vg.play.expected.utility = function(play, util.funs=NULL, numPlayers = sum(str.s
 }
 
 
-#' Replace actions by transformations described by rules
-#'
-#'
-#' If we have a rule for a stage all actions with the rule variable
-#' will be replaced. There can be at most one rule for each
-#' stage-action pair
-#'
-#' Note that only rules that specify a stage are considered.
+# Replace actions by transformations described by rules
+#
+#
+# If we have a rule for a stage all actions with the rule variable
+# will be replaced. There can be at most one rule for each
+# stage-action pair
+#
+# Note that only rules that specify a stage are considered.
 set.vg.rules = function(vg, rules, warn=TRUE) {
   restore.point("set.vg.rules")
 

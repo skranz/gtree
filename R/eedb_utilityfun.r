@@ -46,12 +46,12 @@ ineqAvUtil = function(player = 1,alpha=0.75,beta=0.5,n=2) {
 }
 
 
-#' pref_envy
-#'
-#' Fehr-Schmidt inequality aversion without guilt but envy only.
-#' @param alpha:
-#'     descr: the degree of envy
-#'     default: 0.5
+# pref_envy
+#
+# Fehr-Schmidt inequality aversion without guilt but envy only.
+# @param alpha:
+#     descr: the degree of envy
+#     default: 0.5
 envyUtil = function(player = 1:2,alpha=0.5,n=2) {
   np = length(player)
   util =  vector("character",np)
@@ -206,7 +206,7 @@ examples.OwnSumMin = function() {
   OwnSumMin()
 }
 
-#' Put weight on own payoff, total payoff and minimal payoff
+# Put weight on own payoff, total payoff and minimal payoff
 OwnSumMin = function(player=1,own_weight = 1, sum_weight=1, min_weight=1,n=2) {
 	sum = paste0("payoff_",seq_len(n), collapse="+")
 	min = paste0("pmin(",paste0("payoff_",seq_len(n),collapse=", "),")")
