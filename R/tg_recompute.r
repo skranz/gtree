@@ -49,34 +49,34 @@ examples.tg_recompute = function() {
   )
   game %>%
     game_solve_spe() %>%
-    game.eq.outcomes() -> res
+    eq_outcomes() -> res
 
 
   game %>%
     game_change_param(natureProb = 0.99,highOfferProb = 0.99) %>%
     game_solve_spe(mixed=TRUE, efg.dir=getwd(), solver="gambit-enummixed") %>%
-    game.eq.li() -> res
+    eq_li() -> res
 
-  eqo.df = game.eq.outcomes(game)
+  eqo.df = eq_outcomes(game)
 
 
 
   game %>%
     game_solve_spe() %>%
-    game.eq.tables()
+    eq_tables()
 
   game %>%
     game_gambit_solve(efg.dir = "D:/libraries/gtree") %>%
-    game.eq.tables()
+    eq_tables()
 
-  game.eq.li(game)
-  game.eq.outcomes(game)
+  eq_li(game)
+  eq_outcomes(game)
 
-  game %>% game.eq.li() %>% .[[1]]
-  game.outcomes(game)
+  game %>% eq_li() %>% .[[1]]
+  get_outcomes(game)
 
 
-  game %>% game.eq.tables()
+  game %>% eq_tables()
 
   # lev.df of random offer stage and acceptStage
   # Note that rows that don't satisfy cond are missing

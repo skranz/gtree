@@ -35,9 +35,9 @@ example.game = function() {
   game_add_types(game, typeNames = c("TypeA", "TypeB"))
   game
 
-  game.eq.li(game)
-  game.eq.outcomes(game)
-  game.eq.li.tables(game, combine=TRUE)
+  eq_li(game)
+  eq_outcomes(game)
+  eq_li.tables(game, combine=TRUE)
 
 
   tg = vg.to.tg(vg)
@@ -323,29 +323,13 @@ game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg
   invisible(game)
 }
 
-#' Return solved equilibrium in a table format
-#'
-#' Best take a look at the Vignettes to understand this format.
-#'
-#' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
-#' @param combine if 0 generate separate tables for each equilibrium. If 1 bind the tables of each variable over all equilibria. If 2 (default) also collapse the rows that are the same for different equilibria and add a column eq.inds that contains all equilibrium numbers as a comma separated string
-#' @param eq.ind Vector of integers specifying the indices of all equilibria that shall be considered. By default all equilibria.
-#' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not.
-game.eq.tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, ...) {
-  if (is.null(game$unknown.vars.at.actions)) {
-    game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
-  }
-
-  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.keys), ignore.li = game$unknown.vars.at.actions,  ...)
-}
 
 #' Return a data frame of all possible outcomes
 #' @param game the game object defined with \code{new_game} and being compiled with \code{game_compile} or after a call of \code{game_solve}.
 #' @param reduce.cols if TRUE remove some technical columns
-game.outcomes = function(game,..., reduce.cols=FALSE) {
+get_outcomes = function(game,..., reduce.cols=TRUE) {
   if (is.null(game[["tg"]])) {
-    warning("You first must have compiled the games to see the outcomes.\n")
-    return(NULL)
+    game_compile(game)
   }
   oco.df = game$tg$oco.df
   if (reduce.cols) {
@@ -356,22 +340,40 @@ game.outcomes = function(game,..., reduce.cols=FALSE) {
   oco.df
 }
 
+
+#' Return solved equilibrium in a table format
+#'
+#' Best take a look at the Vignettes to understand this format.
+#'
+#' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
+#' @param combine if 0 generate separate tables for each equilibrium. If 1 bind the tables of each variable over all equilibria. If 2 (default) also collapse the rows that are the same for different equilibria and add a column eq.inds that contains all equilibrium numbers as a comma separated string
+#' @param eq.ind Vector of integers specifying the indices of all equilibria that shall be considered. By default all equilibria.
+#' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not.
+eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, ...) {
+  if (is.null(game$unknown.vars.at.actions)) {
+    game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
+  }
+
+  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.keys), ignore.li = game$unknown.vars.at.actions,  ...)
+}
+
 #' Return the computed equilibria using the internal representation
-game.eq.li = function(game,...) {
+eq_li = function(game,...) {
   game$eq.li
 }
 
 #' Return a data frame of all equilibrium outcomes
 #' @param game the game object for which previously equilibria were computed e.g. with \code{game_solve}.
-game.eq.outcomes = function(game,...) {
+eq_outcomes = function(game,...) {
   if (is.null(game$eqo.df))
     game$eqo.df = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
 
   game$eqo.df
 }
+
 #' Return a data frame of expected equilibrium outcomes
 #' @param game the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.
-game.expected.eq.outcomes = function(game,...) {
+eq_expected_outcomes = function(game,...) {
   if (is.null(game$eeqo.df))
     game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg)
 

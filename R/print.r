@@ -27,7 +27,7 @@ print.gtree_game = function(game,..., show.stages = TRUE, show.size = TRUE, show
   if (!is.null(game$eq.li) & show.eq) {
     cat(paste0("\n\n", length(game$eq.li), " Equilibria:\n"))
     #cat(knitr::kable(eq.li.tables(game$eq.li,tg = game$tg,combine = 2)))
-    tabs = game.eq.tables(game)
+    tabs = eq_tables(game)
     for (var in names(tabs)) {
       #cat(paste0("\n",var,":\n"))
       cat("\n")

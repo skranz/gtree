@@ -63,7 +63,7 @@ The following code assumes that players have inequality aversion preferences à 
 game %>%
   game_set_preferences(pref_ineqAv(alpha=1, beta=0)) %>%
   game_solve() %>%
-  game.eq.tables()
+  eq_tables()
 ```
 
 ```
@@ -97,7 +97,7 @@ We see that the proposer offers 4 and every offer below 4 would be rejected. Wha
 game %>%
   game_change_param(autoAcceptProb = 0.9) %>%
   game_solve() %>%
-  game.eq.tables()
+  eq_tables()
 ```
 
 ```

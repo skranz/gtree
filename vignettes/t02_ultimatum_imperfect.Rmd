@@ -1,0 +1,140 @@
+---
+title: "2. Moves of Nature and Imperfect Information"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error=TRUE)
+library(gtree)
+```
+
+## Ultimatum Game with Moves of Nature
+
+The following code generates a variant of an ultimatum game that has an initial stage with a move of nature, a.k.a. a random variable, `autoAccept`. With probability 20% an offer will always be automatically accepted, even if the responder wants to reject it. This is like a probabilistic mixture between an Ultimatum Game and an Dictator Game.
+
+The effect of `autoAccept` is  specified in the `payoffStage`. No player observes `autoAccept`.
+```{r}
+game = new_game(
+  gameId = "UG_AutoAccept",
+  params = list(numPlayers=2, cake=4),
+  options = make_game_options(verbose=FALSE),
+  stages = list(
+    stage("autoAcceptStage",
+      nature=list(
+        natureMove("autoAccept", c(FALSE,TRUE),probs = c(0.8,0.2))
+      )
+    ),
+    stage("proposerStage",
+      player=1,
+      actions = list(
+        action("offer",~0:cake)
+      )
+    ),
+    stage("responderStage",
+      player=2,
+      observe = "offer",
+      actions = list(
+        action("accept",c(FALSE,TRUE))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
+        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
+      )
+    )
+  )
+) 
+```
+
+
+## Surprisingly many subgame perfect equilibria
+
+Let us solve the game and take a look at the equilibria.
+```{r}
+
+game %>%
+  game_solve_spe() %>%
+  eq_tables()
+```
+
+If you are not familiar with the exact definition of a subgame perfect equilibrium (and maybe even if you are), the result may surprise you. We have 32 different pure SPE and even though players care only about their own monetary payoff, every offer between 0 and 3 is supported by some SPE. 
+
+We also see that every possible offer between 0 and 4 is accepted in half of the SPE and rejected in the other half.
+
+Let us take a look at the game structure:
+```{r}
+# Show size information only 
+game %>% game_print_size_info()
+```
+
+We only have a single subgame. The reason is that a new subgame only begins if a player perfectly knows the outcomes of all previous moves of natures and all previous actions. Since no player observes the initial realization of `autoAccept` the only "subgame", is the complete game. This means the set of SPE is equal to the set of Nash equilibria and backward induction does not help to compute SPE. You may recall that the ultimatum game has a lot of Nash equilibria supported by out-off-equilibrium threats to reject out-off-equilibrium offers.
+
+(As a test question you can ask yourself why in our game there is no SPE in which the proposer offers the whole cake, even though that is a NE in the original ultimatum game.)
+
+## Finding a sequential equilibrium using the Gambit logit solver
+
+Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. 
+
+Gambit has the command line solver `gambit-logit` [documentation](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) that tries to find one sequential equilibrium using a homotopy method based on quantal response equilibria. The following code solves for an equilibrium using the `gambit-logit` solver:
+
+```{r}
+# If gambit binaries are not on your path
+# change the options globally
+# options(gambit.dir = "your Gambit directory")
+game %>%
+  game_gambit_solve("gambit-logit -q -e") %>%
+  eq_tables()
+```
+We get one equilibrium that is sequentially rational. Interesting this is a mixed strategy equilibrium, in which the responder is equally likely to accept or reject a zero offer.
+
+
+## Optimally placing moves of nature in game definition
+
+In our example there is a much simpler approach to get fewer equilibria. Follow a simple rule:
+
+    Define moves of nature as late as possible in the game.
+
+Since the variable `autoAccept` is first and only used in the last stage, we should not specify it before that last stage. So consider the following modification of our game. 
+
+```{r}
+game = new_game(
+  gameId = "UG_AutoAccept",
+  params = list(numPlayers=2, cake=4, acceptProb=0.2),
+  options = make_game_options(verbose=FALSE),
+  stages = list(
+    stage("proposerStage",
+      player=1,
+      actions = list(
+        action("offer",~0:cake)
+      )
+    ),
+    stage("responderStage",
+      player=2,
+      observe = "offer",
+      actions = list(
+        action("accept",c(FALSE,TRUE))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      nature=list(
+        natureMove("autoAccept", c(FALSE,TRUE),probs = ~c(1-acceptProb,acceptProb))
+      ),
+      compute=list(
+        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
+        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
+      )
+    )
+  )
+) 
+
+game %>%
+  game_solve_spe() %>%
+  print(show.stages = FALSE)
+```
+
+We now have again 6 subgames and subgame perfection has bite again. Only the two pure equilibria where 0 or 1 is offered are selected.
+
+Remark on the order of nature, compute and actions: In a stage, first move of natures are computed, then deterministic computations and then actions take place. This means the formulas of the computed payoffs in the `PayoffStage` can use the value of the move of nature `autoAccept` in the same stage. So here we can put both variables in the same stage. Sometimes one has to add an extra computation stage, however.

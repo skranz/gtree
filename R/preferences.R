@@ -66,9 +66,6 @@ pref_payoff = function(player=1:2,...) {
 pref_custom = function(..., params=NULL, label="custom") {
   utils_general = eval(substitute(alist(...)))
   restore.point("pref_custom")
-  if (is.null(players)) {
-    players = seq_along(utils_general)
-  }
   utils = lapply(utils_general, function(u) substitute.call(u, params))
   res = list(utils_general = utils_general, utils=utils, params=params, label=label, type="custom")
   class(res) = c("preferences","list")

@@ -1,0 +1,32 @@
+EFG 2 R "Sender-Receiver" { "pl1" "pl2" }
+c "" 13 "" { "orange_1" 0.5 "orange_2" 0.5 } 0
+c "" 14 "" { "blue_1" 0.5 "blue_2" 0.5 } 0
+p "" 1 1 "" { "reveal_orange" "reveal_blue" } 0
+p "" 2 5 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 1 "" { 1, 1 }
+t "" 2 "" { 0, 0 }
+p "" 2 5 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 3 "" { 1, 1 }
+t "" 4 "" { 0, 0 }
+p "" 1 2 "" { "reveal_orange" "reveal_blue" } 0
+p "" 2 5 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 5 "" { 1, 1 }
+t "" 6 "" { 0, 0 }
+p "" 2 6 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 7 "" { 1, 1 }
+t "" 8 "" { 0, 0 }
+c "" 15 "" { "blue_1" 0.5 "blue_2" 0.5 } 0
+p "" 1 3 "" { "reveal_orange" "reveal_blue" } 0
+p "" 2 6 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 9 "" { 1, 1 }
+t "" 10 "" { 0, 0 }
+p "" 2 5 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 11 "" { 1, 1 }
+t "" 12 "" { 0, 0 }
+p "" 1 4 "" { "reveal_orange" "reveal_blue" } 0
+p "" 2 6 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 13 "" { 1, 1 }
+t "" 14 "" { 0, 0 }
+p "" 2 6 "" { "accept_TRUE" "accept_FALSE" } 0
+t "" 15 "" { 1, 1 }
+t "" 16 "" { 0, 0 }

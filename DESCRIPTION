@@ -8,6 +8,7 @@ Maintainer: Sebastian Kranz <sebastian.kranz@uni-ulm.de>
 Description:
   gtree basic functionality to model and solve games 
 License: GPL >= 2.0
+URL: https://github.com/skranz/gtree
 Depends:
   restorepoint,stringtools, yaml,
   data.table,dplyr, dplyrExtras, 

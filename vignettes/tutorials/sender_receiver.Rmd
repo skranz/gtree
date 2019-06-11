@@ -108,7 +108,7 @@ game %>%
   game_print_size_info() %>%
   game_gambit_solve(mixed=TRUE,gambit.command = "gambit-logit -q -e")
 
-game %>% game.eq.tables()
+game %>% eq_tables()
 ```
 The results seem intutive: Player 2 only accepts if and only if the shown card is at least a 6. Player 1 always shows a card that is at least 6 if he has one.
 
@@ -170,7 +170,7 @@ game %>%
   game_print_size_info() %>%
   game_solve() %>%
   game_print_eq_tables() %>%
-  game.outcomes() -> oco
+  get_outcomes() -> oco
 
 ```
 
@@ -232,5 +232,5 @@ game %>%
   game_print_size_info() %>%
   game_solve() %>%
   game_print_eq_tables() %>%
-  game.outcomes() -> oco
+  get_outcomes() -> oco
 ```

@@ -1,5 +1,5 @@
 ---
-title: "gtree - Introduction a Simple Ultimatum Game"
+title: "gtree - Exploring Reciprocity Preferences"
 output: html_document
 ---
 
@@ -8,21 +8,31 @@ knitr::opts_chunk$set(echo = TRUE, error=TRUE)
 library(gtree)
 ```
 
-## Specifying a game
-
-First, we load the `gtree` library amd then define a simple Ultimatum game with the function `new_game`.
+## An Ultimatum Game with possibility of random offer
 
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "UltimatumGame",
+  gameId = "miniUG_RandomOffer",
   options = make_game_options(verbose=TRUE),
-  params = list(numPlayers=2,cake=4),
+  params = list(numPlayers=2,natureProb = 0.5, low=2, high=8, mid=5),
   stages = list(
+    stage("who_offers",
+      nature = list(
+        natureMove("offerType",c("nature","player"), probs = ~c(natureProb, 1-natureProb))
+      )  
+    ),
     stage("proposerStage",
       player=1,
+      condition = ~ offerType == "player",
       actions = list(
-        action("offer",~0:cake)
+        action("playerOffer",0:1)
+      )
+    ),
+    stage("randomOffer",
+      condition = ~ offerType == "nature"
+      nature = list(
+        natureMove("natureOffer",c("equal","unequal"))
       )
     ),
     stage("responderStage",
@@ -81,7 +91,7 @@ As a game tree our game looks as follows:
 ![ug.svg](ug.svg)
 
 
-Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. Gambit has a larger selection of solvers and for many cases, you have to use Gambit. E.g. when finding a mixed strategy equilibrium. Only for finding all pure strategy SPE, `gtree` has an internal solver (it is often faster than the corresponding `gambit-enumpure` solver of Gambit). The internal solver computes some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
+Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. For finding pure strategy equilibria, usually (but not always) the internal `gtree` solver is faster. It will compute some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
 
 Remark 2: To generate an image of the game tree, we can export the game to a [Gambit](http://www.gambit-project.org/) extensive form game format using the following command:
 ```{r eval=FALSE}
@@ -98,10 +108,10 @@ game_solve_spe(game)
 
 The following code shows the equilibrium outcomes, i.e. all actions and computed variables on the equilibrium path. 
 ```{r}
-game.eq.outcomes(game)
+eq_outcomes(game)
 ```
 We have two different equilibrium outcomes: the proposer either offers 
-0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `game.expected.eq.outcomes` that shows expected equilibrium outcomes.
+0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `eq_expected_outcomes` that shows expected equilibrium outcomes.
 
 Remark on my naming convention for functions: A function that starts with `game.` takes as first argument a game object but does not return a game object. In contrast, a function starting with `game_` takes a game object as first argument and always returns a game object.
 
@@ -112,7 +122,7 @@ An equilibrium also describes equilibrium play off the equilibrium path, e.g. it
 
 In gtree there are different ways to represent the computed equilibria. Here is a convenient representation for pure strategy equilibria:
 ```{r}
-game.eq.tables(game, combine=2, reduce.tables = TRUE)
+eq_tables(game, combine=2, reduce.tables = TRUE)
 ```
 We have a list with a `tibble` for every action variable.
 
@@ -128,13 +138,13 @@ In my view that such a representation of equilibria is quite intuitive and conve
 
 Yet, `gtree` uses  a different internal representation of equilibria. To understand the internal representation it is first useful to show all possible outcomes of the game:
 ```{r}
-game.outcomes(game, reduce.cols=TRUE)
+get_outcomes(game, reduce.cols=TRUE)
 ```
 This data frame corresponds to all possible full paths that can be taken through the game tree. (It does not fully describe the game tree, though, since it contains no specification of information sets.)
 
 Let us now show the internal representation of our 2 equilibria:
 ```{r}
-game.eq.li(game)
+eq_li(game)
 ```
 It is a list with a matrix for each equilibrium. Each row corresponds to one possible outcome of the game and the column describe for each action the equilibrium choice probability on the corresponding outcome path. The last column specifies the total probality of the particular outcome in the equilibrium. 
 
@@ -175,7 +185,7 @@ prefs = pref_custom(
 game %>%
   game_set_preferences(prefs) %>%
   game_solve_spe(game) %>% 
-  game.eq.tables()
+  eq_tables()
 ```
 We see that with inequality aversion with an envy parameter of `alpha=1` and a guilt parameter of `beta=0.5` there is a unique SPE in which the proposer offers half of the cake.
 
@@ -185,7 +195,7 @@ Some common preference clases that are only transformations of material payoffs 
 game %>%
   game_set_preferences(pref_ineqAv(alpha=1,beta=0, player=1:2)) %>%
   game_solve_spe(game) %>% 
-  game.eq.tables()
+  eq_tables()
 ```
 
 We will discuss later how one can specify heterogenous preferences via different preference types.
@@ -231,7 +241,7 @@ game = new_game(
 
 game %>%
   game_solve_spe() %>%
-  game.eq.tables()
+  eq_tables()
 
 ```
 
@@ -242,26 +252,16 @@ We also see that every possible offer between 0 and 4 is accepted in half of the
 Let us take a look at the game structure:
 ```{r}
 # Show size information only 
-game %>% game_print_size_info()
+print(game, show.stages=FALSE, show.eq=FALSE)
 ```
 
 We only have a single subgame. The reason is that a new subgame only begins if a player perfectly knows the outcomes of all previous moves of natures and all previous actions. Since no player observes the initial realization of `autoAccept` the only "subgame", is the complete game. This means the set of SPE is equal to the set of Nash equilibria and backward induction does not help to compute SPE. You may recall that the ultimatum game has a lot of Nash equilibria supported by out-off-equilibrium threats to reject out-off-equilibrium offers.
 
 (As a test question you can ask yourself why in our game there is no SPE in which the proposer offers the whole cake, even though that is a NE in the original ultimatum game.)
 
-Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. 
+Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. Unfortunately, I don't know a fast algorithm to compute sequential, trembling-hand perfect or perfect Bayesian algorithms (neither is there a Gambit command line tool for it).
 
-Gambit has the command line solver `gambit-logit` [documentation](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) that tries to find one sequential equilibrium using a homotopy method based on quantal response equilibria. The following code solves for an equilibrium using the `gambit-logit` solver:
-
-```{r}
-game %>%
-  game_gambit_solve("gambit-logit -q -e") %>%
-  game.eq.tables()
-```
-We get one equilibrium that is sequentially rational. Interesting this is a mixed strategy equilibrium, in which the responder is equally likely to accept or rejet a zero offer.
-
-
-Another approach is to modify the game to manually add trembles in order to select equilibria that will usually coincide with trembling-hand perfect equilbria. The call to function `game_add_tremble` in the following code changes the game structure such that with probability 0.01%, the proposer trembles and picks a random offer.
+We can however modify the game to manually add trembles in order to select equilibria that will usually coincide with trembling-hand perfect equilbria. The call to function `game_add_tremble` in the following code changes the game structure such that with probability 0.01%, the proposer trembles and picks a random offer.
 ```{r}
 game %>%
   # make deep copy since game structure will be changed  
@@ -276,15 +276,15 @@ The stages `proposerStage` and `proposeStage_performTremble` have a `condition` 
 
 The number of possible outcomes naturally increases, but the number of strategy profiles has not increased by the possibility of trembles.
 
-Looking at the equilibria, we see that only the two intuitive pure strategy equilibria where the proposer offers 0 or 1 survive.  
+Looking at the equilibria, we see that only the two intuitive equilibria where the proposer offers 0 or 1 survive.  
 
 ## Optimal position of moves of nature in stage game
 
-In our example there is a much simpler approach to get fewer equilibria. Follow a simple rule:
+Instead of adding trembles there would be a much simpler modification to reduce the number of equilibria that follows a simple rule:
 
     Define moves of nature as late as possible in the game.
 
-Since the variable `autoAccept` is first and only used in the last stage, we should not specify it before that last stage. So consider the following modification of our game. 
+Since the variable `autoAccept` is first and only used in the last stage, we should not specify before that last stage. So consider the following modification of our game. 
 
 ```{r}
 game = new_game(
@@ -323,6 +323,6 @@ game %>%
   print(show.stages = FALSE)
 ```
 
-We now have again 6 subgames and subgame perfection has bite again. Only the two pure equilibria where 0 or 1 is offered are selected.
+We now have again 6 subgames and subgame perfection has bite again. Only the two equilibria where 0 or 1 is offered are selected.
 
-Remark on the order of nature, compute and actions: In a stage, first move of natures are computed, then deterministic computations and then actions take place. This means the formulas of the computed payoffs in the `PayoffStage` can use the value of the move of nature `autoAccept` in the same stage. So here we can put both variables in the same stage. Sometimes one has to add an extra computation stage, however.
+Note that in a stage first move of natures are computed, then deterministic variables are computated and then actions take place. This means the payoffs in the `PayoffStage` can use the value of `autoAccept`. Otherwise, we simply had to add a separate stage.

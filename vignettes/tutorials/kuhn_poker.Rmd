@@ -1,0 +1,138 @@
+---
+title: "Kuhn Poker"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error=TRUE)
+library(gtree)
+```
+
+## Kuhn Poker Description
+
+Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_poker) in conventional poker terms as follows:
+
++ Each player antes 1.
+
++ Each player is dealt one of the three cards, and the third is put aside unseen.
+
++ Player one can check or bet 1.
+  + If player one checks then player two can check or bet 1.
+    + If player two checks there is a showdown for the pot of 2 (i.e. the higher card wins 1 from the other player).
+    + If player two bets then player one can fold or call.
+      + If player one folds then player two takes the pot of 3 (i.e. winning 1 from player 1).
+      + If player one calls there is a showdown for the pot of 4 (i.e. the higher card wins 2 from the other player).
+  + If player one bets then player two can fold or call.
+    + If player two folds then player one takes the pot of 3 (i.e. winning 1 from player 2).
+    + If player two calls there is a showdown for the pot of 4 (i.e. the higher card wins 2 from the other player).
+
+## Specifying as gtree game
+
+```{r}
+library(gtree)
+game = new_game(
+  gameId = "Kuhn-Poker",
+  params = list(numPlayers=2),
+  options = make_game_options(verbose=1),
+  stages = list(
+    stage("dealCards",
+      nature = list(
+        natureMove("pl1_card", 1:3),
+        natureMove("pl2_card", ~setdiff(1:3, pl1_card))
+      )
+    ),
+    stage("pl1CheckBet",
+      player=1,
+      observe = c("pl1_card"),
+      actions = list(
+        action("cb1",c("check","bet"))
+      )
+    ),
+    stage("pl2CheckBet",
+      player=2,
+      condition = ~ cb1 == "check",
+      observe = c("pl2_card","cb1"),
+      actions = list(
+        action("cb2",c("check","bet"))
+      )
+    ),
+    stage("pl2FoldCall",
+      player=2,
+      condition = ~ cb1 == "bet",
+      observe = c("pl2_card","cb1"),
+      actions = list(
+        action("fc2",c("fold","call"))
+      )
+    ),
+    stage("pl1FoldCall",
+      player=1,
+      condition = ~ is_true(cb1 == "check" & cb2=="bet"),
+      observe = c("cb2"),
+      actions = list(
+        action("fc1",c("fold","call"))
+      )
+    ),
+    stage("PayoffStage",
+      player=1:2,
+      compute=list(
+        folder ~ case_distinction(
+          is_true(fc1 == "fold"),1,
+          is_true(fc2 == "fold"),2,
+          0
+        ),
+        winner ~ case_distinction(
+          folder == 1,2,
+          folder == 2,1,
+          folder == 0, (pl2_card > pl1_card) +1
+        ),
+        gave1 ~ 1 + 1*(is_true(cb1 == "bet") | is_true(fc1 == "call")),
+        gave2 ~ 1 + 1*(is_true(cb2 == "bet") | is_true(fc2 == "call")),
+        pott ~ gave1 + gave2,
+        payoff_1 ~ (winner == 1)*pott - gave1,
+        payoff_2 ~ (winner == 2)*pott - gave2
+      )
+    )
+  )
+) 
+```
+
+To check whether we have correctly specified the game, let us take a look at the outcomes:
+```{r}
+game %>% get_outcomes()
+```
+
+Looking at the number of pure strategy profiles the game seems tractable for numerical analysis
+```{r}
+game %>%
+  game_print_size_info()
+```
+
+
+## Solving Kuhn Poker
+
+Let us now solve the game using the `gambit-logit` solver, which is the default solver for finding a mixed strategy equilibrium:
+```{r}
+game %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_tables()
+```
+
+```{r}
+game %>% 
+  eq_expected_outcomes() %>% 
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
+```
+
+## Inequality Averse Players
+What if players become inequality averse?
+```{r}
+game %>%
+  game_set_preferences(pref_ineqAv(alpha=1, beta=0.5)) %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_tables()
+
+game %>% 
+  eq_expected_outcomes() %>% 
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
+```
+

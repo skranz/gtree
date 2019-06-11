@@ -15,7 +15,6 @@ Author: Sebastian Kranz, Ulm University
 gtree is an R package that allows you to specify extensive form games using stages, similar as one specifies economic experiments with [ztree](https://www.ztree.uzh.ch/en.html) or [otree](https://otree.readthedocs.io/en/latest/). The game is internally converted to a formal game tree and one can find its equilibria using a [Gambit](http://www.gambit-project.org/) solver or an internal solver. The equilibria are presented in a format that facilitates comparison with experimental results. One can also conveniently study the effects of non-standard preferences characterized e.g. by inequality aversion or loss aversion.
 
 
-
 Here is an example of a game definition:
 ```{r}
 library(gtree)
@@ -66,7 +65,7 @@ The following code assumes that players have inequality aversion preferences à 
 game %>%
   game_set_preferences(pref_ineqAv(alpha=1, beta=0)) %>%
   game_solve() %>%
-  game.eq.tables()
+  eq_tables()
 ```
 
 We see that the proposer offers 4 and every offer below 4 would be rejected. What happens for an auto accept probability of 90%?
@@ -75,7 +74,7 @@ We see that the proposer offers 4 and every offer below 4 would be rejected. Wha
 game %>%
   game_change_param(autoAcceptProb = 0.9) %>%
   game_solve() %>%
-  game.eq.tables()
+  eq_tables()
 ```
 
 While the responder's behavior does not change, the proposer will now only offer 0. Sure the offer will be rejected with 10% probability, but in 90% of cases the proposer gets the whole cake for herself.

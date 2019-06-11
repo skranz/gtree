@@ -1,4 +1,4 @@
-# gtree: Game-Theoretic Representation of Economic Experiments"
+# gtree: Game-Theoretic Representation of Economic Experiments
 
 Author: Sebastian Kranz, Ulm University
 

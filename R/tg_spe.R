@@ -83,7 +83,7 @@ compute.tg.fields.for.internal.solver = function(tg, verbose=TRUE, add.sg = TRUE
   if (add.spi | add.spo) {
     num.sp = sum(tg$sg.df$.num.strats.without.desc)
     if (num.sp > max.sp) {
-      stop(paste0("Even using subgames there are ", num.sp, " relevant strategy profile. Yet as an upper bound the internal gtree solver only attempts to fully compile and solve the game if there are fewer than ", max.sp, " relevant strategy profiles. You can change this bound e.g. to 2 Mio by calling \n\noptions(gtree.max.sp = 2000000)\n\nSome Gambit solvers, like gambit-logit, use algorithms that can still find one equilibrium in reasonable time for certain but not all games with a very large number of strategy profiles. So try out game_gambit_solve with a fitting Gambit command line tool (see Gambit documention)." ))
+      stop(paste0("Even using subgames there are ", num.sp, " relevant strategy profile.\nYet as an upper bound the internal gtree solver only attempts to fully compile and solve the game\nif there are fewer than ", max.sp, " relevant strategy profiles.\n You can change this bound e.g. to 2 Mio by calling \n\noptions(gtree.max.sp = 2000000)\n\nSome Gambit solvers, like gambit-logit, use algorithms that can still find one equilibrium\nin reasonable time for certain but not all games with a very large number of strategy profiles.\nSo try out game_gambit_solve with a fitting Gambit command line tool (see Gambit documention)." ))
     }
   }
 

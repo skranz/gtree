@@ -1,0 +1,33 @@
+template:
+  params:
+    bootswatch: cerulean
+navbar:
+  structure:
+    left:
+    - home
+    - articles
+    - reference
+    - tutorials
+    - news
+    right: github
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Tutorials
+      menu:
+        - text: '1. Introduction: A Simple Ultimatum Game'
+          href: articles/t01_ultimatum_basic.html
+        - text: '2. Moves of Nature and Imperfect Information'
+          href: articles/t02_ultimatum_imperfect.html
+        - text: '3. Kuhn Poker'
+          href: articles/t03_kuhn_poker.html
+        - text: '4. Comparing with Gambit Python API: QRE in a Sender-Receriver Game'
+          href: articles/t04_sender_receiver.html
+    github:
+      icon: fa-github fa-lg
+      href: https://github.com/skranz/gtree

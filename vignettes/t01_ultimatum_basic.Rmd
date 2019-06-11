@@ -1,5 +1,5 @@
 ---
-title: "gtree - Introduction a Simple Ultimatum Game"
+title: "1. Introduction: A Simple Ultimatum Game"
 output: html_document
 ---
 
@@ -8,16 +8,18 @@ knitr::opts_chunk$set(echo = TRUE, error=TRUE)
 library(gtree)
 ```
 
-## Specifying a game
+This tutorial uses an even simpler ultimatum game example than the README file. Yet, we explain `gtree` in a bit more detail.
 
-First, we load the `gtree` library amd then define a simple Ultimatum game with the function `new_game`.
+## Specifying the game
+
+First, we load the `gtree` library amd then define a simple ultimatum game with the function `new_game`.
 
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "UG_AutoAccept",
-  params = list(numPlayers=2, cake=6, acceptProb=0.2),
-  options = make_game_options(verbose=1),
+  gameId = "UltimatumGame",
+  options = make_game_options(verbose=TRUE),
+  params = list(numPlayers=2,cake=4),
   stages = list(
     stage("proposerStage",
       player=1,
@@ -34,57 +36,32 @@ game = new_game(
     ),
     stage("PayoffStage",
       player=1:2,
-      nature=list(
-        natureMove("autoAccept", c(FALSE,TRUE),probs = ~c(1-acceptProb,acceptProb))
-      ),
       compute=list(
-        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
-        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
+        payoff_1 ~ ifelse(accept, cake-offer,0),
+        payoff_2 ~ ifelse(accept, offer,0)
       )
     )
   )
-) 
-
-pref.list = list(
-#  pref_payoff(),
-  pref_ineqAv(alpha=0.5, beta=0)
 )
-param.grid = expand.grid(alpha = c(0.5,1),acceptProb=c(0.3,0.5,0.8))
-
-game_study(game, param.grid=param.grid, pref.list=pref.list)
-
-game.study.eq.outcomes(game) %>%
-  group_by_at(c(names(param.grid),"pref")) %>%
-  summarize(min_offer = min(offer), max_offer=max(offer))
-
-game %>%
-  game_change_param(acceptProb = 0) %>%
-  game_set_preferences(pref_envy(alpha=5)) %>%
-  game_solve_spe() %>%
-  game.eq.tables()
-
-oco = game %>% game.outcomes()
 ```
-
-
 The `gameId` should be a unique name of the game. This is relevant if we want to conveniently save results, like computed equilibria, in the default folder structure used by `gtree`.
 
 We then define a list of parameters `params`. Parameters can be referenced to in later definitions of the game. Note that you must *always* specify the number of players in a parameter called `numPlayers`. We also specify the size of the `cake` that can be distributed between the proposer and responder in the game.
 
 Heart of our definition is a list of 3 `stages`. Each stage in the list should be generated with the function `stage` that sets defaults and transforms all formulas into a canoncial format.
 
-1. In the first stage is named `proposerStage`. The argument `player=1`, specifies that player 1 acts here.
+1\. In the first stage is named `proposerStage`. The argument `player=1`, specifies that player 1 acts here.
 She chooses an action `offer`, that is created with the function `action` and element of a list `actions`. The function `action` first requires a name and then a set of possible values the action can take. Here we specify the set as a formula `~ 0:cake`. This means we compute the action set based on the specified parameters and possibly based on previously computed variables including chosen action values or realized moves of nature.<br>
 Alternatively, we could also provide a fixed action set without formula e.q. `0:4`. This can not contain references to parameters or variables of the game and is always fixed when the game is created.
 
-2. In the second stage player 2, observes the offer. This is specified by the argument `observe="offer"`. The argument observe specifies all observed variables as a simple character vector, or remains `NULL` if nothing is observed.<br>
+2\. In the second stage player 2, observes the offer. This is specified by the argument `observe="offer"`. The argument observe specifies all observed variables as a simple character vector, or remains `NULL` if nothing is observed.<br>
 Player 2 then decides whether to accept the action or not. Here we have chosen the fixed action set `c(FALSE,TRUE)`. You could encode specify the set for accept in a different way, e.g. as a character vector `c("reject","accept")` or an integer vector `c(0,1)`. 
 
 
-3. The third stage just computes variables as specified by the list provided for the field `compute`. You can briefly specify a computation with the formula syntax `name ~ formula`.  Note that for each player `i` you must compute somewhere in your game the variable `payoff_i`, like `payoff_1` and `payoff_2`, that specifies the (monetary) payoff for that player. We can later easily transform these monetary payoffs, using some alternative outcome based utility function, e.g. to account for inequality aversion or loss aversion.
-<br>You can use any vectorized, deterministic R function to specify a computed variable. Random variables must be declared separately, as a move of nature, however (see further below). Here we use the function `ifelse` for a simple distinction of two cases. For distinguishing more than two cases the functions `cases` in `gtreeCore` provides a simple syntax. Note that we could have more compactly written:
-`payoff_1 ~ (cake-offer)*accept` and `payoff_2 ~ offer*accept`
-<br>For computing equilibria, it does not really matter which players you specify a stage in which no action takes place. However, `gtree` also has (currently rudimentary) features to run a game as a web-based experiment. When running as an experiment, a stage will be shown to all players that are specified in the `players` field. If an action is taken in a stage, exactly ONE player must be specified. For stages without actions, you can specify any number of players including no player.
+3\. The third stage just computes variables as specified by the list provided for the field `compute`. You can briefly specify a computation with the formula syntax `name ~ formula`.  Note that for each player `i` you must compute somewhere in your game the variable `payoff_i`, like `payoff_1` and `payoff_2`, that specifies the (monetary) payoff for that player. We can later easily transform these monetary payoffs, using some alternative outcome based utility function, e.g. to account for inequality aversion or loss aversion.
+<br>You can use any vectorized, deterministic R function to specify a computed variable. Random variables must be declared separately, as a move of nature, however (see further below). Here we use the function `ifelse` for a simple distinction of two cases. For distinguishing more than two cases the functions `cases` in `gtree` provides a simple syntax. Note that we could have more compactly written: `payoff_1 ~ (cake-offer)*accept` and `payoff_2 ~ offer*accept`
+
+For computing equilibria, it does not really matter which players you specify a stage in which no action takes place. However, `gtree` also has (currently rudimentary) features to run a game as a web-based experiment. When running as an experiment, a stage will be shown to all players that are specified in the `players` field. If an action is taken in a stage, exactly ONE player must be specified. For stages without actions, you can specify any number of players including no player.
 
 We can get a short overview of a specified game by typing its variable name in the R console.
 ```{r}
@@ -93,7 +70,7 @@ game
 
 ## Compiling and Solving for equilibria
 
-In order to compute equlibria `gtree` will create different internal representations of the game. While the function `game_solve_spe` will automatically call the corresponding functions, it is useful to call them manually before.
+In order to compute equlibria `gtree` will create different internal representations of the game. While the function `game_solve` will automatically call the corresponding functions, it is useful to call them manually before.
 ```{r}
 game_compile(game, for.internal.solver = TRUE)
 game
@@ -104,9 +81,13 @@ As a game tree our game looks as follows:
 ![ug.svg](ug.svg)
 
 
-Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. For finding pure strategy equilibria, usually (but not always) the internal `gtree` solver is faster. It will compute some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
+Remark 1: By default `game_compile` only computes the information neccessary to create a game tree that can be saved as a Gambit `.efg` file and then solved via Gambit. Gambit has a larger selection of solvers and for many cases, you have to use Gambit. E.g. when finding a mixed strategy equilibrium. Only for finding all pure strategy SPE, `gtree` has an internal solver (it is often faster than the corresponding `gambit-enumpure` solver of Gambit). The internal solver computes some additional information, e.g. identifying in which information sets new subgames start. The argument `for.internal.solver` forced the computation of this additional information.
 
-Remark 2: To generate an image of the game tree, we can export the game to a [Gambit](http://www.gambit-project.org/) extensive form game format using the following command:
+
+Remark 2: A game object is an environment, this means functions like `game_compile` have side effects and directly change the game object. Nevertheless, all functions starting with `game_` also return the changed game object invisibly. They thus can be conveniently used with pipes.
+
+
+Remark 3: To generate an image of the game tree, we can export the game to a [Gambit](http://www.gambit-project.org/) extensive form game format using the following command:
 ```{r eval=FALSE}
 game_write_efg(game,"UG.efg")
 ```
@@ -114,19 +95,17 @@ We can then open the file with Gambit GUI, which draws the game tree.
 
 Ok, enough remarks. Let us now solve the game. More precisely, we use the internal solver to find all pure strategy subgame (SPE) perfect equilibria.
 ```{r}
-game_solve_spe(game)
+game_solve(game)
 ```
 
 ### Equilibrium outcomes
 
 The following code shows the equilibrium outcomes, i.e. all actions and computed variables on the equilibrium path. 
 ```{r}
-game.eq.outcomes(game)
+eq_outcomes(game)
 ```
 We have two different equilibrium outcomes: the proposer either offers 
-0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `game.expected.eq.outcomes` that shows expected equilibrium outcomes.
-
-Remark on my naming convention for functions: A function that starts with `game.` takes as first argument a game object but does not return a game object. In contrast, a function starting with `game_` takes a game object as first argument and always returns a game object.
+0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `eq_expected_outcomes` that shows expected equilibrium outcomes.
 
 
 ### Equilibria represented as action tables
@@ -135,7 +114,7 @@ An equilibrium also describes equilibrium play off the equilibrium path, e.g. it
 
 In gtree there are different ways to represent the computed equilibria. Here is a convenient representation for pure strategy equilibria:
 ```{r}
-game.eq.tables(game, combine=2, reduce.tables = TRUE)
+eq_tables(game, combine=2, reduce.tables = TRUE)
 ```
 We have a list with a `tibble` for every action variable.
 
@@ -151,16 +130,15 @@ In my view that such a representation of equilibria is quite intuitive and conve
 
 Yet, `gtree` uses  a different internal representation of equilibria. To understand the internal representation it is first useful to show all possible outcomes of the game:
 ```{r}
-game.outcomes(game, reduce.cols=TRUE)
+get_outcomes(game, reduce.cols=TRUE)
 ```
 This data frame corresponds to all possible full paths that can be taken through the game tree. (It does not fully describe the game tree, though, since it contains no specification of information sets.)
 
 Let us now show the internal representation of our 2 equilibria:
 ```{r}
-game.eq.li(game)
+eq_li(game)
 ```
 It is a list with a matrix for each equilibrium. Each row corresponds to one possible outcome of the game and the column describe for each action the equilibrium choice probability on the corresponding outcome path. The last column specifies the total probality of the particular outcome in the equilibrium. 
-
 
 The attribute `info.set.probs` shows the most compact equilibrium representation. It is just a numerical vector that describes the move probability for every possible move in every information set. This is similar to the equilibrium representation that you get if you manually call a Gambit solver on an `.efg` file (except that Gambit has a different default ordering of the information sets). The information sets are further described in the `game` object. In principle you can access the information, e.g. by typing
 ```{r}
@@ -198,7 +176,7 @@ pref = pref_custom(
 game %>%
   game_set_preferences(pref) %>%
   game_solve_spe(game) %>% 
-  game.eq.tables()
+  eq_tables()
 ```
 We see that with inequality aversion with an envy parameter of `alpha=1` and a guilt parameter of `beta=0.5` there is a unique SPE in which the proposer offers half of the cake.
 
@@ -207,8 +185,8 @@ Some common preference clases that are only transformations of material payoffs 
 ```{r}
 game %>%
   game_set_preferences(pref_ineqAv(alpha=1,beta=0, player=1:2)) %>%
-  game_solve_spe(game) %>% 
-  game.eq.tables()
+  game_solve(game) %>% 
+  eq_tables()
 ```
 
 We will discuss later how one can specify heterogenous preferences via different preference types.

@@ -112,7 +112,7 @@ game_run_study = function(game, verbose=game$options$verbose,...) {
       game_set_preferences(game, pref)
     }
     game_solve_spe(game, verbose= (verbose>=2))
-    res = game.eq.outcomes(game)
+    res = eq_outcomes(game)
     add = as.list(study.grid[row,])
     add$pref = game$pref$label
     add$scenario.ind = row

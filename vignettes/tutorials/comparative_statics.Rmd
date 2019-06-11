@@ -1,5 +1,5 @@
 ---
-title: "gtree - Exploring Reciprocity Preferences"
+title: "gtree - Introduction a Simple Ultimatum Game"
 output: html_document
 ---
 
@@ -8,31 +8,21 @@ knitr::opts_chunk$set(echo = TRUE, error=TRUE)
 library(gtree)
 ```
 
-## An Ultimatum Game with possibility of random offer
+## Specifying a game
+
+First, we load the `gtree` library amd then define a simple Ultimatum game with the function `new_game`.
 
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "miniUG_RandomOffer",
-  options = make_game_options(verbose=TRUE),
-  params = list(numPlayers=2,natureProb = 0.5, low=2, high=8, mid=5),
+  gameId = "UG_AutoAccept",
+  params = list(numPlayers=2, cake=6, acceptProb=0.2),
+  options = make_game_options(verbose=1),
   stages = list(
-    stage("who_offers",
-      nature = list(
-        natureMove("offerType",c("nature","player"), probs = ~c(natureProb, 1-natureProb))
-      )  
-    ),
     stage("proposerStage",
       player=1,
-      condition = ~ offerType == "player",
       actions = list(
-        action("playerOffer",0:1)
-      )
-    ),
-    stage("randomOffer",
-      condition = ~ offerType == "nature"
-      nature = list(
-        natureMove("natureOffer",c("equal","unequal"))
+        action("offer",~0:cake)
       )
     ),
     stage("responderStage",
@@ -44,13 +34,36 @@ game = new_game(
     ),
     stage("PayoffStage",
       player=1:2,
+      nature=list(
+        natureMove("autoAccept", c(FALSE,TRUE),probs = ~c(1-acceptProb,acceptProb))
+      ),
       compute=list(
-        payoff_1 ~ ifelse(accept, cake-offer,0),
-        payoff_2 ~ ifelse(accept, offer,0)
+        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
+        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
       )
     )
   )
+) 
+
+pref.list = list(
+#  pref_payoff(),
+  pref_ineqAv(alpha=0.5, beta=0)
 )
+param.grid = expand.grid(alpha = c(0.5,1),acceptProb=c(0.3,0.5,0.8))
+
+game_study(game, param.grid=param.grid, pref.list=pref.list)
+
+game.study.eq.outcomes(game) %>%
+  group_by_at(c(names(param.grid),"pref")) %>%
+  summarize(min_offer = min(offer), max_offer=max(offer))
+
+game %>%
+  game_change_param(acceptProb = 0) %>%
+  game_set_preferences(pref_envy(alpha=5)) %>%
+  game_solve_spe() %>%
+  eq_tables()
+
+oco = game %>% game.outcomes()
 ```
 
 
@@ -108,10 +121,10 @@ game_solve_spe(game)
 
 The following code shows the equilibrium outcomes, i.e. all actions and computed variables on the equilibrium path. 
 ```{r}
-game.eq.outcomes(game)
+eq_outcomes(game)
 ```
 We have two different equilibrium outcomes: the proposer either offers 
-0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `game.expected.eq.outcomes` that shows expected equilibrium outcomes.
+0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `eq_expected_outcomes` that shows expected equilibrium outcomes.
 
 Remark on my naming convention for functions: A function that starts with `game.` takes as first argument a game object but does not return a game object. In contrast, a function starting with `game_` takes a game object as first argument and always returns a game object.
 
@@ -122,7 +135,7 @@ An equilibrium also describes equilibrium play off the equilibrium path, e.g. it
 
 In gtree there are different ways to represent the computed equilibria. Here is a convenient representation for pure strategy equilibria:
 ```{r}
-game.eq.tables(game, combine=2, reduce.tables = TRUE)
+eq_tables(game, combine=2, reduce.tables = TRUE)
 ```
 We have a list with a `tibble` for every action variable.
 
@@ -144,7 +157,7 @@ This data frame corresponds to all possible full paths that can be taken through
 
 Let us now show the internal representation of our 2 equilibria:
 ```{r}
-game.eq.li(game)
+eq_li(game)
 ```
 It is a list with a matrix for each equilibrium. Each row corresponds to one possible outcome of the game and the column describe for each action the equilibrium choice probability on the corresponding outcome path. The last column specifies the total probality of the particular outcome in the equilibrium. 
 
@@ -175,7 +188,7 @@ where $\pi$ denotes monetary payoffs.
 
 The following code manually specifies these preferences and solves for subgame perfect equilibria:
 ```{r}
-prefs = pref_custom(
+pref = pref_custom(
   util_1 = payoff_1 - alpha*(pmax(payoff_2-payoff_1,0)) - beta*(pmax(payoff_1-payoff_2,0)),
   util_2 = payoff_2 - alpha*(pmax(payoff_1-payoff_2,0)) - beta*(pmax(payoff_1-payoff_2,0)),
   params = list(alpha = 1, beta=0.5),
@@ -183,9 +196,9 @@ prefs = pref_custom(
 )
 
 game %>%
-  game_set_preferences(prefs) %>%
+  game_set_preferences(pref) %>%
   game_solve_spe(game) %>% 
-  game.eq.tables()
+  eq_tables()
 ```
 We see that with inequality aversion with an envy parameter of `alpha=1` and a guilt parameter of `beta=0.5` there is a unique SPE in which the proposer offers half of the cake.
 
@@ -195,134 +208,7 @@ Some common preference clases that are only transformations of material payoffs 
 game %>%
   game_set_preferences(pref_ineqAv(alpha=1,beta=0, player=1:2)) %>%
   game_solve_spe(game) %>% 
-  game.eq.tables()
+  eq_tables()
 ```
 
 We will discuss later how one can specify heterogenous preferences via different preference types.
-
-## Moves of Nature
-
-The following code generates a game that has an initial stage with a move of nature, a.k.a. a random variable, `autoAccept`. With probability 20% an offer will always be automatically accepted, even if the responder wants to reject it. This is like a probabilistic mixture between an Ultimatum Game and an Dictator Game.
-
-The effect of `autoAccept` is  specified in the `payoffStage`. No player observes `autoAccept`.
-```{r}
-game = new_game(
-  gameId = "UG_AutoAccept",
-  params = list(numPlayers=2, cake=4),
-  options = make_game_options(verbose=FALSE),
-  stages = list(
-    stage("autoAcceptStage",
-      nature=list(
-        natureMove("autoAccept", c(FALSE,TRUE),probs = c(0.8,0.2))
-      )
-    ),
-    stage("proposerStage",
-      player=1,
-      actions = list(
-        action("offer",~0:cake)
-      )
-    ),
-    stage("responderStage",
-      player=2,
-      observe = "offer",
-      actions = list(
-        action("accept",c(FALSE,TRUE))
-      )
-    ),
-    stage("PayoffStage",
-      player=1:2,
-      compute=list(
-        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
-        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
-      )
-    )
-  )
-) 
-
-game %>%
-  game_solve_spe() %>%
-  game.eq.tables()
-
-```
-
-If you are not familiar with the exact definition of a subgame perfect equilibrium (and maybe even if you are), the result may surprise you. We have 32 different pure SPE and even though players care only about their own monetary payoff, every offer between 0 and 3 is supported by some SPE. 
-
-We also see that every possible offer between 0 and 4 is accepted in half of the SPE and rejected in the other half.
-
-Let us take a look at the game structure:
-```{r}
-# Show size information only 
-print(game, show.stages=FALSE, show.eq=FALSE)
-```
-
-We only have a single subgame. The reason is that a new subgame only begins if a player perfectly knows the outcomes of all previous moves of natures and all previous actions. Since no player observes the initial realization of `autoAccept` the only "subgame", is the complete game. This means the set of SPE is equal to the set of Nash equilibria and backward induction does not help to compute SPE. You may recall that the ultimatum game has a lot of Nash equilibria supported by out-off-equilibrium threats to reject out-off-equilibrium offers.
-
-(As a test question you can ask yourself why in our game there is no SPE in which the proposer offers the whole cake, even though that is a NE in the original ultimatum game.)
-
-Intuitively, most of us would still solve the game via some form of backward induction. Formally, one could choose a refinement like `sequential equilibrium` or `trembling-hand perfect equilibrium` in which only equilibrium offers of 0 or 1 would survive. Unfortunately, I don't know a fast algorithm to compute sequential, trembling-hand perfect or perfect Bayesian algorithms (neither is there a Gambit command line tool for it).
-
-We can however modify the game to manually add trembles in order to select equilibria that will usually coincide with trembling-hand perfect equilbria. The call to function `game_add_tremble` in the following code changes the game structure such that with probability 0.01%, the proposer trembles and picks a random offer.
-```{r}
-game %>%
-  # make deep copy since game structure will be changed  
-  game_copy() %>%  
-  game_add_tremble(action="offer", tremble.prob = 0.0001) %>%
-  game_solve_spe() %>%
-  print()
-```
-You see that 2 new stages have been automatically added before the `proposerStage`: `proposeStage_willTremble` determines whether the proposer will tremble and `proposerStage_performTremble` will choose a random offer in case trembling happens.
-
-The stages `proposerStage` and `proposeStage_performTremble` have a `condition` field that specifies whether the stage will be played or not. Here it simply depends on whether trembling happens or not.
-
-The number of possible outcomes naturally increases, but the number of strategy profiles has not increased by the possibility of trembles.
-
-Looking at the equilibria, we see that only the two intuitive equilibria where the proposer offers 0 or 1 survive.  
-
-## Optimal position of moves of nature in stage game
-
-Instead of adding trembles there would be a much simpler modification to reduce the number of equilibria that follows a simple rule:
-
-    Define moves of nature as late as possible in the game.
-
-Since the variable `autoAccept` is first and only used in the last stage, we should not specify before that last stage. So consider the following modification of our game. 
-
-```{r}
-game = new_game(
-  gameId = "UG_AutoAccept",
-  params = list(numPlayers=2, cake=4, acceptProb=0.2),
-  options = make_game_options(verbose=FALSE),
-  stages = list(
-    stage("proposerStage",
-      player=1,
-      actions = list(
-        action("offer",~0:cake)
-      )
-    ),
-    stage("responderStage",
-      player=2,
-      observe = "offer",
-      actions = list(
-        action("accept",c(FALSE,TRUE))
-      )
-    ),
-    stage("PayoffStage",
-      player=1:2,
-      nature=list(
-        natureMove("autoAccept", c(FALSE,TRUE),probs = ~c(1-acceptProb,acceptProb))
-      ),
-      compute=list(
-        payoff_1 ~ ifelse(accept | autoAccept, cake-offer,0),
-        payoff_2 ~ ifelse(accept | autoAccept, offer,0)
-      )
-    )
-  )
-) 
-
-game %>%
-  game_solve_spe() %>%
-  print(show.stages = FALSE)
-```
-
-We now have again 6 subgames and subgame perfection has bite again. Only the two equilibria where 0 or 1 is offered are selected.
-
-Note that in a stage first move of natures are computed, then deterministic variables are computated and then actions take place. This means the payoffs in the `PayoffStage` can use the value of `autoAccept`. Otherwise, we simply had to add a separate stage.
