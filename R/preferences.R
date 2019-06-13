@@ -1,3 +1,56 @@
+game_fix_action_preferences =  function(game,..., actions = list(...), util.add = 1000) {
+  restore.point("game_fix_action_preferences")
+  pref = game$pref
+  if (is.null(pref)) {
+    pref = pref_payoff(game$players)
+  } else if (pref$type == "prefer_actions") {
+    pref = game$pref$org_pref
+  }
+  n = length(game$players)
+  player.actions = vector("list",n)
+  for (stage in game$vg$stages) {
+    vars = intersect(names(stage$actions), names(actions))
+    if (length(vars)==0) next
+    player = stage$player
+    if (!is.numeric(player)) {
+      stop(paste0("Can only fix action preferences for stages that have a fixed player (not a formula). This is not satisfied for action ", paste0(vars, collapse=", ")," in stage ", stage$name))
+    }
+    player.actions[[player]] = c(player.actions[[player]], actions[vars])
+  }
+  utils_general = first.non.null(pref$utils_general, pref$utils)
+  for (i in game$players) {
+    acts = player.actions[[i]]
+    if (length(acts)==0) {
+      if (is.character(utils_general[[i]]))
+        utils_general[i] = list(parse.as.call(utils_general[[i]]))
+      next
+    }
+    codes = sapply(seq_along(acts), function(act.ind) {
+      act = f2c(acts[[act.ind]])
+      if (is.character(act)) {
+        return(paste0("ifelse(",names(acts)[act.ind],"=='", act, "',util.add,0)"))
+      } else if (is.call(act) | is.name(act)) {
+        return(paste0("ifelse(",names(acts)[act.ind],"==", deparse1(act), ",util.add,0)"))
+      } else {
+        return(paste0("ifelse(",names(acts)[act.ind],"==", act, ",util.add,0)"))
+      }
+    })
+    code = paste0(codes, collapse="+")
+    if (is.character(utils_general[[i]])) {
+      code = paste0(utils_general[[i]], " + ", code)
+    } else {
+      code = paste0(deparse1(utils_general[[i]]), " + ", code)
+    }
+    utils_general[i] = list(parse.as.call(code))
+  }
+  params = c(pref$params, list(util.add = util.add))
+  utils = lapply(utils_general, function(u) substitute.call(u, params))
+  new.pref = list(utils_general = utils_general, utils=utils, params=params, label=pref$label, type="prefer_actions", org_pref = pref)
+  class(new.pref) = c("preferences","list")
+  game_set_preferences(game, new.pref)
+}
+
+
 #' Change the parameters of a preference object
 pref_change_params = function(pref, ..., params=list(), label=NULL, players=1:2, numPlayers=length(players)) {
   new.params = c(list(...), params)

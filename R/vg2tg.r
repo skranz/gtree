@@ -74,6 +74,7 @@ vg.to.tg = function(vg, branching.limit = 10000, add.sg=TRUE, add.spi=FALSE, add
 
   tg$stage.df = data_frame(numPlayers=tg$params$numPlayers,.prob=1)
 
+
   #tg$stage.df = as_data_frame(as.data.frame(tg$params,stringsAsFactors = FALSE))
   #tg$stage.df$.prob = 1
 
@@ -161,7 +162,9 @@ compute.tg.et.oco.etc = function(tg) {
   df = arrange_(df,.dots = order.cols)
 
   # Drop unnecessary cols to save memory
-  drop.cols = c(".info.set.ind",".node.ind",".info.set.move.ind",".player",paste0(".player_", 1:tg$numPlayers))
+  drop.cols = c(".info.set.ind",".node.ind",".info.set.move.ind",".player",paste0(".player_", 1:tg$numPlayers)
+#  ,"numPlayers"
+    )
   df = remove.cols(df,drop.cols)
 
   tg$stage.df = df

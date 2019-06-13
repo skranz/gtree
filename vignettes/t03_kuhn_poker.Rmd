@@ -132,7 +132,7 @@ Let us now solve the game using the `gambit-logit` solver, which is the default 
 ```{r}
 game %>%
   game_gambit_solve(mixed=TRUE)
-```
+L```
 
 Let us first take a look at the expected equilibrium outcomes:
 ```{r}
@@ -182,6 +182,28 @@ fgame %>%
   eq_cond_expected_outcomes(pl1_card = rep(1:3, each=2), cb1=rep(c("bet", "check"), times=3)) %>% 
   select(pl1_card, payoff_1,payoff_2, cb1, fc1, cb2,fc2)
 
+
+game %>%
+  game_fix_action_preferences(cb1="check", util.add=1000) %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_cond_expected_outcomes("pl1_card","cb1") %>%
+  select(payoff_1,payoff_2,pl1_card, cb1, fc1, cb2,fc2, is.eqo)  
+  
+game %>%
+  game_fix_action_preferences(cb1=~ifelse(pl1_card<=2,"check","bet"), util.add=10) %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_cond_expected_outcomes("pl1_card","cb1") %>%
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2, is.eqo)  
+
+game %>%
+  game_fix_action_preferences(cb1=~ifelse(pl1_card<=2,"check","bet"), util.add=10) %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_cond_expected_outcomes("pl1_card","pl2_card", "cb1") %>%
+  select(payoff_1,payoff_2,pl1_card, pl2_card, cb1, fc1, cb2,fc2, is.eqo)  
+
+
+game %>%  eq_expected_outcomes()  %>%
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)  
 
 pref = pref_custom(util_1 = ifelse(cb1=="check", payoff_1+1000, payoff_1), util_2 = payoff_2)
 game %>%

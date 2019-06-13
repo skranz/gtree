@@ -98,17 +98,17 @@ Ok, enough remarks. Let us now solve the game. More precisely, we use the intern
 game_solve(game)
 ```
 
-### Equilibrium outcomes
+## Expected Equilibrium outcomes
 
 The following code shows the equilibrium outcomes, i.e. all actions and computed variables on the equilibrium path. 
 ```{r}
-eq_outcomes(game)
+eq_expected_outcomes(game)
 ```
 We have two different equilibrium outcomes: the proposer either offers 
 0 or 1 and in both equilibrium outcomes the offer will be accepted. For games with moves of nature there is also a function `eq_expected_outcomes` that shows expected equilibrium outcomes.
 
 
-### Equilibria represented as action tables
+## Equilibria represented as action tables
 
 An equilibrium also describes equilibrium play off the equilibrium path, e.g. it also describes whether player 2 would `accept` an out-off-equilibrium `offer` of 3.
 
@@ -125,6 +125,17 @@ We have a list with a `tibble` for every action variable.
 The argument `combine` can take the values 0,1 and 2 and describes how the results of different equilibria are combined. For example, with `combine = 0`, we would get a separate list for every equilibrium. The argument `reduce.tables` automatically removes key columns that have no impact on the chosen equilibrium action.
 
 In my view that such a representation of equilibria is quite intuitive and convenient when comparing equilibrium predictions with experimental results.
+
+## Conditional expected equilibrium outcomes
+```{r}
+eq_cond_expected_outcomes(game, offer=0)
+```
+
+
+```{r}
+eq_cond_expected_outcomes(game, "offer")
+```
+
 
 ### Internal representation of equilibria
 

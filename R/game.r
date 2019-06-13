@@ -338,7 +338,10 @@ game_fix_actions = function(game, ..., fix.li=list(...), tremble.prob = NULL) {
   invisible(game)
 }
 
+game_fix_actions_using_util = function(game, ..., fix.li = list(...), util.add = 1000) {
+  game$action.util.fix.li = fix.li
 
+}
 
 
 #' Return a data frame of all possible outcomes
@@ -382,19 +385,19 @@ eq_li = function(game,...) {
 #' Return a data frame of all equilibrium outcomes
 #' @param game the game object for which previously equilibria were computed e.g. with \code{game_solve}.
 eq_outcomes = function(game) {
-  if (is.null(game$eqo.df))
-    game$eqo.df = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
-
-  game$eqo.df
+  res = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
+  cols = setdiff(colnames(res), c("numPlayers", ".outcome","eqo.ind"))
+  res = res[,c(cols,"eqo.ind")]
+  res
 }
 
 #' Return a data frame of expected equilibrium outcomes
 #' @param game the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.
-eq_expected_outcomes = function(game,ignore.NA = TRUE) {
-  if (is.null(game$eeqo.df))
-    game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg, ignore.NA = ignore.NA)
-
-  game$eeqo.df
+eq_expected_outcomes = function(game) {
+  res = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg, ignore.NA = TRUE)
+  cols = setdiff(colnames(res), c("numPlayers",".prob", ".outcome","eqo.ind"))
+  res = res[,c(cols,"eqo.ind")]
+  res
 }
 
 #' Return conditional equilibrium outcomes
@@ -403,17 +406,34 @@ eq_expected_outcomes = function(game,ignore.NA = TRUE) {
 #' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional equilibrium outcomes for each combination of values
 #' @param fixed Alternativly to ... a named list with values to fix.
 eq_cond_outcomes = function(game,...,fixed=list(...)) {
-  eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
+  res = eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
+  cols = setdiff(colnames(res), c("numPlayers", ".outcome","cond.ind"))
+  res = res[,c(cols,"cond.ind")]
+  res
 }
 
 #' Return conditional expected equilibrium outcomes
 #'
 #' @param game the game object for which equilibria were computed e.g. with \code{game_solve}.
 #' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional expected equilibrium outcomes for each combination of values
-#' @param fixed Alternativly to ... a named list with values to fix.
-eq_cond_expected_outcomes = function(game,...,fixed=list(...)) {
-  ceqo.df = eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
-  cond.expected.outcomes(ceqo.df)
+#' @param fixed.list Alternativly to ... a named list with values to fix.
+#' @param fixed.vars Alternative to ... or fixed.list, a vector of variable names. If provided, we compute the conditional expected outcomes holding fixed every possible combination of the variables stated in fixed.vars
+eq_cond_expected_outcomes = function(game,...,fixed.list=list(...), fixed.vars = NULL) {
+  restore.point("eq_cond_expected_outcomes")
+
+  if (is.null(names(fixed.list))) {
+    fixed.vars = unlist(fixed.list)
+  }
+  if (!is.null(fixed.vars)) {
+    fixed.list = unique(game$tg$oco.df[,fixed.vars]) %>%
+      arrange_at(fixed.vars)
+  }
+
+  ceqo.df = eq.li.cond.outcomes(game$eq.li,cond = fixed.list, tg = game$tg)
+  res = cond.expected.outcomes(ceqo.df)
+  cols = setdiff(colnames(res), c("numPlayers", ".prob",".outcome","cond.ind"))
+  res = res[,c(cols,"cond.ind")]
+  res
 }
 
 

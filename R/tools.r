@@ -1,3 +1,8 @@
+quote.strings = function(vals, quotes='"') {
+  if (is.character(vals)) return(paste0(quotes, vals, quotes))
+  return(vals)
+}
+
 does.intersect = function(A,B) {
   length(intersect(A,B))>0
 }

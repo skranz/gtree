@@ -372,7 +372,7 @@ eq.li.cond.outcomes = function(eq.li, cond, tg=NULL,oco.df=tg$oco.df, expected=F
 	# have the same equilibrium outcomes
 	if (remove.duplicate.eq) {
     cols = setdiff(colnames(ceqo),c("eq.ind","is.eqo"))
-    ceqo = arrange(ceqo, ceqo.ind, !is.eqo)
+    ceqo = arrange(ceqo, cond.ind, !is.eqo)
     dupl = duplicated(ceqo[,cols])
     if (any(dupl))
       ceqo = ceqo[!dupl,,drop=FALSE]
@@ -392,7 +392,7 @@ cond.expected.outcomes = function(ceqo.df) {
   restore.point("expected.cond.eq.outcomes")
   if (!"eqo.ind" %in% colnames(ceqo.df))
     ceqo.df$eqo.ind = ceqo.df$eq.ind
-  res = expected.outcomes(ceqo.df, group.vars=c("ceqo.ind","eq.ind"))
+  res = expected.outcomes(ceqo.df, group.vars=c("cond.ind","eq.ind"))
   res = select(res,-eqo.ind)
   res
 }
@@ -403,14 +403,14 @@ cond.expected.outcomes = function(ceqo.df) {
 # cond is a list with variable names and their assumed value
 # we only pick rows from oco.df in which the condition is satisfied
 # we set the probabilities of the conditioned variable values to 1
-cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.non.null(attr(eq,"eq.ind"),NA), eo.df = eq.outcome(eq=eq, oco.df=oco.df, tg=tg), ceqo.ind=1) {
+cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.non.null(attr(eq,"eq.ind"),NA), eo.df = eq.outcome(eq=eq, oco.df=oco.df, tg=tg), cond.ind=1L) {
   restore.point("cond.eq.outcome")
 	cond.df = as_data_frame(cond)
 
 	# multiple rows, call function repeatedly
 	if (NROW(cond.df)>1) {
 		li = lapply(seq_len(NROW(cond.df)), function(row) {
-			cond.eq.outcome(eq=eq, cond = cond.df[row,,drop=FALSE], oco.df = oco.df, tg =tg, eq.ind=eq.ind, eo.df = eo.df, ceqo.ind=row+ceqo.ind-1)
+			cond.eq.outcome(eq=eq, cond = cond.df[row,,drop=FALSE], oco.df = oco.df, tg =tg, eq.ind=eq.ind, eo.df = eo.df, cond.ind=row+cond.ind-1L)
 		})
 		return(bind_rows(li))
 	}
@@ -443,7 +443,7 @@ cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.n
 	)
 	eo.df$is.eqo = TRUE
 	ceo.df = left_join(ceo.df, eo.df[,c(keys,"is.eqo")],by=keys)
-	ceo.df$ceqo.ind = ceqo.ind
+	ceo.df$cond.ind = cond.ind
 	ceo.df$is.eqo[is.na(ceo.df$is.eqo)] = FALSE
 
   xs.col.order(ceo.df,tg)
