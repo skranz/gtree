@@ -4,9 +4,11 @@ pkgdown_sha: ~
 articles:
   t01_ultimatum_basic: t01_ultimatum_basic.html
   t02_ultimatum_imperfect: t02_ultimatum_imperfect.html
-  t03_sender_receiver: t03_sender_receiver.html
+  t03_kuhn_poker: t03_kuhn_poker.html
+  t04_sender_receiver: t04_sender_receiver.html
   comparative_statics: tutorials/comparative_statics.html
   gtree_quant_comp: tutorials/gtree_quant_comp.html
+  kuhn_poker: tutorials/kuhn_poker.html
   README: tutorials/README.html
   reciprocity: tutorials/reciprocity.html
   sender_receiver: tutorials/sender_receiver.html

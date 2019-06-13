@@ -1,3 +1,15 @@
 pre code {
   font-size: 14px;
 }
+
+.data-frame-table {border-collapse: collapse;  display: block; overflow-x: auto;}
+
+.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+
+.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+
+.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+
+.data-frame-table tbody>tr:last-child>td {
+  border-bottom: solid 1px black;
+}

@@ -121,3 +121,26 @@ pref_envy = function(alpha=0.75,player=1:numPlayers, numPlayers=2,...) {
 
   pref
 }
+
+#' 'Linear loss aversion preferences with a single reference point
+#'
+#' @param lambda factor by which losses loom larger than gains (default = 2)
+#' @param r The reference point, by default 0. Can be a vector in order to have different reference points for different players.
+#' @param player player(s) for which the preferences apply. Per default 1:2
+#' @param numPlayers number of players in game per default 2
+pref_lossAv = function(lambda=2,r=0, player = 1:numPlayers, numPlayers=2) {
+	restore.point("pref_lossAv")
+
+  utils_general = lapply(player, function(i) {
+    if (length(r)>1) {
+      parse.as.call(paste0("loss.aversion.util(payoff_",i,",r=r[",i,"],lambda=lambda)"))
+    } else {
+      parse.as.call(paste0("loss.aversion.util(payoff_",i,",r=r,lambda=lambda)"))
+    }
+  })
+  params = list(lambda=lambda, r=r)
+  utils = lapply(utils_general, function(u) substitute.call(u, params))
+  label.fun = function(params) paste0("lossAv",params$lambda)
+  pref = list(utils_general = utils_general, utils=utils, params=params, label=label.fun(params), label.fun=label.fun, type="lossAv")
+  pref
+}

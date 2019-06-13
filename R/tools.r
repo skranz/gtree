@@ -14,6 +14,30 @@ list.call.to.call.list = function(call) {
   as.list(eval(call))
 }
 
+replace.by.sublist = function(li, pos, new) {
+  if (pos==1) {
+    c(new, li[-1])
+  } else if (pos == length(li)) {
+    c(li[-length(li)], new)
+  } else {
+    c(li[1:(pos-1)], new, li[(pos+1):length(li)])
+  }
+}
+
+insert.sublist = function(li,after, new) {
+  if (is.character(after)) {
+    after = match(after, names(li))
+  }
+  if (after == 0) {
+    return(c(new, li))
+  } else if (after >= length(li)) {
+    return(c(li, new))
+  } else {
+    return(c(li[1:after], new, li[(after+1):length(li)]))
+  }
+
+}
+
 remove.from.list = function(li, names) {
   use = setdiff(names(li), names)
   li[use]

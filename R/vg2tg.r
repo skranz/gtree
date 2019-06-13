@@ -644,6 +644,7 @@ compute.nature.level = function(tg,stage, randomVar, lev.df, know.li, kel) {
     kel.check.call.vars(randomVar$probs,c(names(lev.df),names(tg$params)),kel=kel)
   )
 
+
   tg.check.branching.limit(tg=tg, lev.df = lev.df, kel=kel, stage=stage, var=var)
 
 
@@ -652,8 +653,39 @@ compute.nature.level = function(tg,stage, randomVar, lev.df, know.li, kel) {
   lev.df$.node.ind = seq.int(NROW(lev.df))
 
 
+  if (!is.null(randomVar$table)) {
+    # nature move defines a table
+    table = randomVar$table
+    if (has.col(table,".prob")) {
+      colnames(table)[which(colnames(table)==".prob")] = ".move.prob"
+    }
+    keys = setdiff(colnames(table), c(var, ".move.prob"))
+    lev.df = left_join(lev.df, table, by=keys)
+    if (any(is.na(lev.df[[var]]))) {
+      .GlobalEnv$error.lev.df. = lev.df
+      kel$error(paste0("The keys of your table for the move of nature ", var, " do not span all neccessary values. To help you fix the error, I saved in your global environment a data frame 'error.lev.df'. The problematic rows are were ", var, " has NA values."))
+      stop()
+    }
+  } else {
+    # normal case nature move defines set and probs
+    lev.df = eval.randomVar.to.df(randomVar$set,randomVar$prob,df = lev.df, var=var,kel = kel,prob.col = ".move.prob", params=tg$params)
+  }
 
-  lev.df = eval.randomVar.to.df(randomVar$set,randomVar$prob,df = lev.df, var=var,kel = kel,prob.col = ".move.prob", params=tg$params)
+  # Fixed move
+  if (!is.null(randomVar$fixed)) {
+    fixed = randomVar$fixed
+    if (is.call(fixed) | is.name(fixed)) {
+      fixed = eval.on.df(lev.df)
+    }
+    lev.df$.move.prob = 1L*(lev.df[[var]] == fixed)
+    if (!is.null(randomVar$tremble.prob)) {
+      tremble.prob = randomVar$tremble.prob
+      lev.df = lev.df %>%
+        group_by(.node.ind) %>%
+        mutate(.move.prob = .move.prob * (1-tremble.prob) + tremble.prob / n()) %>%
+        ungroup()
+    }
+  }
 
   # adapt outcome probs
   lev.df$.prev.prob = lev.df$.prob
@@ -693,6 +725,7 @@ compute.nature.level = function(tg,stage, randomVar, lev.df, know.li, kel) {
   tg$lev.li[[lev.num]] = lev
   lev
 }
+
 
 add.var.to.know.mat = function(know.mat, var, value=FALSE) {
   restore.point("add.var.to.know.mat")

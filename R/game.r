@@ -217,7 +217,7 @@ game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE,
 game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gambit = mixed | !just.spe, verbose=isTRUE(game$options$verbose>=1), gambit.command = NULL,...) {
   restore.point("game_solve_spe")
   if (use.gambit) {
-    game_gambit_solve(game, mixed=mixed, just.spe=just.spe, verbose=verbose, ...)
+    return(game_gambit_solve(game, mixed=mixed, just.spe=just.spe, verbose=verbose, ...))
   } else if (mixed | !just.spe) {
     stop("You must set use.gambit=TRUE or call game_gambit_solve if you want to solve for mixed stratetgy equilibria or for all pure NE, including NE that are not subgame perfect.")
   }
@@ -324,10 +324,27 @@ game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg
 }
 
 
+rule = function(var, formula, condition=NULL) {
+  list(var=var, formula=formula, condition=NULL)
+}
+
+#' Fix some actions
+#'
+#' ... some rules or tables
+game_fix_actions = function(game, ..., fix.li=list(...), tremble.prob = NULL) {
+  restore.point("game_fix_actions")
+  game = clear.non.vg(game)
+  game$vg = fix.vg.actions(game$vg,fix.li=fix.li, tremble.prob = tremble.prob)
+  invisible(game)
+}
+
+
+
+
 #' Return a data frame of all possible outcomes
 #' @param game the game object defined with \code{new_game} and being compiled with \code{game_compile} or after a call of \code{game_solve}.
 #' @param reduce.cols if TRUE remove some technical columns
-get_outcomes = function(game,..., reduce.cols=TRUE) {
+get_outcomes = function(game,reduce.cols=TRUE) {
   if (is.null(game[["tg"]])) {
     game_compile(game)
   }
@@ -364,7 +381,7 @@ eq_li = function(game,...) {
 
 #' Return a data frame of all equilibrium outcomes
 #' @param game the game object for which previously equilibria were computed e.g. with \code{game_solve}.
-eq_outcomes = function(game,...) {
+eq_outcomes = function(game) {
   if (is.null(game$eqo.df))
     game$eqo.df = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
 
@@ -373,11 +390,30 @@ eq_outcomes = function(game,...) {
 
 #' Return a data frame of expected equilibrium outcomes
 #' @param game the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.
-eq_expected_outcomes = function(game,...) {
+eq_expected_outcomes = function(game,ignore.NA = TRUE) {
   if (is.null(game$eeqo.df))
-    game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg)
+    game$eeqo.df = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg, ignore.NA = ignore.NA)
 
   game$eeqo.df
+}
+
+#' Return conditional equilibrium outcomes
+#'
+#' @param game the game object for which equilibria were computed e.g. with \code{game_solve}.
+#' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional equilibrium outcomes for each combination of values
+#' @param fixed Alternativly to ... a named list with values to fix.
+eq_cond_outcomes = function(game,...,fixed=list(...)) {
+  eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
+}
+
+#' Return conditional expected equilibrium outcomes
+#'
+#' @param game the game object for which equilibria were computed e.g. with \code{game_solve}.
+#' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional expected equilibrium outcomes for each combination of values
+#' @param fixed Alternativly to ... a named list with values to fix.
+eq_cond_expected_outcomes = function(game,...,fixed=list(...)) {
+  ceqo.df = eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
+  cond.expected.outcomes(ceqo.df)
 }
 
 
@@ -429,8 +465,14 @@ action = function(name, set, strategyMethodDomain=NULL, ...) {
 #' @param name The variable name of the variable
 #' @param set The set of different values. Can be a rhs only formula.
 #' @param probs The probability of each element in set. If NULL all moves are equally likely. Can be a rhs formula
-natureMove = function(name, set, probs=NULL,...) {
-  list(name=name,set=f2c(set),probs=f2c(probs),...)
+natureMove = function(name, set, probs=NULL, table=NULL, fixed=NULL, tremble.prob = NULL,...) {
+  if (!is.null(table)) {
+    list(name=name,table=table)
+  } else if (!is.null(fixed)) {
+    list(name=name,set=f2c(set),probs=NULL,fixed=fixed, tremble.prob = tremble.prob)
+  } else {
+    list(name=name,set=f2c(set),probs=f2c(probs))
+  }
 }
 
 #' Specify a stage for a game

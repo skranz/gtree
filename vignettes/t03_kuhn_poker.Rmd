@@ -5,12 +5,14 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, error=TRUE)
+library(RTutor)
+RTutor::set.knit.print.opts(html.data.frame=TRUE, table.max.rows=30, round.digits=8, signif.digits=8)
 library(gtree)
 ```
 
 ## Kuhn Poker Description
 
-Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_poker) in conventional poker terms as follows:
+Joseph Kuhn (1950) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_poker) in conventional poker terms as follows:
 
 + Each player antes 1.
 
@@ -28,22 +30,25 @@ Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_pok
 
 ## Specifying as gtree game
 
+We specify the game in gtree as follows:
 ```{r}
 library(gtree)
-game = new_game(
+game = org.game = new_game(
   gameId = "Kuhn-Poker",
   params = list(numPlayers=2),
   options = make_game_options(verbose=FALSE),
   stages = list(
     stage("dealCards",
       nature = list(
+        # Player 1 gets a random card 1, 2, or 3
         natureMove("pl1_card", 1:3),
+        # Draw from remaining cards for player 2
         natureMove("pl2_card", ~setdiff(1:3, pl1_card))
       )
     ),
     stage("pl1CheckBet",
       player=1,
-      observe = c("pl1_card"),
+      observe = "pl1_card",
       actions = list(
         action("cb1",c("check","bet"))
       )
@@ -67,7 +72,7 @@ game = new_game(
     stage("pl1FoldCall",
       player=1,
       condition = ~ is_true(cb1 == "check" & cb2=="bet"),
-      observe = c("cb2"),
+      observe = "cb2",
       actions = list(
         action("fc1",c("fold","call"))
       )
@@ -75,64 +80,132 @@ game = new_game(
     stage("PayoffStage",
       player=1:2,
       compute=list(
+        # Which player folds?
         folder ~ case_distinction(
           is_true(fc1 == "fold"),1,
           is_true(fc2 == "fold"),2,
-          0
+          0 # 0 means no player folds
         ),
+        
+        # Which player wins?
         winner ~ case_distinction(
           folder == 1,2,
           folder == 2,1,
           folder == 0, (pl2_card > pl1_card) +1
         ),
-        gave1 ~ 1 + 1*(is_true(cb1 == "bet") | is_true(fc1 == "call")),
-        gave2 ~ 1 + 1*(is_true(cb2 == "bet") | is_true(fc2 == "call")),
-        pott ~ gave1 + gave2,
-        payoff_1 ~ (winner == 1)*pott - gave1,
-        payoff_2 ~ (winner == 2)*pott - gave2
+        
+        # How much gave each player to the pot?
+        gave1 ~ 1 + 1*is_true((cb1 == "bet") | (fc1 == "call")),
+        gave2 ~ 1 + 1*is_true((cb2 == "bet") | (fc2 == "call")),
+        pot ~ gave1 + gave2,
+        
+        # Final payoffs
+        payoff_1 ~ (winner == 1)*pot - gave1,
+        payoff_2 ~ (winner == 2)*pot - gave2
       )
     )
   )
 ) 
 ```
 
-To check whether we have correctly specified the game, let us take a look at the outcomes:
-```{r}
-game %>% get_outcomes()
+To better understand the definition and to check whether we have correctly specified the game, it is useful to take a look at the outcomes:
+```{r table.max.rows = 6}
+game %>% get_outcomes() %>% head(6)
 ```
+Look at the first row. We see from `cb1` and `cb2` that this corresponds to an outcome in which both players check. The variables `fc2` and `fc1` take `NA` values because there is no decision to fold or call if both players check.
 
-Looking at the number of pure strategy profiles the game seems tractable for numerical analysis
+Formulas in the game definition will be internaly evaluated in a vectorized fashion over similar data frames and may take `NA` values. The helper function `is_true` takes a logical vector and replaces `NA` values with `FALSE`. I use this function in the game definition where a condition must evaluate to either `TRUE` or `FALSE` while `NA` values are not allowed.
+
+You may also take a look at the definition of `pl2_card` in the first stage. Here the `set` of the random variable is a formula and depends on the previously computed value of `pl1_card`.
+
+
+Let us also take a look at the game size:
 ```{r}
 game %>%
   game_print_size_info()
 ```
-
+While the number of pure strategy profiles is not really small, the game still seems of tractable size for numerical analysis.
 
 ## Solving Kuhn Poker
 
 Let us now solve the game using the `gambit-logit` solver, which is the default solver for finding a mixed strategy equilibrium:
 ```{r}
 game %>%
-  game_gambit_solve(mixed=TRUE) %>%
-  eq_tables()
+  game_gambit_solve(mixed=TRUE)
 ```
 
+Let us first take a look at the expected equilibrium outcomes:
 ```{r}
 game %>% 
   eq_expected_outcomes() %>% 
   select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
 ```
 
-## Inequality Averse Players
-What if players become inequality averse?
 ```{r}
 game %>%
-  game_set_preferences(pref_ineqAv(alpha=1, beta=0.5)) %>%
-  game_gambit_solve(mixed=TRUE) %>%
-  eq_tables()
+  eq_cond_expected_outcomes(pl1_card = 3, cb1=c("bet", "check")) %>% 
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
 
-game %>% 
+```
+
+```{r}
+game %>%
+  eq_cond_expected_outcomes(pl1_card = 1, cb1=c("bet", "check")) %>% 
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
+```
+
+
+
+For more details let us look at the equilibrium tables:
+```{r}
+game_print_eq_tables(game)
+```
+
+```{r}
+fgame = org.game %>%
+  game_copy() %>%
+  game_fix_actions(cb1="check", tremble.prob = NULL) %>%
+  game_print() 
+
+fgame %>% 
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_expected_outcomes() %>%
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)  
+
+
+fgame %>% 
+  game_gambit_solve("gambit-logit -e") %>%
+  eq_expected_outcomes() %>%
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)  
+
+fgame %>%
+  eq_cond_expected_outcomes(pl1_card = rep(1:3, each=2), cb1=rep(c("bet", "check"), times=3)) %>% 
+  select(pl1_card, payoff_1,payoff_2, cb1, fc1, cb2,fc2)
+
+
+pref = pref_custom(util_1 = ifelse(cb1=="check", payoff_1+1000, payoff_1), util_2 = payoff_2)
+game %>%
+  game_set_preferences(pref) %>%
+  game_gambit_solve(mixed=TRUE) %>%
+  eq_expected_outcomes()  %>%
+  select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)  
+  
+
+  
+```
+
+
+##  Loss Averse Players
+What if players are averse?
+```{r}
+game %>%
+  game_set_preferences(pref_lossAv(lambda=3, r=0)) %>%
+  game_gambit_solve(mixed=TRUE) %>%
   eq_expected_outcomes() %>% 
   select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
 ```
 
+
+## References
+
+Kuhn, H. W. (1950). "Simplified Two-Person Poker". In Kuhn, H. W.; Tucker, A. W. (eds.). Contributions to the Theory of Games. 1. Princeton University Press. pp. 97–103.

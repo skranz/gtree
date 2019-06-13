@@ -1,3 +1,7 @@
+game_print = function(game,...) {
+  print(game)
+  invisible(game)
+}
 
 game_print_eq_tables = function(game, ...) {
   print.gtree_game(game=game, show.stages=FALSE, show.size=FALSE, show.eq=TRUE)
@@ -34,7 +38,7 @@ print.gtree_game = function(game,..., show.stages = TRUE, show.size = TRUE, show
       df = as.data.frame(tabs[[var]])
       if (has.col(df,".prob"))
         df$.prob = round(df$.prob,3)
-      print.data.frame(df,row.names = FALSE)
+      print(df,row.names = FALSE)
     }
 
 
@@ -107,8 +111,18 @@ print.gtree_stage = function(stage) {
 
   for (x in stage$compute)
     cat(paste0("\n  Compute ", x$name, if (!is.null(x$tables)) " specified by tables." else paste0(" = ", form2string(x$formula))))
-  for (x in stage$nature)
-    cat(paste0("\n  Nature ", x$name, " \U2208 ", form2string(x$set,"{","}")), ", Prob = ",form2string(x$probs,"(",")"))
+  for (x in stage$nature) {
+    if (!is.null(x$table)) {
+      set = unique(x$table[[x$name]])
+      cat(paste0("\n  Nature ", x$name, " \U2208 ", form2string(set,"{","}")," (table omitted) "))
+    } else if (!is.null(x$fixed)) {
+      cat(paste0("\n  Nature ", x$name, " \U2208 ", form2string(x$set,"{","}"), " (fixed to ", form2string(x$fixed),")"))
+    } else if (is.null(x$probs)) {
+      cat(paste0("\n  Nature ", x$name, " \U2208 ", form2string(x$set,"{","}"), " (uniform)"))
+    } else {
+      cat(paste0("\n  Nature ", x$name, " \U2208 ", form2string(x$set,"{","}")), ", Prob = ",form2string(x$probs,"(",")"))
+    }
+  }
   for (x in stage$actions)
     cat(paste0("\n  Action ", x$name, " \U2208 ", form2string(x$set,"{","}")))
 
@@ -117,7 +131,7 @@ print.gtree_stage = function(stage) {
 
 form2string = function(x, set.start="", set.end="") {
   if (is.call(x)) {
-    return(capture.output(print(x)))
+    return(paste0(trimws(capture.output(print(x))), collapse=""))
   }
   paste0(set.start,paste0(as.character(x), collapse=", "),set.end)
 }

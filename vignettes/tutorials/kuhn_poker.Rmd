@@ -123,7 +123,7 @@ game %>%
   select(payoff_1,payoff_2, cb1, fc1, cb2,fc2)
 ```
 
-## Inequality Averse Players
+## Loss Averse Players
 What if players become inequality averse?
 ```{r}
 game %>%

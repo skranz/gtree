@@ -257,13 +257,13 @@ eq.outcome = function(eq,tg=NULL, cond=NULL, oco.df=tg$oco.df) {
 # @param compress if TRUE (default) remove duplicated outcomes from different equilibria
 # @param combine if TRUE (default) combine all outcomes to a single data frame. If FALSE have a list of the different outcomes. If combine=FALSE and compress=TRUE the list only contains unique equilibrium outcomes and may thus have fewer elements than the number of equilibria. Set both combine=FALSE and compress=FALSE to have a list that maps one to one equilibrium outcomes to equilibria.
 # @export
-eq.li.expected.outcomes = function(eq.li, tg, compress=TRUE, combine=TRUE) {
+eq.li.expected.outcomes = function(eq.li, tg, compress=TRUE, combine=TRUE, ignore.NA = TRUE) {
   if (!combine) {
     eqo.li = eq.li.outcomes(eq.li, tg=tg, compress=compress, combine=combine)
-    res = lapply(eqo.li,expected.outcomes, tg=tg)
+    res = lapply(eqo.li,expected.outcomes, tg=tg, ignore.NA=ignore.NA)
   } else {
     eqo.df = eq.li.outcomes(eq.li, tg=tg, compress=compress, combine=combine)
-    res = expected.outcomes(eqo.df,tg = tg)
+    res = expected.outcomes(eqo.df,tg = tg, ignore.NA = ignore.NA)
   }
   return(res)
 }
@@ -283,8 +283,8 @@ eq.expected.outcome = function(eq, tg) {
 # @param eqo.df A data frame of equilibrium outcomes as returned by eq.outcome or eq.li.outcomes (with combine=TRUE)
 # @param tg the table-form game
 # @export
-expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) {
-	restore.point("expected.eq.outcomes")
+expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind"), ignore.NA = TRUE) {
+	restore.point("expected.outcomes")
 
 	if (NROW(eqo.df)==0) return(eqo.df)
 
@@ -304,12 +304,18 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) 
 		restore.point("fun")
 		vals = lapply(vars, function(var) {
 			if (is.character(df[[var]]) & var != "variant") {
-				restore.point("jhsjkhfkdhfh")
+				#restore.point("jhsjkhfkdhfh")
 				sdf = group_by_(df, "eqo.ind", var) %>%
-					s_summarise(paste0('
-						.sum.prob = sum(.prob),
-						.var.prob = paste0(first(',var,'),ifelse(.sum.prob < 1,paste0("(",round(.sum.prob,2),")"),""))'
-					))
+				  summarize(.sum.prob = sum(.prob))
+        if (ignore.NA) {
+          na.row = which(is.na(sdf[[var]]))
+          if (length(na.row)==1) {
+            na.prob = sdf$.sum.prob[[na.row]]
+            sdf = sdf[-na.row,]
+            sdf$.sum.prob = sdf$.sum.prob / (1-na.prob)
+          }
+        }
+				sdf$.var.prob = paste0(sdf[[var]],ifelse(sdf$.sum.prob < 1,paste0("(",round(sdf$.sum.prob,2),")"),""))
 				return(paste0(unique(sdf[[".var.prob"]]), collapse=","))
 			}
 
@@ -337,7 +343,7 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) 
 
 	all.vars = c(group.vars, vars)
 	res = eqo.df[,all.vars, drop=FALSE] %>%
-		group_by_(.dots=group.vars) %>%
+		group_by_at(group.vars) %>%
 		do(fun(.)) %>%
 	  ungroup()
 	res
@@ -345,7 +351,7 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind")) 
 }
 
 
-# Return a conditional equilibrium outcome
+# Return conditional equilibrium outcomes
 #
 # @param eq.li The computed equilibria in gtree form
 # @param cond is a list with variable names and their assumed value
@@ -386,7 +392,7 @@ cond.expected.outcomes = function(ceqo.df) {
   restore.point("expected.cond.eq.outcomes")
   if (!"eqo.ind" %in% colnames(ceqo.df))
     ceqo.df$eqo.ind = ceqo.df$eq.ind
-  res = expected.eq.outcomes(ceqo.df, group.vars=c("ceqo.ind","eq.ind"))
+  res = expected.outcomes(ceqo.df, group.vars=c("ceqo.ind","eq.ind"))
   res = select(res,-eqo.ind)
   res
 }

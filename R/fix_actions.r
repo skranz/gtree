@@ -43,6 +43,45 @@ example.fix.actions = function() {
   eeo = expected.eq.outcomes(eq.li=eq.li, tg=tg.fix)
 }
 
+fix.vg.actions = function(vg,..., fix.li=list(...), tremble.prob = NULL) {
+  restore.point("fix.vg.actions")
+  for (i in seq_along(fix.li)) {
+    vg = fix.vg.action(vg,names(fix.li)[[i]], fix.li[[i]], tremble.prob)
+  }
+  vg
+}
+
+fix.vg.action = function(vg,var, fix, tremble.prob = NULL) {
+  restore.point("fix.vg.action")
+  stage.num = which(sapply(vg$stages, function(stage) var %in% names(stage$actions)))
+  if (length(stage.num)==0) {
+    warning(paste0("Your game has no action ", var))
+    return(vg)
+  }
+  stage = vg$stages[[stage.num]]
+  action = stage$actions[[var]]
+  if (is.data.frame(fix)) {
+    nature = list(natureMove(var, table=fix))
+  } else {
+    nature = list(natureMove(var, action$set, fixed=fix, tremble.prob = tremble.prob))
+  }
+  names(nature) = var
+  # Adapt old action stage
+  stage$actions = remove.from.list(stage$actions, var)
+  split.stage = length(stage$compute) >0 | length(stage$nature) >0
+  if (!split.stage) {
+    stage$nature = c(stage$nature, nature)
+    stage$observe = union(stage$observe, var)
+    vg$stages[[stage.num]] = stage
+  } else {
+    nstage = stage(paste0(stage$name,"_nature_",var),player = stage$player, condition = stage$condition, observe = var, nature = nature)
+    vg$stages = replace.by.sublist(vg$stages, stage.num, list(stage, nstage))
+  }
+  vg
+}
+
+
+
 fix.tg.actions = function(tg, fix.df=NULL, var=NULL, fix.li=NULL, tg.id = paste0("fixed",tg$tg.id), omit.zero.prob=TRUE, tremble.prob=0) {
   restore.point("fix.tg.actions")
 
