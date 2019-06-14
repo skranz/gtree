@@ -35,3 +35,13 @@ If left as NULL a default gambit command line solver with appropriate arguments 
 You need to install Gambit \url{http://www.gambit-project.org} to
 use this function.
 }
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_outcomes}}, \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_solve_spe}}
+
+Other Gambit: \code{\link{game_write_efg}}
+}

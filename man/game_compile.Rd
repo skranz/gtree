@@ -2,7 +2,7 @@
 % Please edit documentation in R/game.r
 \name{game_compile}
 \alias{game_compile}
-\title{Compile a game defined with new_game}
+\title{Compile a game defined with \code{new_game}}
 \usage{
 game_compile(game, branching.limit = 10000, for.internal.solver = FALSE,
   add.sg = for.internal.solver, add.spi = for.internal.solver,
@@ -10,5 +10,9 @@ game_compile(game, branching.limit = 10000, for.internal.solver = FALSE,
   verbose = game$options$verbose, ...)
 }
 \description{
-Compile a game defined with new_game
+Compile a game defined with \code{new_game}
+}
+\seealso{
+Other Build Game: \code{\link{make_game_options}},
+  \code{\link{make_game_params}}, \code{\link{stage}}
 }

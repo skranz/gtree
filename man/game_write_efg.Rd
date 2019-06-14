@@ -20,3 +20,6 @@ game_write_efg(game, file.with.dir = file.path(dir, file),
 \description{
 Write game as a Gambit efg file
 }
+\seealso{
+Other Gambit: \code{\link{game_gambit_solve}}
+}

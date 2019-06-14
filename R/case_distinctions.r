@@ -17,6 +17,8 @@ example.case_distinction = function() {
 cases = function(...) case_distinction(...)
 
 #' A simple function to define case distinctions
+#'
+#' @family Helper Functions
 case_distinction = function(...) {
   args = list(...)
 

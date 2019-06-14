@@ -1,3 +1,64 @@
+#' Set add a large amount of utility if a player plays a particular action
+#'
+#' Allows to study the game under the assumption that a player strongly prefers
+#' to chose one particular move of an action variable.
+#'
+#' If you want to fix mixed strategies, use the he related function \code{\link{game_fix_action_preferences}} transforms the corresponding action into a move of nature.
+#'
+#' For fixing pure strategies \code{\link{game_fix_action_preferences}}
+#' is preferable when using the \code{gambit-logit} solver that can
+#' find sequential equilibria, by using logit trembles.
+#'
+#' @util_add How much shall be added to the utility levels
+#' @param player1 A formula describing which utility levels should be added to the current utility function of player 1 (see example). If NULL we don't add utilities for player 1. Similar for the other players 2-4.
+#' @param ... additional formulas for games with more than 4 players.
+#' @param player.prefs by default equal to \code{list(player1,player2,player3, player4,...)}. Can be manually provided.
+#' @family Fix Actions
+#' @family Preferences
+game_prefer_outcomes =  function(game,player1=NULL, player2=NULL, player3=NULL,..., player.prefs = list(player1=player1, player2 = player2, player3 = player3,...)) {
+  restore.point("game_prefer_outcomes")
+  pref = game$pref
+  if (is.null(pref)) {
+    pref = pref_payoff(game$players)
+  } else if (pref$type == "prefer_actions") {
+    pref = game$pref$org_pref
+  }
+  n = length(game$players)
+  utils_general = first.non.null(pref$utils_general, pref$utils)
+  for (i in seq_len(n)) {
+    if (is.character(utils_general[[i]]))
+      utils_general[i] = list(parse.as.call(utils_general[[i]]))
+    if (i > length(player.prefs)) next
+    pp = player.prefs[[i]]
+    if (is.null(pp)) next
+    pp = f2c(pp)
+    utils_general[i] = list(substitute.call(quote(old + new), list(old = utils_general[[i]], new = pp)))
+  }
+  params = pref$params
+  utils = lapply(utils_general, function(u) substitute.call(u, params))
+  new.pref = list(utils_general = utils_general, utils=utils, params=params, label=pref$label, type="prefer_actions", org_pref = pref)
+  class(new.pref) = c("preferences","list")
+  game_set_preferences(game, new.pref)
+}
+
+
+#' Set add a large amount of utility if a player plays a particular action
+#'
+#' Allows to study the game under the assumption that a player strongly prefers
+#' to chose one particular move of an action variable.
+#'
+#' If you want to fix mixed strategies, use the he related function \code{\link{game_fix_action_preferences}} transforms the corresponding action into a move of nature.
+#'
+#' For fixing pure strategies \code{\link{game_fix_action_preferences}}
+#' is preferable when using the \code{gambit-logit} solver that can
+#' find sequential equilibria, by using logit trembles.
+#'
+#' @util_add How much shall be added to the utility levels
+#' @param actions a named list. The names correspond to action names and the values either to fixed values of the action or to a formula. If it is a formula
+#' the action value can depend on earlier computed variables.
+#' @param ... directly the named arguments from which \code{actions} will be constructed
+#' @family Fix Actions
+#' @family Preferences
 game_fix_action_preferences =  function(game,..., actions = list(...), util.add = 1000) {
   restore.point("game_fix_action_preferences")
   pref = game$pref
@@ -52,6 +113,9 @@ game_fix_action_preferences =  function(game,..., actions = list(...), util.add 
 
 
 #' Change the parameters of a preference object
+#'
+#' @family Modify Game
+#' @family Preferences
 pref_change_params = function(pref, ..., params=list(), label=NULL, players=1:2, numPlayers=length(players)) {
   new.params = c(list(...), params)
   restore.point("pref_change_param")
@@ -80,6 +144,8 @@ pref_change_params = function(pref, ..., params=list(), label=NULL, players=1:2,
 #' @param prefs alternatively the preferences as a list object
 #' @param label optional label of preferences. If NULL the individual labels will be pasted together
 #' @param type label of the combined preference type
+#'
+#' @family Preferences
 pref_heterogeneous_players = function(..., prefs = list(...), label=NULL) {
   utils = lapply(prefs, function(pref) pref$utils)
   utils = do.call(c, utils)
@@ -97,6 +163,8 @@ pref_heterogeneous_players = function(..., prefs = list(...), label=NULL) {
 #' neutral expected payoff maximizer.
 #'
 #' @param player player(s) for which the preferences apply. Per default 1:2
+#'
+#' @family Preferences
 pref_payoff = function(player=1:2,...) {
   restore.point("pref_payoff")
   res = list(
@@ -116,6 +184,8 @@ pref_payoff = function(player=1:2,...) {
 #' @param params An optional list of parameters that are used in the formulas above
 #' @param label A label for the preference, should contain info about the parameters
 #' @param type A general type label independet of the parameters
+#'
+#' @family Preferences
 pref_custom = function(..., params=NULL, label="custom") {
   utils_general = eval(substitute(alist(...)))
   restore.point("pref_custom")
@@ -131,6 +201,8 @@ pref_custom = function(..., params=NULL, label="custom") {
 #' @param beta the degree of guilt
 #' @param player player(s) for which the preferences apply. Per default 1:2
 #' @param numPlayers number of players in game per default 2
+#'
+#' @family Preferences
 pref_ineqAv = function(alpha=0.75,beta=0.5,player=1:numPlayers, numPlayers=2,...) {
   restore.point("pref_ineqAv")
 
@@ -165,6 +237,8 @@ pref_ineqAv = function(alpha=0.75,beta=0.5,player=1:numPlayers, numPlayers=2,...
 #' @param alpha the degree of envy
 #' @param player player(s) for which the preferences apply. Per default 1:2
 #' @param numPlayers number of players in game per default 2
+#'
+#' @family Preferences
 pref_envy = function(alpha=0.75,player=1:numPlayers, numPlayers=2,...) {
   restore.point("pref_envy")
   pref = pref_ineqAv(alpha=alpha, beta=0, player=player, numPlayers=numPlayers)
@@ -181,6 +255,8 @@ pref_envy = function(alpha=0.75,player=1:numPlayers, numPlayers=2,...) {
 #' @param r The reference point, by default 0. Can be a vector in order to have different reference points for different players.
 #' @param player player(s) for which the preferences apply. Per default 1:2
 #' @param numPlayers number of players in game per default 2
+#'
+#' @family Preferences
 pref_lossAv = function(lambda=2,r=0, player = 1:numPlayers, numPlayers=2) {
 	restore.point("pref_lossAv")
 

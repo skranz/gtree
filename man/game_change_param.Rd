@@ -8,5 +8,13 @@ game_change_param(game, ..., params = list(),
   verbose = isTRUE(game$options$verbose > 0))
 }
 \description{
-Changes one or several parameters of a game
+For an already compiled game, we try to change parameters
+in a fashion that is faster than a complete recompilation.
+}
+\seealso{
+Other Modify Game: \code{\link{game_copy}},
+  \code{\link{game_set_preferences}},
+  \code{\link{pref_change_params}}
+
+Other Game Parameters: \code{\link{make_game_params}}
 }

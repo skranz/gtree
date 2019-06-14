@@ -8,5 +8,5 @@ new_game(gameId, params = game_params(), options = make_game_options(),
   stages, variant = "", check = TRUE)
 }
 \description{
-See the examples on gtree website.
+See the examples on gtree website for detailed explanation.
 }

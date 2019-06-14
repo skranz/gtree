@@ -18,3 +18,13 @@ pref_custom(..., params = NULL, label = "custom")
 \description{
 Create a custom preference
 }
+\seealso{
+Other Preferences: \code{\link{game_fix_action_preferences}},
+  \code{\link{game_prefer_outcomes}},
+  \code{\link{game_set_preferences}},
+  \code{\link{pref_change_params}},
+  \code{\link{pref_envy}},
+  \code{\link{pref_heterogeneous_players}},
+  \code{\link{pref_ineqAv}}, \code{\link{pref_lossAv}},
+  \code{\link{pref_payoff}}
+}

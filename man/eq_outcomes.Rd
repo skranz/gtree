@@ -4,11 +4,41 @@
 \alias{eq_outcomes}
 \title{Return a data frame of all equilibrium outcomes}
 \usage{
-eq_outcomes(game, ...)
+eq_outcomes(game, add.move.probs = FALSE)
 }
 \arguments{
 \item{game}{the game object for which previously equilibria were computed e.g. with \code{game_solve}.}
+
+\item{add.move.probs}{if \code{TRUE} add for each action (and move of nature) the probability that the actual value has been chosen in the corresponding information set (node).}
 }
 \description{
-Return a data frame of all equilibrium outcomes
+If we have mixed strategies or moves of nature an
+equilibrium outcome will consist of several rows. One row
+for each pure outcome that occurs with positive probability.
+}
+\details{
+Typically \code{\link{eq_expected_outcomes}} will
+deliver a version that is easier to read.
+It will take expected values and reduce
+each outcome to one row.
+
+Yet \code{eq_outcomes} may be more useful for automatical
+analysis.
+}
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
+
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
 }

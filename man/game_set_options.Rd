@@ -2,11 +2,14 @@
 % Please edit documentation in R/game.r
 \name{game_set_options}
 \alias{game_set_options}
-\title{Change options of the game object}
+\title{Change options of an already created game object}
 \usage{
 game_set_options(game, ...)
 }
 \description{
-See make_game_options for a description of the
+See \code{make_game_options} for a description of the
 available options.
+}
+\seealso{
+Other Game Options: \code{\link{make_game_options}}
 }

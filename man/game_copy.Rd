@@ -9,3 +9,8 @@ game_copy(game)
 \description{
 Make a deep copy of a game
 }
+\seealso{
+Other Modify Game: \code{\link{game_change_param}},
+  \code{\link{game_set_preferences}},
+  \code{\link{pref_change_params}}
+}

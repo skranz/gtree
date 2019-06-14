@@ -1,5 +1,11 @@
 
 #' Changes one or several parameters of a game
+#'
+#' For an already compiled game, we try to change parameters
+#' in a fashion that is faster than a complete recompilation.
+#'
+#' @family Modify Game
+#' @family Game Parameters
 game_change_param = function(game, ..., params=list(), verbose=isTRUE(game$options$verbose>0)) {
   args = list(...)
 

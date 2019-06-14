@@ -4,7 +4,8 @@
 \alias{natureMove}
 \title{Specify a random move of nature in a stage}
 \usage{
-natureMove(name, set, probs = NULL, ...)
+natureMove(name, set, probs = NULL, table = NULL, fixed = NULL,
+  tremble.prob = NULL, ...)
 }
 \arguments{
 \item{name}{The variable name of the variable}
@@ -15,4 +16,8 @@ natureMove(name, set, probs = NULL, ...)
 }
 \description{
 Specify a random move of nature in a stage
+}
+\seealso{
+Other Define Stage: \code{\link{action}},
+  \code{\link{stage}}
 }

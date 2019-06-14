@@ -4,7 +4,7 @@
 \alias{get_outcomes}
 \title{Return a data frame of all possible outcomes}
 \usage{
-get_outcomes(game, ..., reduce.cols = FALSE)
+get_outcomes(game, reduce.cols = TRUE)
 }
 \arguments{
 \item{game}{the game object defined with \code{new_game} and being compiled with \code{game_compile} or after a call of \code{game_solve}.}

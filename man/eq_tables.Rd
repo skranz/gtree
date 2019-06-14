@@ -19,3 +19,12 @@ eq_tables(game, reduce.tables = TRUE, combine = 2,
 \description{
 Best take a look at the Vignettes to understand this format.
 }
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_outcomes}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
+}

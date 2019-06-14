@@ -100,7 +100,7 @@
 <div id="kuhn-poker-description" class="section level2">
 <h2 class="hasAnchor">
 <a href="#kuhn-poker-description" class="anchor"></a>Kuhn Poker Description</h2>
-<p>Wikipedia describes the <a href="https://en.wikipedia.org/wiki/Kuhn_poker">Kuhn Poker game</a> in conventional poker terms as follows:</p>
+<p>Joseph Kuhn (1950) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the <a href="https://en.wikipedia.org/wiki/Kuhn_poker">Kuhn Poker game</a> in conventional poker terms as follows:</p>
 <ul>
 <li><p>Each player antes 1.</p></li>
 <li><p>Each player is dealt one of the three cards, and the third is put aside unseen.</p></li>
@@ -130,73 +130,83 @@
 <div id="specifying-as-gtree-game" class="section level2">
 <h2 class="hasAnchor">
 <a href="#specifying-as-gtree-game" class="anchor"></a>Specifying as gtree game</h2>
+<p>We specify the game in gtree as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(gtree)</a>
-<a class="sourceLine" id="cb1-2" title="2">game =<span class="st"> </span><span class="kw"><a href="../reference/new_game.html">new_game</a></span>(</a>
+<a class="sourceLine" id="cb1-2" title="2">game =<span class="st"> </span>org.game =<span class="st"> </span><span class="kw"><a href="../reference/new_game.html">new_game</a></span>(</a>
 <a class="sourceLine" id="cb1-3" title="3">  <span class="dt">gameId =</span> <span class="st">"Kuhn-Poker"</span>,</a>
 <a class="sourceLine" id="cb1-4" title="4">  <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">numPlayers=</span><span class="dv">2</span>),</a>
 <a class="sourceLine" id="cb1-5" title="5">  <span class="dt">options =</span> <span class="kw"><a href="../reference/make_game_options.html">make_game_options</a></span>(<span class="dt">verbose=</span><span class="ot">FALSE</span>),</a>
 <a class="sourceLine" id="cb1-6" title="6">  <span class="dt">stages =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
 <a class="sourceLine" id="cb1-7" title="7">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"dealCards"</span>,</a>
 <a class="sourceLine" id="cb1-8" title="8">      <span class="dt">nature =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-9" title="9">        <span class="kw"><a href="../reference/natureMove.html">natureMove</a></span>(<span class="st">"pl1_card"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb1-10" title="10">        <span class="kw"><a href="../reference/natureMove.html">natureMove</a></span>(<span class="st">"pl2_card"</span>, <span class="op">~</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sets">setdiff</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, pl1_card))</a>
-<a class="sourceLine" id="cb1-11" title="11">      )</a>
-<a class="sourceLine" id="cb1-12" title="12">    ),</a>
-<a class="sourceLine" id="cb1-13" title="13">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl1CheckBet"</span>,</a>
-<a class="sourceLine" id="cb1-14" title="14">      <span class="dt">player=</span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-15" title="15">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"pl1_card"</span>),</a>
-<a class="sourceLine" id="cb1-16" title="16">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-17" title="17">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"cb1"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"check"</span>,<span class="st">"bet"</span>))</a>
-<a class="sourceLine" id="cb1-18" title="18">      )</a>
-<a class="sourceLine" id="cb1-19" title="19">    ),</a>
-<a class="sourceLine" id="cb1-20" title="20">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl2CheckBet"</span>,</a>
-<a class="sourceLine" id="cb1-21" title="21">      <span class="dt">player=</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb1-22" title="22">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "check"</span>,</a>
-<a class="sourceLine" id="cb1-23" title="23">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"pl2_card"</span>,<span class="st">"cb1"</span>),</a>
-<a class="sourceLine" id="cb1-24" title="24">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-25" title="25">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"cb2"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"check"</span>,<span class="st">"bet"</span>))</a>
-<a class="sourceLine" id="cb1-26" title="26">      )</a>
-<a class="sourceLine" id="cb1-27" title="27">    ),</a>
-<a class="sourceLine" id="cb1-28" title="28">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl2FoldCall"</span>,</a>
-<a class="sourceLine" id="cb1-29" title="29">      <span class="dt">player=</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb1-30" title="30">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "bet"</span>,</a>
-<a class="sourceLine" id="cb1-31" title="31">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"pl2_card"</span>,<span class="st">"cb1"</span>),</a>
-<a class="sourceLine" id="cb1-32" title="32">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-33" title="33">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"fc2"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"fold"</span>,<span class="st">"call"</span>))</a>
-<a class="sourceLine" id="cb1-34" title="34">      )</a>
-<a class="sourceLine" id="cb1-35" title="35">    ),</a>
-<a class="sourceLine" id="cb1-36" title="36">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl1FoldCall"</span>,</a>
-<a class="sourceLine" id="cb1-37" title="37">      <span class="dt">player=</span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-38" title="38">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span><span class="kw">is_true</span>(cb1 <span class="op">==</span><span class="st"> "check"</span> <span class="op">&amp;</span><span class="st"> </span>cb2<span class="op">==</span><span class="st">"bet"</span>),</a>
-<a class="sourceLine" id="cb1-39" title="39">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"cb2"</span>),</a>
-<a class="sourceLine" id="cb1-40" title="40">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-41" title="41">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"fc1"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"fold"</span>,<span class="st">"call"</span>))</a>
-<a class="sourceLine" id="cb1-42" title="42">      )</a>
-<a class="sourceLine" id="cb1-43" title="43">    ),</a>
-<a class="sourceLine" id="cb1-44" title="44">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"PayoffStage"</span>,</a>
-<a class="sourceLine" id="cb1-45" title="45">      <span class="dt">player=</span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb1-46" title="46">      <span class="dt">compute=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-47" title="47">        folder <span class="op">~</span><span class="st"> </span><span class="kw">case_distinction</span>(</a>
-<a class="sourceLine" id="cb1-48" title="48">          <span class="kw">is_true</span>(fc1 <span class="op">==</span><span class="st"> "fold"</span>),<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-49" title="49">          <span class="kw">is_true</span>(fc2 <span class="op">==</span><span class="st"> "fold"</span>),<span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb1-50" title="50">          <span class="dv">0</span></a>
-<a class="sourceLine" id="cb1-51" title="51">        ),</a>
-<a class="sourceLine" id="cb1-52" title="52">        winner <span class="op">~</span><span class="st"> </span><span class="kw">case_distinction</span>(</a>
-<a class="sourceLine" id="cb1-53" title="53">          folder <span class="op">==</span><span class="st"> </span><span class="dv">1</span>,<span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb1-54" title="54">          folder <span class="op">==</span><span class="st"> </span><span class="dv">2</span>,<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-55" title="55">          folder <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, (pl2_card <span class="op">&gt;</span><span class="st"> </span>pl1_card) <span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb1-56" title="56">        ),</a>
-<a class="sourceLine" id="cb1-57" title="57">        gave1 <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">is_true</span>(cb1 <span class="op">==</span><span class="st"> "bet"</span>) <span class="op">|</span><span class="st"> </span><span class="kw">is_true</span>(fc1 <span class="op">==</span><span class="st"> "call"</span>)),</a>
-<a class="sourceLine" id="cb1-58" title="58">        gave2 <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">is_true</span>(cb2 <span class="op">==</span><span class="st"> "bet"</span>) <span class="op">|</span><span class="st"> </span><span class="kw">is_true</span>(fc2 <span class="op">==</span><span class="st"> "call"</span>)),</a>
-<a class="sourceLine" id="cb1-59" title="59">        pott <span class="op">~</span><span class="st"> </span>gave1 <span class="op">+</span><span class="st"> </span>gave2,</a>
-<a class="sourceLine" id="cb1-60" title="60">        payoff_<span class="dv">1</span> <span class="op">~</span><span class="st"> </span>(winner <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)<span class="op">*</span>pott <span class="op">-</span><span class="st"> </span>gave1,</a>
-<a class="sourceLine" id="cb1-61" title="61">        payoff_<span class="dv">2</span> <span class="op">~</span><span class="st"> </span>(winner <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)<span class="op">*</span>pott <span class="op">-</span><span class="st"> </span>gave2</a>
-<a class="sourceLine" id="cb1-62" title="62">      )</a>
-<a class="sourceLine" id="cb1-63" title="63">    )</a>
-<a class="sourceLine" id="cb1-64" title="64">  )</a>
-<a class="sourceLine" id="cb1-65" title="65">) </a></code></pre></div>
-<p>To check whether we have correctly specified the game, let us take a look at the outcomes:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/get_outcomes.html">get_outcomes</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb1-9" title="9">        <span class="co"># Player 1 gets a random card 1, 2, or 3</span></a>
+<a class="sourceLine" id="cb1-10" title="10">        <span class="kw"><a href="../reference/natureMove.html">natureMove</a></span>(<span class="st">"card1"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-11" title="11">        <span class="co"># Draw from remaining cards for player 2</span></a>
+<a class="sourceLine" id="cb1-12" title="12">        <span class="kw"><a href="../reference/natureMove.html">natureMove</a></span>(<span class="st">"card2"</span>, <span class="op">~</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sets">setdiff</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, card1))</a>
+<a class="sourceLine" id="cb1-13" title="13">      )</a>
+<a class="sourceLine" id="cb1-14" title="14">    ),</a>
+<a class="sourceLine" id="cb1-15" title="15">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl1CheckBet"</span>,</a>
+<a class="sourceLine" id="cb1-16" title="16">      <span class="dt">player=</span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-17" title="17">      <span class="dt">observe =</span> <span class="st">"card1"</span>,</a>
+<a class="sourceLine" id="cb1-18" title="18">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb1-19" title="19">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"cb1"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"check"</span>,<span class="st">"bet"</span>))</a>
+<a class="sourceLine" id="cb1-20" title="20">      )</a>
+<a class="sourceLine" id="cb1-21" title="21">    ),</a>
+<a class="sourceLine" id="cb1-22" title="22">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl2CheckBet"</span>,</a>
+<a class="sourceLine" id="cb1-23" title="23">      <span class="dt">player=</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-24" title="24">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "check"</span>,</a>
+<a class="sourceLine" id="cb1-25" title="25">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"card2"</span>,<span class="st">"cb1"</span>),</a>
+<a class="sourceLine" id="cb1-26" title="26">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb1-27" title="27">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"cb2"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"check"</span>,<span class="st">"bet"</span>))</a>
+<a class="sourceLine" id="cb1-28" title="28">      )</a>
+<a class="sourceLine" id="cb1-29" title="29">    ),</a>
+<a class="sourceLine" id="cb1-30" title="30">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl2FoldCall"</span>,</a>
+<a class="sourceLine" id="cb1-31" title="31">      <span class="dt">player=</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-32" title="32">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "bet"</span>,</a>
+<a class="sourceLine" id="cb1-33" title="33">      <span class="dt">observe =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"card2"</span>,<span class="st">"cb1"</span>),</a>
+<a class="sourceLine" id="cb1-34" title="34">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb1-35" title="35">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"fc2"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"fold"</span>,<span class="st">"call"</span>))</a>
+<a class="sourceLine" id="cb1-36" title="36">      )</a>
+<a class="sourceLine" id="cb1-37" title="37">    ),</a>
+<a class="sourceLine" id="cb1-38" title="38">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"pl1FoldCall"</span>,</a>
+<a class="sourceLine" id="cb1-39" title="39">      <span class="dt">player=</span><span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-40" title="40">      <span class="dt">condition =</span> <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/is_true.html">is_true</a></span>(cb1 <span class="op">==</span><span class="st"> "check"</span> <span class="op">&amp;</span><span class="st"> </span>cb2<span class="op">==</span><span class="st">"bet"</span>),</a>
+<a class="sourceLine" id="cb1-41" title="41">      <span class="dt">observe =</span> <span class="st">"cb2"</span>,</a>
+<a class="sourceLine" id="cb1-42" title="42">      <span class="dt">actions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb1-43" title="43">        <span class="kw"><a href="../reference/action.html">action</a></span>(<span class="st">"fc1"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"fold"</span>,<span class="st">"call"</span>))</a>
+<a class="sourceLine" id="cb1-44" title="44">      )</a>
+<a class="sourceLine" id="cb1-45" title="45">    ),</a>
+<a class="sourceLine" id="cb1-46" title="46">    <span class="kw"><a href="../reference/stage.html">stage</a></span>(<span class="st">"PayoffStage"</span>,</a>
+<a class="sourceLine" id="cb1-47" title="47">      <span class="dt">player=</span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-48" title="48">      <span class="dt">compute=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb1-49" title="49">        <span class="co"># Which player folds?</span></a>
+<a class="sourceLine" id="cb1-50" title="50">        folder <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
+<a class="sourceLine" id="cb1-51" title="51">          <span class="kw"><a href="../reference/is_true.html">is_true</a></span>(fc1 <span class="op">==</span><span class="st"> "fold"</span>),<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-52" title="52">          <span class="kw"><a href="../reference/is_true.html">is_true</a></span>(fc2 <span class="op">==</span><span class="st"> "fold"</span>),<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-53" title="53">          <span class="dv">0</span> <span class="co"># 0 means no player folds</span></a>
+<a class="sourceLine" id="cb1-54" title="54">        ),</a>
+<a class="sourceLine" id="cb1-55" title="55">        </a>
+<a class="sourceLine" id="cb1-56" title="56">        <span class="co"># Which player wins?</span></a>
+<a class="sourceLine" id="cb1-57" title="57">        winner <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
+<a class="sourceLine" id="cb1-58" title="58">          folder <span class="op">==</span><span class="st"> </span><span class="dv">1</span>,<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-59" title="59">          folder <span class="op">==</span><span class="st"> </span><span class="dv">2</span>,<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-60" title="60">          folder <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, (card2 <span class="op">&gt;</span><span class="st"> </span>card1) <span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-61" title="61">        ),</a>
+<a class="sourceLine" id="cb1-62" title="62">        </a>
+<a class="sourceLine" id="cb1-63" title="63">        <span class="co"># How much gave each player to the pot?</span></a>
+<a class="sourceLine" id="cb1-64" title="64">        gave1 <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">*</span><span class="kw"><a href="../reference/is_true.html">is_true</a></span>((cb1 <span class="op">==</span><span class="st"> "bet"</span>) <span class="op">|</span><span class="st"> </span>(fc1 <span class="op">==</span><span class="st"> "call"</span>)),</a>
+<a class="sourceLine" id="cb1-65" title="65">        gave2 <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">*</span><span class="kw"><a href="../reference/is_true.html">is_true</a></span>((cb2 <span class="op">==</span><span class="st"> "bet"</span>) <span class="op">|</span><span class="st"> </span>(fc2 <span class="op">==</span><span class="st"> "call"</span>)),</a>
+<a class="sourceLine" id="cb1-66" title="66">        pot <span class="op">~</span><span class="st"> </span>gave1 <span class="op">+</span><span class="st"> </span>gave2,</a>
+<a class="sourceLine" id="cb1-67" title="67">        </a>
+<a class="sourceLine" id="cb1-68" title="68">        <span class="co"># Final payoffs</span></a>
+<a class="sourceLine" id="cb1-69" title="69">        payoff_<span class="dv">1</span> <span class="op">~</span><span class="st"> </span>(winner <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)<span class="op">*</span>pot <span class="op">-</span><span class="st"> </span>gave1,</a>
+<a class="sourceLine" id="cb1-70" title="70">        payoff_<span class="dv">2</span> <span class="op">~</span><span class="st"> </span>(winner <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)<span class="op">*</span>pot <span class="op">-</span><span class="st"> </span>gave2</a>
+<a class="sourceLine" id="cb1-71" title="71">      )</a>
+<a class="sourceLine" id="cb1-72" title="72">    )</a>
+<a class="sourceLine" id="cb1-73" title="73">  )</a>
+<a class="sourceLine" id="cb1-74" title="74">) </a></code></pre></div>
+<p>To better understand the definition and to check whether we have correctly specified the game, it is useful to take a look at the outcomes:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/get_outcomes.html">get_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="dv">6</span>)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -208,10 +218,10 @@
 <table class="table data-frame-table">
 <tr>
 <th class="data-frame-th">
-pl1_card
+card1
 </th>
 <th class="data-frame-th">
-pl2_card
+card2
 </th>
 <th class="data-frame-th">
 cb1
@@ -238,7 +248,7 @@ gave1
 gave2
 </th>
 <th class="data-frame-th">
-pott
+pot
 </th>
 <th class="data-frame-th">
 payoff_1
@@ -536,10 +546,10 @@ NA
 </td>
 </tr>
 </table>
-<p>
-… only 6 of 30 rows shown …
-</p>
-<p>Looking at the number of pure strategy profiles the game seems tractable for numerical analysis</p>
+<p>Look at the first row. We see from <code>cb1</code> and <code>cb2</code> that this corresponds to an outcome in which both players check. The variables <code>fc2</code> and <code>fc1</code> take <code>NA</code> values because there is no decision to fold or call if both players check.</p>
+<p>Formulas in the game definition will be internaly evaluated in a vectorized fashion over similar data frames and may take <code>NA</code> values. The helper function <code>is_true</code> takes a logical vector and replaces <code>NA</code> values with <code>FALSE</code>. I use this function in the game definition where a condition must evaluate to either <code>TRUE</code> or <code>FALSE</code> while <code>NA</code> values are not allowed.</p>
+<p>You may also take a look at the definition of <code>card2</code> in the first stage. Here the <code>set</code> of the random variable is a formula and depends on the previously computed value of <code>card1</code>.</p>
+<p>Let us also take a look at the game size:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">game <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="st">  </span><span class="kw">game_print_size_info</span>()</a></code></pre></div>
 <pre><code>## 
@@ -552,58 +562,22 @@ NA
 ##   - 4 096 pure strategy profiles (64 * 64)
 ##   - 1 subgames
 ##   - 4 096 relevant pure strategy profiles in subgames</code></pre>
+<p>While the number of pure strategy profiles is not really small, the game still seems of tractable size for numerical analysis.</p>
 </div>
 <div id="solving-kuhn-poker" class="section level2">
 <h2 class="hasAnchor">
 <a href="#solving-kuhn-poker" class="anchor"></a>Solving Kuhn Poker</h2>
 <p>Let us now solve the game using the <code>gambit-logit</code> solver, which is the default solver for finding a mixed strategy equilibrium:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## 
-## Written to C:\Users\skranz\AppData\Local\Temp\Rtmpi0iPcr/Kuhn-Poker___payoff.efg
+## Written to C:\Users\skranz\AppData\Local\Temp\RtmpemUFmM/Kuhn-Poker___payoff.efg
 ## 
-## Solve with command gambit-logit -q -e ... done in 1.390869 secs</code></pre>
-<pre><code>## $cb1
-## # A tibble: 5 x 4
-## # Groups:   pl1_card, cb1 [5]
-##   pl1_card cb1   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 bet   0.202 1      
-## 2        1 check 0.798 1      
-## 3        2 check 1     1      
-## 4        3 bet   0.605 1      
-## 5        3 check 0.395 1      
-## 
-## $cb2
-## # A tibble: 4 x 4
-##   pl2_card cb2   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 bet   0.333 1      
-## 2        1 check 0.667 1      
-## 3        2 check 1     1      
-## 4        3 bet   1     1      
-## 
-## $fc2
-## # A tibble: 4 x 4
-##   pl2_card fc2   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 fold  1     1      
-## 2        2 call  0.333 1      
-## 3        2 fold  0.667 1      
-## 4        3 call  1     1      
-## 
-## $fc1
-## # A tibble: 4 x 4
-##   pl1_card fc1   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 fold  1     1      
-## 2        2 call  0.535 1      
-## 3        2 fold  0.465 1      
-## 4        3 call  1     1</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+## Solve with command gambit-logit -q -e ... done in 0.9236829 secs</code></pre>
+<p>Let us first take a look at the expected equilibrium outcomes:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -635,79 +609,438 @@ fc2
 </tr>
 <tr>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
--0.05555556
+-0.056
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-0.05555556
+0.056
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
 bet(0.27),check(0.73)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-call(0.14),fold(0.24),NA(0.62)
+call(0.37),fold(0.63)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-bet(0.38),check(0.35),NA(0.27)
+bet(0.52),check(0.48)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-call(0.08),fold(0.19),NA(0.73)
+call(0.29),fold(0.71)
 </td>
 </tr>
 </table>
+<p>We see that player 1 has a lower expected payoff than player 2. Even though the logit solver found only one equilibrium, it is well known that two player zero-sum games with finitely many actions have unique expected equilibrium payoffs.</p>
+<p>We also see that every player checks, bets, calls or folds with positive probability on the equilibrium path.</p>
 </div>
-<div id="inequality-averse-players" class="section level2">
+<div id="exploring-conditional-expected-equilibrium-outcomes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#inequality-averse-players" class="anchor"></a>Inequality Averse Players</h2>
-<p>What if players become inequality averse?</p>
+<a href="#exploring-conditional-expected-equilibrium-outcomes" class="anchor"></a>Exploring conditional expected equilibrium outcomes</h2>
+<p>To get better insight into the equilibria let us show the conditional expected outcomes in the case that player 1 gets as card either 1,2 or 3:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+<style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
+ td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+ td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+ th.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+ tbody>tr:last-child>td {
+      border-bottom: solid 1px black;
+    }
+</style>
+<table class="table data-frame-table">
+<tr>
+<th class="data-frame-th">
+card1
+</th>
+<th class="data-frame-th">
+payoff_1
+</th>
+<th class="data-frame-th">
+payoff_2
+</th>
+<th class="data-frame-th">
+cb1
+</th>
+<th class="data-frame-th">
+fc1
+</th>
+<th class="data-frame-th">
+cb2
+</th>
+<th class="data-frame-th">
+fc2
+</th>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet(0.2),check(0.8)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+fold
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet(0.5),check(0.5)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.67),fold(0.33)
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+2
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+-0.333
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+0.333
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+call(0.54),fold(0.46)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+bet(0.67),check(0.33)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+</td>
+</tr>
+<tr>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+3
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+1.167
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+-1.167
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+bet(0.61),check(0.39)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+call(1)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+bet(0.17),check(0.83)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+call(0.17),fold(0.83)
+</td>
+</tr>
+</table>
+<p>Naturally, player 1’s payoffs increase in his card value. Interstingly, having a 2 yields to losses on average while the expected win of a 3 is larger than the expected loss of a 1.</p>
+<p>We also see that player 1 is mixing between <code>bet</code> and <code>check</code> if his card is <code>1</code> or <code>3</code>, while he always checks if his card is <code>2</code>.</p>
+<p>You may recall from fully mixed equilibria in simple bimatrix games, that in equilibrium each player chooses mixing probabilities that make the other player indifferent. This indifference requirement also plays a role in our Kuhn-Poker equilibrium, but the game is a bit more complex.</p>
+<p>If you wanted to completely solve the game, you could already start sitting down and doing it per hand (take a look at the references on the Wikipedia page). It might be helpful, however, to first build more intution at the conditional equilibrium outcomes.</p>
+<p>First consder the cases that player 1 has the highest card and either bets or checks:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_set_preferences.html">game_set_preferences</a></span>(<span class="kw"><a href="../reference/pref_ineqAv.html">pref_ineqAv</a></span>(<span class="dt">alpha=</span><span class="dv">1</span>, <span class="dt">beta=</span><span class="fl">0.5</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card1=</span><span class="dv">3</span>, <span class="dt">cb1=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+<style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
+ td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+ td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+ th.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+ tbody>tr:last-child>td {
+      border-bottom: solid 1px black;
+    }
+</style>
+<table class="table data-frame-table">
+<tr>
+<th class="data-frame-th">
+card1
+</th>
+<th class="data-frame-th">
+payoff_1
+</th>
+<th class="data-frame-th">
+payoff_2
+</th>
+<th class="data-frame-th">
+cb1
+</th>
+<th class="data-frame-th">
+fc1
+</th>
+<th class="data-frame-th">
+cb2
+</th>
+<th class="data-frame-th">
+fc2
+</th>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+3
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1.167
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-1.167
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.17),fold(0.83)
+</td>
+</tr>
+<tr>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+3
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+1.167
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+-1.167
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+call(1)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+bet(0.17),check(0.83)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+</td>
+</tr>
+</table>
+<p>We see that player 1 gets the same payoff from betting or checking. Of course, it must always be the case that a player is indifferent between all moves over which he mixes in an equilibrium.</p>
+<p>We also see why player 1 is indifferent. Having the highest card player 1 will always win the pot. The only question is whether he can taunt player 2 into increasing the pot. If player 1 bets player 2 will call and thus increase the pot only with ca. 17% probability (see <code>fc2</code>). If player 1 checks, player 2 will also increase the pot with ca. 17% probability by betting.</p>
+<p>How do we come to these probabilites of player 2’s actions? Let us dive into the expected equilibrium outcomes conditional on the the different values of <code>card2</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card2"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
+<style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
+ td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+ td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+ th.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+ tbody>tr:last-child>td {
+      border-bottom: solid 1px black;
+    }
+</style>
+<table class="table data-frame-table">
+<tr>
+<th class="data-frame-th">
+card2
+</th>
+<th class="data-frame-th">
+payoff_1
+</th>
+<th class="data-frame-th">
+payoff_2
+</th>
+<th class="data-frame-th">
+cb2
+</th>
+<th class="data-frame-th">
+fc2
+</th>
+<th class="data-frame-th">
+cb1
+</th>
+<th class="data-frame-th">
+fc1
+</th>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet(0.33),check(0.67)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+fold
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet(0.3),check(0.7)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.67),fold(0.33)
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+2
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+0.202
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+-0.202
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+call(0.33),fold(0.67)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+bet(0.4),check(0.6)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+</td>
+</tr>
+<tr>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+3
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+-1.368
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+1.368
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+bet(1)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+call(1)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+bet(0.1),check(0.9)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
+call(0.3),fold(0.7)
+</td>
+</tr>
+</table>
+<p>Like for player 1, player 2 has a negative expected payoff with a <code>2</code> while her expected wins are larger with <code>3</code> than her losses with a <code>1</code>.</p>
+<p>Player 2 only mixes between <code>bet</code> and <code>check</code> if she has a <code>1</code>. Let us explore this case in more detail:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card2=</span><span class="dv">1</span>, <span class="dt">cb2=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
+<style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
+ td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+ td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+ th.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+ tbody>tr:last-child>td {
+      border-bottom: solid 1px black;
+    }
+</style>
+<table class="table data-frame-table">
+<tr>
+<th class="data-frame-th">
+card2
+</th>
+<th class="data-frame-th">
+payoff_1
+</th>
+<th class="data-frame-th">
+payoff_2
+</th>
+<th class="data-frame-th">
+cb2
+</th>
+<th class="data-frame-th">
+fc2
+</th>
+<th class="data-frame-th">
+cb1
+</th>
+<th class="data-frame-th">
+fc1
+</th>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+check
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.67),fold(0.33)
+</td>
+</tr>
+<tr>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+1
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+1
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+-1
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+</td>
+</tr>
+</table>
+<p>Indeed player 2 is indifferent between both moves. The drawback of <code>bet</code> is that inceases the pot and thus the losses if player 1 calls (with 67%). The advantage is that player 1 also folds after a bet with 33%: in this case player 2 has successfully bluffed and gets the small pot. Player 1 is indifferent between calling and folding because he does not know whether player 2 has a 1 or a 3. In contrast, if player 2 checks he always loses, but the losses are always small.</p>
+</div>
+<div id="alternative-strategies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#alternative-strategies" class="anchor"></a>Alternative strategies</h2>
+<p>We may be interested in different strategies. For example, a consider a naive player 1 who thinks: “Obviously, it must be optimal to always bet if I have the highest card, and to never bet if I have the lowest card. That is what I will do.”</p>
+<p>What would be the resulting equilibrium strategies under this restriction? We include this behavior by adding 1000 units to player 1’s utility if he follows this rule using the function <code>game_prefer_outcomes</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_prefer_outcomes.html">game_prefer_outcomes</a></span>(<span class="dt">player1 =</span><span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
+<a class="sourceLine" id="cb12-3" title="3">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "check"</span>, <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb12-4" title="4">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "bet"</span>, <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb12-5" title="5">    <span class="dv">0</span></a>
+<a class="sourceLine" id="cb12-6" title="6">  ))</a></code></pre></div>
+<p>Using some knowledge about the internal structure of the <code>game</code> object, we can have a look at the newly generated formulas for the utility functions:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">game<span class="op">$</span>pref<span class="op">$</span>utils</a></code></pre></div>
+<pre><code>## [[1]]
+## payoff_1 + case_distinction(card1 == 1 &amp; cb1 == "check", 1000, 
+##     card1 == 3 &amp; cb1 == "bet", 1000, 0)
+## 
+## [[2]]
+## payoff_2</code></pre>
+<p>But let us look at the resulting equilibrium outcomes</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>()  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <pre><code>## 
-## Written to C:\Users\skranz\AppData\Local\Temp\Rtmpi0iPcr/Kuhn-Poker___ineq100_50.efg
+## Written to C:\Users\skranz\AppData\Local\Temp\RtmpemUFmM/Kuhn-Poker___payoff.efg
 ## 
-## Solve with command gambit-logit -q -e ... done in 0.9210989 secs</code></pre>
-<pre><code>## $cb1
-## # A tibble: 5 x 4
-## # Groups:   pl1_card, cb1 [5]
-##   pl1_card cb1   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 bet   0.500 1      
-## 2        1 check 0.500 1      
-## 3        2 check 1     1      
-## 4        3 bet   0.5   1      
-## 5        3 check 0.5   1      
-## 
-## $cb2
-## # A tibble: 5 x 5
-## # Groups:   pl2_card, cb1, cb2 [5]
-##   pl2_card cb1   cb2   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 check bet     0.5 1      
-## 2        1 check check   0.5 1      
-## 3        2 check check   1   1      
-## 4        3 check bet     0.5 1      
-## 5        3 check check   0.5 1      
-## 
-## $fc2
-## # A tibble: 3 x 4
-##   pl2_card fc2   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 fold      1 1      
-## 2        2 fold      1 1      
-## 3        3 call      1 1      
-## 
-## $fc1
-## # A tibble: 4 x 4
-##   pl1_card fc1   .prob eq.inds
-##      &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  
-## 1        1 fold   1    1      
-## 2        2 call   0.25 1      
-## 3        2 fold   0.75 1      
-## 4        3 call   1    1</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+## Solve with command gambit-logit -q -e ... done in 1.22612 secs</code></pre>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -739,25 +1072,219 @@ fc2
 </tr>
 <tr>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
--1.33e-06
+-0.111
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-1.33e-06
+0.111
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
 bet(0.33),check(0.67)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-call(0.08),fold(0.17),NA(0.75)
+call(0.31),fold(0.69)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-bet(0.25),check(0.42),NA(0.33)
+bet(0.71),check(0.29)
 </td>
 <td class="data-frame-td-bottom" nowrap bgcolor="#dddddd">
-call(0.08),fold(0.25),NA(0.67)
+fold(1)
 </td>
 </tr>
 </table>
+<p>We see that player 1 has a lower expected payoff if he wants to follow this rule than in the original equilibrium.</p>
+<p>More details are available from the following conditional expected outcomes:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>,<span class="st">"cb1"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2, is.eqo)  </a></code></pre></div>
+<style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
+ td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
+ td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
+ th.data-frame-th {font-weight: bold; margin: 3px; padding: 3px; border: solid 1px black; text-align: center;font-size: 80%;}
+ tbody>tr:last-child>td {
+      border-bottom: solid 1px black;
+    }
+</style>
+<table class="table data-frame-table">
+<tr>
+<th class="data-frame-th">
+card1
+</th>
+<th class="data-frame-th">
+payoff_1
+</th>
+<th class="data-frame-th">
+payoff_2
+</th>
+<th class="data-frame-th">
+cb1
+</th>
+<th class="data-frame-th">
+fc1
+</th>
+<th class="data-frame-th">
+cb2
+</th>
+<th class="data-frame-th">
+fc2
+</th>
+<th class="data-frame-th">
+is.eqo
+</th>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-0.5
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+0.5
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.5),fold(0.5)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+FALSE
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+-1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+fold
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+bet(0.75),check(0.25)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+TRUE
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+2
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-0.5
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+0.5
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+call(0.5),fold(0.5)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+FALSE
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+2
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+-0.333
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+0.333
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+call(0.67),fold(0.33)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+bet(0.67),check(0.33)
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#ffffff">
+TRUE
+</td>
+</tr>
+<tr>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+3
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+-1
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+bet
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+fold
+</td>
+<td class="data-frame-td" nowrap bgcolor="#dddddd">
+TRUE
+</td>
+</tr>
+<tr>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+3
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+1.417
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+-1.417
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+check
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+call
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+bet(0.42),check(0.58)
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+</td>
+<td class="data-frame-td-bottom" nowrap bgcolor="#ffffff">
+FALSE
+</td>
+</tr>
+</table>
+<p>We see that player 1 will also check if he has a <code>2</code>. Given the resulting equilibrium play, he would rather like to <code>bet</code> if he has a 1 and <code>check</code> if he has a <code>3</code>. Consider the later case. Since player 1 will bets only with a <code>3</code>, player 2 will always fold</p>
+</div>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
+<p>Kuhn, H. W. (1950). “Simplified Two-Person Poker”. In Kuhn, H. W.; Tucker, A. W. (eds.). Contributions to the Theory of Games. 1. Princeton University Press. pp. 97–103.</p>
 </div>
   </div>
 
@@ -769,7 +1296,9 @@ call(0.08),fold(0.25),NA(0.67)
 <li><a href="#kuhn-poker-description">Kuhn Poker Description</a></li>
       <li><a href="#specifying-as-gtree-game">Specifying as gtree game</a></li>
       <li><a href="#solving-kuhn-poker">Solving Kuhn Poker</a></li>
-      <li><a href="#inequality-averse-players">Inequality Averse Players</a></li>
+      <li><a href="#exploring-conditional-expected-equilibrium-outcomes">Exploring conditional expected equilibrium outcomes</a></li>
+      <li><a href="#alternative-strategies">Alternative strategies</a></li>
+      <li><a href="#references">References</a></li>
       </ul>
 </div>
       </div>

@@ -34,7 +34,10 @@
   
 <meta property="og:title" content="Return a data frame of expected equilibrium outcomes — eq_expected_outcomes" />
 
-<meta property="og:description" content="Return a data frame of expected equilibrium outcomes" />
+<meta property="og:description" content="Each row will describe a possible expected
+equilibrium outcome. For numerical variables like
+payoff_1 the expected value on the equilibrium
+path is returned." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -91,7 +94,10 @@
       <a href="../articles/t02_ultimatum_imperfect.html">2. Moves of Nature and Imperfect Information</a>
     </li>
     <li>
-      <a href="../articles/t03_sender_receiver.html">3. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
+      <a href="../articles/t03_kuhn_poker.html">3. Kuhn Poker</a>
+    </li>
+    <li>
+      <a href="../articles/t04_sender_receiver.html">4. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
     </li>
   </ul>
 </li>
@@ -126,11 +132,14 @@
 
     <div class="ref-description">
     
-    <p>Return a data frame of expected equilibrium outcomes</p>
+    <p>Each row will describe a possible expected
+equilibrium outcome. For numerical variables like
+<code>payoff_1</code> the expected value on the equilibrium
+path is returned.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>eq_expected_outcomes</span>(<span class='no'>game</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>eq_expected_outcomes</span>(<span class='no'>game</span>, <span class='kw'>like.factor</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,7 +148,27 @@
       <th>game</th>
       <td><p>the game object for which prevoiously equilibria were computed e.g. with <code>game_solve</code>.</p></td>
     </tr>
+    <tr>
+      <th>like.factor</th>
+      <td><p>an optional character vector of names of numerical variables that shall be presented like qualitative variables.</p></td>
+    </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For qualitative variables, we generate a string like
+<code>"accept(0.3),reject(0.2)"</code> describing the moves
+that occur with positive probability and those
+probabilities on the equilibrium path.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other eq: <code><a href='eq_cond_expected_outcomes.html'>eq_cond_expected_outcomes</a></code>,
+  <code><a href='eq_cond_outcomes.html'>eq_cond_outcomes</a></code>, <code><a href='eq_li.html'>eq_li</a></code>,
+  <code><a href='eq_outcomes.html'>eq_outcomes</a></code>, <code><a href='eq_tables.html'>eq_tables</a></code>,
+  <code><a href='game_gambit_solve_qre.html'>game_gambit_solve_qre</a></code>,
+  <code><a href='game_gambit_solve.html'>game_gambit_solve</a></code>,
+  <code><a href='game_solve_spe.html'>game_solve_spe</a></code></p></div>
     
 
   </div>
@@ -147,7 +176,11 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
   </div>
 </div>

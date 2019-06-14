@@ -154,7 +154,9 @@ example.game = function() {
 
 #' Create a new gtree game
 #'
-#' See the examples on gtree website.
+#' See the examples on gtree website for detailed explanation.
+#'
+#' @family Create Game
 new_game = function(gameId, params=game_params(), options=make_game_options(), stages, variant="", check=TRUE) {
   restore.point("new.game")
   vg = as.environment(list(
@@ -181,7 +183,9 @@ new_game = function(gameId, params=game_params(), options=make_game_options(), s
   game
 }
 
-#' Compile a game defined with new_game
+#' Compile a game defined with \code{new_game}
+#'
+#' @family Build Game
 game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE, add.sg=for.internal.solver, add.spi=for.internal.solver, add.spo=for.internal.solver, force=FALSE, verbose=game$options$verbose,...) {
   # Create all required addition
   restore.point("game_compile")
@@ -213,6 +217,7 @@ game_compile = function(game,branching.limit = 10000, for.internal.solver=FALSE,
 #' @param game the game object created with new_game
 #' @param verbose
 #' @param use.gambit solve via Gambit. Changing \code{mixed} or \code{just.spe} or specifying a \code{gambit.command} has only impact if \code{use.gambit=TRUE}.  See \code{\link{game_gambit_solve}} for details.
+#' @family eq
 #' @export
 game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gambit = mixed | !just.spe, verbose=isTRUE(game$options$verbose>=1), gambit.command = NULL,...) {
   restore.point("game_solve_spe")
@@ -246,6 +251,8 @@ game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gam
 #' @param efg.dir To solve via Gambit we first write the game tree into an .efg file. If \code{efg.dir} is NULL (default), the file will be written to a temporary directory. But you can also specify a custom directory here, e.g. if you want to take a look at the file.
 #' @param efg.file If NULL a default file name for the efg file will be generated based on the name of the game and the specified preferences. But you can specify a custom name here.
 #' @param verbose if TRUE show some extra information
+#' @family eq
+#' @family Gambit
 #' @export
 game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,gambit.dir=first.non.null(getOption("gtree.gambit.dir"),""),efg.dir = NULL, efg.file=NULL,  verbose=isTRUE(game$options$verbose>=1), add.q.flag = TRUE,  ...) {
   restore.point("game_solve_with_gambit")
@@ -264,7 +271,7 @@ game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=T
     }
   }
 
-  game$eq.li = gambit.solve.eq(tg=game$tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=gambit.command)
+  game$eq.li = gambit.solve.eq(tg=game$tg, mixed=mixed, just.spe=just.spe,efg.file=efg.file, efg.dir=efg.dir, gambit.dir=gambit.dir, solver=gambit.command, verbose=verbose)
   game$eqo.df = game$eeqo.df = NULL
   invisible(game)
 }
@@ -274,6 +281,7 @@ game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=T
 #' This function computes logit agent quantal response equilibria using the Gambit solver gambit-logit. For a short description see the \href{https://en.wikipedia.org/wiki/Quantal_response_equilibrium}{Wikipedia article} and the gambit-logit solver's \href{documentation}{https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria}. Details are in the article \href{Using Quantal Response to Compute Nash and Sequential Equilibria}{https://link.springer.com/article/10.1007/s00199-009-0443-3} by Theodore Turocy. But unfortunately, the article can only be found behind a pay wall.
 #'
 #' For a description of the arguments see \code{\link{game_gambit_solve}}
+#' @family eq
 game_gambit_solve_qre = function(game, gambit.command = "gambit-logit -q -l",gambit.dir="", efg.file=NULL, efg.dir = NULL, verbose=isTRUE(game$options$verbose>=1)) {
 
 }
@@ -286,6 +294,8 @@ game_gambit_solve_qre = function(game, gambit.command = "gambit-logit -q -l",gam
 #'
 #' @param game The game object
 #' @param pref A preference created with a function starting with \code{pref_}, like e.g. \code{pref_ineqAv(alpha=1, beta=0.5)}. Use \code{pref_custom} to specify custom preferences.
+#' @family Preferences
+#' @family Modify Game
 game_set_preferences = function(game, pref) {
   restore.point("game_set_preferences")
   game$pref = pref
@@ -293,6 +303,8 @@ game_set_preferences = function(game, pref) {
 }
 
 #' Make a deep copy of a game
+#'
+#' @family Modify Game
 game_copy = function(game) {
   ngame = as.environment(as.list(game))
   class(ngame) = class(game)
@@ -316,6 +328,7 @@ game_add_tremble = function(game, action=NULL, tremble.prob = 0.0001) {
 #' @param file.with.dir The file with full path. If NULL create a default name
 #' @param file The file name without directory
 #' @param dir The directory of a file
+#' @family Gambit
 game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg.file.name(game$tg), dir=getwd(),  verbose = !isTRUE(game$options$verbose==0)) {
   game_compile(game)
   game$efg.file = file.with.dir
@@ -324,23 +337,21 @@ game_write_efg = function(game,file.with.dir = file.path(dir, file), file=tg.efg
 }
 
 
-rule = function(var, formula, condition=NULL) {
-  list(var=var, formula=formula, condition=NULL)
-}
-
-#' Fix some actions
+#' Fix move probabilities of actions
 #'
-#' ... some rules or tables
-game_fix_actions = function(game, ..., fix.li=list(...), tremble.prob = NULL) {
+#' The function corresponds the provided actions into moves of nature with specified move probabilities. Can be a useful step when checking for existence of equilibria with particular structure.
+#'
+#' For fixing pure strategies \code{\link{game_fix_action_preferences}} is preferable when using the \code{gambit-logit} solver that can find sequential equilibria, by using logit trembles.
+#'
+#' @param actions a named list. The names correspond to action names. The default value to fix mixed strategies is a table that specifies conditional move probabilities (see example). If you want to fix pure actions you can also provide arguments as in \code{\link{game_fix_action_preferences}}.
+#' @param ... directly the named arguments from which \code{actions} will be constructed
+#' @param tremble.prob If a positive number, we assume that with this probability the player trembles and then chooses a random action with uniform probability. Trembles can be useful to enforce some sequential rationality in continuation play, but note that uniform trembles are not neccessarily the correct form of trembles to find sequential equilibria or trembling hand perfect equilibria.
+#' @family Fix Actions
+game_fix_actions = function(game, ..., actions=list(...), tremble.prob = NULL) {
   restore.point("game_fix_actions")
   game = clear.non.vg(game)
-  game$vg = fix.vg.actions(game$vg,fix.li=fix.li, tremble.prob = tremble.prob)
+  game$vg = fix.vg.actions(game$vg,fix.li=actions, tremble.prob = tremble.prob)
   invisible(game)
-}
-
-game_fix_actions_using_util = function(game, ..., fix.li = list(...), util.add = 1000) {
-  game$action.util.fix.li = fix.li
-
 }
 
 
@@ -365,11 +376,15 @@ get_outcomes = function(game,reduce.cols=TRUE) {
 #'
 #' Best take a look at the Vignettes to understand this format.
 #'
+#' @family eq
 #' @param reduce.tables (default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?
 #' @param combine if 0 generate separate tables for each equilibrium. If 1 bind the tables of each variable over all equilibria. If 2 (default) also collapse the rows that are the same for different equilibria and add a column eq.inds that contains all equilibrium numbers as a comma separated string
 #' @param eq.ind Vector of integers specifying the indices of all equilibria that shall be considered. By default all equilibria.
 #' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not.
 eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, ...) {
+  if (is.null(game$eq.li))
+    stop("Please first solve your game.")
+
   if (is.null(game$unknown.vars.at.actions)) {
     game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
   }
@@ -378,13 +393,33 @@ eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game
 }
 
 #' Return the computed equilibria using the internal representation
+#' @family eq
 eq_li = function(game,...) {
   game$eq.li
 }
 
 #' Return a data frame of all equilibrium outcomes
+#'
+#' If we have mixed strategies or moves of nature an
+#' equilibrium outcome will consist of several rows. One row
+#' for each pure outcome that occurs with positive probability.
+#'
+#' Typically \code{\link{eq_expected_outcomes}} will
+#' deliver a version that is easier to read.
+#' It will take expected values and reduce
+#' each outcome to one row.
+#'
+#' Yet \code{eq_outcomes} may be more useful for automatical
+#' analysis.
+#'
+#' @family eq
 #' @param game the game object for which previously equilibria were computed e.g. with \code{game_solve}.
-eq_outcomes = function(game) {
+#' @param add.move.probs if \code{TRUE} add for each action (and move of nature) the probability that the actual value has been chosen in the corresponding information set (node).
+#' @family eq
+eq_outcomes = function(game, add.move.probs=FALSE) {
+  if (is.null(game$eq.li))
+    stop("Please first solve your game.")
+
   res = eq.li.outcomes(eq.li = game$eq.li, tg=game$tg)
   cols = setdiff(colnames(res), c("numPlayers", ".outcome","eqo.ind"))
   res = res[,c(cols,"eqo.ind")]
@@ -392,9 +427,24 @@ eq_outcomes = function(game) {
 }
 
 #' Return a data frame of expected equilibrium outcomes
+#'
+#' Each row will describe a possible expected
+#' equilibrium outcome. For numerical variables like
+#' \code{payoff_1} the expected value on the equilibrium
+#' path is returned.
+#'
+#' For qualitative variables, we generate a string like
+#' \code{"accept(0.3),reject(0.2)"} describing the moves
+#' that occur with positive probability and those
+#' probabilities on the equilibrium path.
+#' @family eq
 #' @param game the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.
-eq_expected_outcomes = function(game) {
-  res = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg, ignore.NA = TRUE)
+#' @param like.factor an optional character vector of names of numerical variables that shall be presented like qualitative variables.
+eq_expected_outcomes = function(game, like.factor = NULL) {
+  if (is.null(game$eq.li))
+    stop("Please first solve your game.")
+
+  res = eq.li.expected.outcomes(eq.li = game$eq.li, tg=game$tg, ignore.NA = TRUE, factor.vars = like.factor)
   cols = setdiff(colnames(res), c("numPlayers",".prob", ".outcome","eqo.ind"))
   res = res[,c(cols,"eqo.ind")]
   res
@@ -402,24 +452,14 @@ eq_expected_outcomes = function(game) {
 
 #' Return conditional equilibrium outcomes
 #'
+#' @family eq
 #' @param game the game object for which equilibria were computed e.g. with \code{game_solve}.
 #' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional equilibrium outcomes for each combination of values
-#' @param fixed Alternativly to ... a named list with values to fix.
-eq_cond_outcomes = function(game,...,fixed=list(...)) {
-  res = eq.li.cond.outcomes(game$eq.li,cond = fixed, tg = game$tg)
-  cols = setdiff(colnames(res), c("numPlayers", ".outcome","cond.ind"))
-  res = res[,c(cols,"cond.ind")]
-  res
-}
-
-#' Return conditional expected equilibrium outcomes
-#'
-#' @param game the game object for which equilibria were computed e.g. with \code{game_solve}.
-#' @param ... variable names and their assumed value. We set the probabilities of the conditioned variable values to 1. These correspond to equilibrium outcomes given an unexpected tremble that makes the variables take the specified values. Variables can take multiple values. We then compute conditional expected equilibrium outcomes for each combination of values
 #' @param fixed.list Alternativly to ... a named list with values to fix.
 #' @param fixed.vars Alternative to ... or fixed.list, a vector of variable names. If provided, we compute the conditional expected outcomes holding fixed every possible combination of the variables stated in fixed.vars
-eq_cond_expected_outcomes = function(game,...,fixed.list=list(...), fixed.vars = NULL) {
-  restore.point("eq_cond_expected_outcomes")
+eq_cond_outcomes = function(game,...,fixed.list=list(...),fixed.vars = NULL) {
+  if (is.null(game$eq.li))
+    stop("Please first solve your game.")
 
   if (is.null(names(fixed.list))) {
     fixed.vars = unlist(fixed.list)
@@ -429,32 +469,72 @@ eq_cond_expected_outcomes = function(game,...,fixed.list=list(...), fixed.vars =
       arrange_at(fixed.vars)
   }
 
+  res = eq.li.cond.outcomes(game$eq.li,cond = fixed.list, tg = game$tg)
+  cols = setdiff(colnames(res), c("numPlayers", ".outcome","cond.ind"))
+  res = res[,c(cols,"cond.ind")]
+  res
+}
+
+#' Return conditional expected equilibrium outcomes
+#'
+#' @family eq
+#' @inheritParams eq_cond_outcomes
+#' @param like.factor an optional character vector of names of numerical variables that shall be presented like qualitative variables.
+eq_cond_expected_outcomes = function(game,...,fixed.list=list(...), fixed.vars = NULL, like.factor = NULL) {
+  restore.point("eq_cond_expected_outcomes")
+  if (is.null(game$eq.li))
+    stop("Please first solve your game.")
+
+
+  if (is.null(names(fixed.list))) {
+    fixed.vars = unlist(fixed.list)
+    fixed.list = NULL
+  } else {
+    has.name = names(fixed.list)!=""
+    fixed.vars = unlist(fixed.list[!has.name])
+    fixed.list = fixed.list[has.name]
+  }
+  if (!is.null(fixed.vars)) {
+    if (length(fixed.list)>0) {
+      stop("Sorry cannot yet combine arguments that are just variables names with arguments that fix values.")
+    }
+    fixed.list = unique(game$tg$oco.df[,fixed.vars]) %>%
+      na.omit() %>%
+      arrange_at(fixed.vars)
+  }
+
   ceqo.df = eq.li.cond.outcomes(game$eq.li,cond = fixed.list, tg = game$tg)
-  res = cond.expected.outcomes(ceqo.df)
+  res = cond.expected.outcomes(ceqo.df, factor.vars = like.factor)
   cols = setdiff(colnames(res), c("numPlayers", ".prob",".outcome","cond.ind"))
   res = res[,c(cols,"cond.ind")]
   res
 }
 
 
-
-
 #' Specify the game parameters
-#'
 #' This function is only to be used inside \code{new_game}. To change the parameters of an existing game call \code{game_change_params}.
+#'
+#' @family Build Game
+#' @family Game Parameters
 make_game_params = function(numPlayers=2,...) {
   list(numPlayers=numPlayers,...)
 }
 
-#' Specify the game options in \code{new_game}
+#' Specify the game options inside \code{new_game}
+#'
+#' @family Build Game
+#' @family Game Options
+#' @seealso game_set_options
 make_game_options = function(verbose=TRUE,...) {
   list(verbose=verbose,...)
 }
 
-#' Change options of the game object
+#' Change options of an already created game object
 #'
-#' See make_game_options for a description of the
+#' See \code{make_game_options} for a description of the
 #' available options.
+#'
+#' @family Game Options
 game_set_options = function(game, ...) {
   args = list(...)
   restore.point("game_set_options")
@@ -469,10 +549,13 @@ game_set_options = function(game, ...) {
 
 
 #' Specify an action in a stage
+#'
+#'
 #' @param name The variable name of the action
 #' @param set The set of different action values. Can be a formula that depends on other game variables.
 #' @param strategyMethodDomain if not NULL the action shall be specified via strategy method in an experiment. State the variable name upon which the action conditions
 #' Only used when running an experiment or analysing experimental data
+#' @family Define Stage
 action = function(name, set, strategyMethodDomain=NULL, ...) {
   if (is.null(strategyMethodDomain)) {
     list(name=name,set=f2c(set),...)
@@ -485,6 +568,7 @@ action = function(name, set, strategyMethodDomain=NULL, ...) {
 #' @param name The variable name of the variable
 #' @param set The set of different values. Can be a rhs only formula.
 #' @param probs The probability of each element in set. If NULL all moves are equally likely. Can be a rhs formula
+#' @family Define Stage
 natureMove = function(name, set, probs=NULL, table=NULL, fixed=NULL, tremble.prob = NULL,...) {
   if (!is.null(table)) {
     list(name=name,table=table)
@@ -503,6 +587,8 @@ natureMove = function(name, set, probs=NULL, table=NULL, fixed=NULL, tremble.pro
 #' @param compute A list of formulas like 'compute=list(payoff_1 ~ x-5)'. The lhs specifies a variable name and the rhs a DETERMINISTIC formula. The variables are computed at the beginning of the stage before actions and moves of nature take place. This means they can be used e.g. in formulas for action sets of the same stage.
 #' @param nature A list of moves of nature, i.e. random variables from a finite set. E.g. nature=list(natureMove("proposer",c(1,2),prob=c(0.4,0.6)).
 #' @param actions A list of actions. E.g. actions=list(action("offer",~0:cake_size)
+#' @family Define Stage
+#' @family Build Game
 stage = function(name, player=NULL, condition=NULL, observe=NULL, compute=NULL, nature=NULL, actions=NULL,...) {
   restore.point("stage")
 

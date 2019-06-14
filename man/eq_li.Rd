@@ -9,3 +9,12 @@ eq_li(game, ...)
 \description{
 Return the computed equilibria using the internal representation
 }
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}},
+  \code{\link{eq_outcomes}}, \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
+}

@@ -16,3 +16,15 @@ This function sets players preferences to a parametrized preference
 type. To specify completely custom preferences use game_set_util_fun
 instead.
 }
+\seealso{
+Other Preferences: \code{\link{game_fix_action_preferences}},
+  \code{\link{game_prefer_outcomes}},
+  \code{\link{pref_change_params}},
+  \code{\link{pref_custom}}, \code{\link{pref_envy}},
+  \code{\link{pref_heterogeneous_players}},
+  \code{\link{pref_ineqAv}}, \code{\link{pref_lossAv}},
+  \code{\link{pref_payoff}}
+
+Other Modify Game: \code{\link{game_change_param}},
+  \code{\link{game_copy}}, \code{\link{pref_change_params}}
+}

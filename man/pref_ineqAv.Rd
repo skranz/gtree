@@ -19,3 +19,12 @@ pref_ineqAv(alpha = 0.75, beta = 0.5, player = 1:numPlayers,
 \description{
 Fehr-Schmidt inequality aversion.
 }
+\seealso{
+Other Preferences: \code{\link{game_fix_action_preferences}},
+  \code{\link{game_prefer_outcomes}},
+  \code{\link{game_set_preferences}},
+  \code{\link{pref_change_params}},
+  \code{\link{pref_custom}}, \code{\link{pref_envy}},
+  \code{\link{pref_heterogeneous_players}},
+  \code{\link{pref_lossAv}}, \code{\link{pref_payoff}}
+}

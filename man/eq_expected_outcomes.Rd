@@ -4,11 +4,30 @@
 \alias{eq_expected_outcomes}
 \title{Return a data frame of expected equilibrium outcomes}
 \usage{
-eq_expected_outcomes(game, ...)
+eq_expected_outcomes(game, like.factor = NULL)
 }
 \arguments{
 \item{game}{the game object for which prevoiously equilibria were computed e.g. with \code{game_solve}.}
+
+\item{like.factor}{an optional character vector of names of numerical variables that shall be presented like qualitative variables.}
 }
 \description{
-Return a data frame of expected equilibrium outcomes
+Each row will describe a possible expected
+equilibrium outcome. For numerical variables like
+\code{payoff_1} the expected value on the equilibrium
+path is returned.
+}
+\details{
+For qualitative variables, we generate a string like
+\code{"accept(0.3),reject(0.2)"} describing the moves
+that occur with positive probability and those
+probabilities on the equilibrium path.
+}
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_outcomes}}, \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
 }

@@ -2,10 +2,18 @@
 % Please edit documentation in R/game.r
 \name{make_game_params}
 \alias{make_game_params}
-\title{Specify the game parameters}
+\title{Specify the game parameters
+This function is only to be used inside \code{new_game}. To change the parameters of an existing game call \code{game_change_params}.}
 \usage{
 make_game_params(numPlayers = 2, ...)
 }
 \description{
+Specify the game parameters
 This function is only to be used inside \code{new_game}. To change the parameters of an existing game call \code{game_change_params}.
+}
+\seealso{
+Other Build Game: \code{\link{game_compile}},
+  \code{\link{make_game_options}}, \code{\link{stage}}
+
+Other Game Parameters: \code{\link{game_change_param}}
 }

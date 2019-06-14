@@ -34,7 +34,9 @@
   
 <meta property="og:title" content="Return a data frame of all equilibrium outcomes — eq_outcomes" />
 
-<meta property="og:description" content="Return a data frame of all equilibrium outcomes" />
+<meta property="og:description" content="If we have mixed strategies or moves of nature an
+equilibrium outcome will consist of several rows. One row
+for each pure outcome that occurs with positive probability." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -91,7 +93,10 @@
       <a href="../articles/t02_ultimatum_imperfect.html">2. Moves of Nature and Imperfect Information</a>
     </li>
     <li>
-      <a href="../articles/t03_sender_receiver.html">3. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
+      <a href="../articles/t03_kuhn_poker.html">3. Kuhn Poker</a>
+    </li>
+    <li>
+      <a href="../articles/t04_sender_receiver.html">4. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
     </li>
   </ul>
 </li>
@@ -126,11 +131,13 @@
 
     <div class="ref-description">
     
-    <p>Return a data frame of all equilibrium outcomes</p>
+    <p>If we have mixed strategies or moves of nature an
+equilibrium outcome will consist of several rows. One row
+for each pure outcome that occurs with positive probability.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>eq_outcomes</span>(<span class='no'>game</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>eq_outcomes</span>(<span class='no'>game</span>, <span class='kw'>add.move.probs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,7 +146,37 @@
       <th>game</th>
       <td><p>the game object for which previously equilibria were computed e.g. with <code>game_solve</code>.</p></td>
     </tr>
+    <tr>
+      <th>add.move.probs</th>
+      <td><p>if <code>TRUE</code> add for each action (and move of nature) the probability that the actual value has been chosen in the corresponding information set (node).</p></td>
+    </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Typically <code><a href='eq_expected_outcomes.html'>eq_expected_outcomes</a></code> will
+deliver a version that is easier to read.
+It will take expected values and reduce
+each outcome to one row.</p>
+<p>Yet <code>eq_outcomes</code> may be more useful for automatical
+analysis.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other eq: <code><a href='eq_cond_expected_outcomes.html'>eq_cond_expected_outcomes</a></code>,
+  <code><a href='eq_cond_outcomes.html'>eq_cond_outcomes</a></code>,
+  <code><a href='eq_expected_outcomes.html'>eq_expected_outcomes</a></code>, <code><a href='eq_li.html'>eq_li</a></code>,
+  <code><a href='eq_tables.html'>eq_tables</a></code>,
+  <code><a href='game_gambit_solve_qre.html'>game_gambit_solve_qre</a></code>,
+  <code><a href='game_gambit_solve.html'>game_gambit_solve</a></code>,
+  <code><a href='game_solve_spe.html'>game_solve_spe</a></code></p>
+<p>Other eq: <code><a href='eq_cond_expected_outcomes.html'>eq_cond_expected_outcomes</a></code>,
+  <code><a href='eq_cond_outcomes.html'>eq_cond_outcomes</a></code>,
+  <code><a href='eq_expected_outcomes.html'>eq_expected_outcomes</a></code>, <code><a href='eq_li.html'>eq_li</a></code>,
+  <code><a href='eq_tables.html'>eq_tables</a></code>,
+  <code><a href='game_gambit_solve_qre.html'>game_gambit_solve_qre</a></code>,
+  <code><a href='game_gambit_solve.html'>game_gambit_solve</a></code>,
+  <code><a href='game_solve_spe.html'>game_solve_spe</a></code></p></div>
     
 
   </div>
@@ -147,7 +184,11 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
   </div>
 </div>

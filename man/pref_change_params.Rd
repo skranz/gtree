@@ -10,3 +10,16 @@ pref_change_params(pref, ..., params = list(), label = NULL,
 \description{
 Change the parameters of a preference object
 }
+\seealso{
+Other Modify Game: \code{\link{game_change_param}},
+  \code{\link{game_copy}},
+  \code{\link{game_set_preferences}}
+
+Other Preferences: \code{\link{game_fix_action_preferences}},
+  \code{\link{game_prefer_outcomes}},
+  \code{\link{game_set_preferences}},
+  \code{\link{pref_custom}}, \code{\link{pref_envy}},
+  \code{\link{pref_heterogeneous_players}},
+  \code{\link{pref_ineqAv}}, \code{\link{pref_lossAv}},
+  \code{\link{pref_payoff}}
+}

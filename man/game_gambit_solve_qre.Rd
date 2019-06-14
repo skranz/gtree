@@ -14,3 +14,11 @@ This function computes logit agent quantal response equilibria using the Gambit 
 \details{
 For a description of the arguments see \code{\link{game_gambit_solve}}
 }
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_outcomes}}, \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve}},
+  \code{\link{game_solve_spe}}
+}

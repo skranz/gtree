@@ -82,7 +82,7 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
     efg.file.with.dir = file.path(efg.dir, efg.file)
   }
 	if (!isTRUE(file.exists(efg.file.with.dir)) | use.temp.dir) {
-	  tg.to.efg(tg, file.with.dir = efg.file.with.dir)
+	  tg.to.efg(tg, file.with.dir = efg.file.with.dir, verbose=verbose)
 	}
 
 	#solver = "gambit-enumpure -q -P -D"

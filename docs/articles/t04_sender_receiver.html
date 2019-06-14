@@ -138,7 +138,7 @@
 <a class="sourceLine" id="cb1-32" title="32">      <span class="dt">compute=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
 <a class="sourceLine" id="cb1-33" title="33">        hand <span class="op">~</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ifelse">ifelse</a></span>(orange<span class="op">+</span>blue<span class="op">&gt;=</span>maxVal, <span class="st">"good"</span>,<span class="st">"bad"</span>), </a>
 <a class="sourceLine" id="cb1-34" title="34">        payoff_<span class="dv">1</span> <span class="op">~</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ifelse">ifelse</a></span>(accept, <span class="dv">1</span>,<span class="dv">0</span>), <span class="co"># Sender wants accept</span></a>
-<a class="sourceLine" id="cb1-35" title="35">        payoff_<span class="dv">2</span> <span class="op">~</span><span class="st"> </span><span class="kw">case_distinction</span>(</a>
+<a class="sourceLine" id="cb1-35" title="35">        payoff_<span class="dv">2</span> <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
 <a class="sourceLine" id="cb1-36" title="36">          accept <span class="op">&amp;</span><span class="st"> </span>hand<span class="op">==</span><span class="st">"good"</span>, <span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb1-37" title="37">          accept <span class="op">&amp;</span><span class="st"> </span>hand<span class="op">==</span><span class="st">"bad"</span>, <span class="dv">0</span>,</a>
 <a class="sourceLine" id="cb1-38" title="38">          <span class="op">!</span>accept <span class="op">&amp;</span><span class="st"> </span>hand<span class="op">==</span><span class="st">"good"</span>,<span class="dv">0</span>,</a>
@@ -215,9 +215,9 @@
 ##   - 1 subgames
 ##   - 1 048 576 relevant pure strategy profiles in subgames
 ## 
-## Written to C:\Users\skranz\AppData\Local\Temp\RtmpCwg7Rh/Sender-Receiver___payoff.efg
+## Written to C:\Users\skranz\AppData\Local\Temp\RtmpGQ953r/Sender-Receiver___payoff.efg
 ## 
-## Solve with command gambit-logit -q -e ... done in 2.354419 secs</code></pre>
+## Solve with command gambit-logit -q -e ... done in 3.109413 secs</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">game <span class="op">%&gt;%</span><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
 <pre><code>## $reveal
 ## # A tibble: 24 x 5

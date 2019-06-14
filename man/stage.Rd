@@ -25,3 +25,11 @@ stage(name, player = NULL, condition = NULL, observe = NULL,
 \description{
 Specify a stage for a game
 }
+\seealso{
+Other Define Stage: \code{\link{action}},
+  \code{\link{natureMove}}
+
+Other Build Game: \code{\link{game_compile}},
+  \code{\link{make_game_options}},
+  \code{\link{make_game_params}}
+}

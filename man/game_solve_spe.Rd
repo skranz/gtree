@@ -17,3 +17,11 @@ game_solve_spe(game, mixed = FALSE, just.spe = TRUE, use.gambit = mixed |
 With the default arguments the internal gtree solver is used
 to find all pure strategy subgame perfect equilibria of the game.
 }
+\seealso{
+Other eq: \code{\link{eq_cond_expected_outcomes}},
+  \code{\link{eq_cond_outcomes}},
+  \code{\link{eq_expected_outcomes}}, \code{\link{eq_li}},
+  \code{\link{eq_outcomes}}, \code{\link{eq_tables}},
+  \code{\link{game_gambit_solve_qre}},
+  \code{\link{game_gambit_solve}}
+}

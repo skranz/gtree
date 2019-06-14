@@ -3,6 +3,8 @@
 #' @param vec A vector of logical values
 #' (possible containing NA) or values that can be
 #' transformed to logicals
+#'
+#' @family Helper Functions
 is_true = function(vec) {
   vec[is.na(vec)] = FALSE
   vec = as.logical(vec)

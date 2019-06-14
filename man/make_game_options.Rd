@@ -2,10 +2,18 @@
 % Please edit documentation in R/game.r
 \name{make_game_options}
 \alias{make_game_options}
-\title{Specify the game options in \code{new_game}}
+\title{Specify the game options inside \code{new_game}}
 \usage{
 make_game_options(verbose = TRUE, ...)
 }
 \description{
-Specify the game options in \code{new_game}
+Specify the game options inside \code{new_game}
+}
+\seealso{
+game_set_options
+
+Other Build Game: \code{\link{game_compile}},
+  \code{\link{make_game_params}}, \code{\link{stage}}
+
+Other Game Options: \code{\link{game_set_options}}
 }

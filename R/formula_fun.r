@@ -22,7 +22,3 @@ str_split = function(str,pattern,ind) {
 str_combine = function(...) {
   paste0(...)
 }
-
-is_true = function(val) {
-  is.true(val)
-}

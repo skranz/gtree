@@ -17,3 +17,7 @@ Only used when running an experiment or analysing experimental data}
 \description{
 Specify an action in a stage
 }
+\seealso{
+Other Define Stage: \code{\link{natureMove}},
+  \code{\link{stage}}
+}

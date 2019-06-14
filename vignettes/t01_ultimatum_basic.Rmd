@@ -124,22 +124,38 @@ We have a list with a `tibble` for every action variable.
   
 The argument `combine` can take the values 0,1 and 2 and describes how the results of different equilibria are combined. For example, with `combine = 0`, we would get a separate list for every equilibrium. The argument `reduce.tables` automatically removes key columns that have no impact on the chosen equilibrium action.
 
-In my view that such a representation of equilibria is quite intuitive and convenient when comparing equilibrium predictions with experimental results.
-
 ## Conditional expected equilibrium outcomes
+
+Let me illustrate another useful function to explore equilibria:
 ```{r}
 eq_cond_expected_outcomes(game, offer=0)
 ```
+Here we show the expected conditional equilibrium outcomes (for all equilibria) assuming that player 1 chooses an offer of 0.
 
+The column `is.eqo` is TRUE if `offer = 0` indeed could happen with positive probability on the equilibrium path of the corresponding equilibrium.
 
+If that offer would not ever be chosen on the equilibrium path, think of the condition as an unexpected one-shot deviation from the equilbrium path.
+
+We can study multiple conditions, e.g.
 ```{r}
+# Condition first on offer = 0 then on offer = 1
+eq_cond_expected_outcomes(game, offer=0:1)
+
+# Condition step-by-step on each possible offer
 eq_cond_expected_outcomes(game, "offer")
 ```
 
+We can also condition on different variables at the same time:
+```{r}
+eq_cond_expected_outcomes(game, offer=2, accept=FALSE)
+```
+Here we assume that in the same play player 1 trembles to offer=2 and player 2 trembles to not accept.
 
-### Internal representation of equilibria
+Admittedly these functions are not really neccessary for our simple Ultimatum game. Yet, take a look at the the Kuhn-Poker tutorial to see how they help to illuminate more complicated equilibrium structures.
 
-Yet, `gtree` uses  a different internal representation of equilibria. To understand the internal representation it is first useful to show all possible outcomes of the game:
+## Internal representation of equilibria
+
+The different representations of equilibria are computed from an internal representation of equilibria. To understand the internal representation, it is first useful to show all possible outcomes of the game:
 ```{r}
 get_outcomes(game, reduce.cols=TRUE)
 ```

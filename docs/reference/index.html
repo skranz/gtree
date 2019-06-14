@@ -88,7 +88,10 @@
       <a href="../articles/t02_ultimatum_imperfect.html">2. Moves of Nature and Imperfect Information</a>
     </li>
     <li>
-      <a href="../articles/t03_sender_receiver.html">3. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
+      <a href="../articles/t03_kuhn_poker.html">3. Kuhn Poker</a>
+    </li>
+    <li>
+      <a href="../articles/t04_sender_receiver.html">4. Comparing with Gambit Python API: QRE in a Sender-Receriver Game</a>
     </li>
   </ul>
 </li>
@@ -143,6 +146,24 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="case_distinction.html">case_distinction()</a></code> </p>
+        </td>
+        <td><p>A simple function to define case distinctions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eq_cond_expected_outcomes.html">eq_cond_expected_outcomes()</a></code> </p>
+        </td>
+        <td><p>Return conditional expected equilibrium outcomes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eq_cond_outcomes.html">eq_cond_outcomes()</a></code> </p>
+        </td>
+        <td><p>Return conditional equilibrium outcomes</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="eq_expected_outcomes.html">eq_expected_outcomes()</a></code> </p>
         </td>
         <td><p>Return a data frame of expected equilibrium outcomes</p></td>
@@ -175,13 +196,25 @@
         <td>
           <p><code><a href="game_compile.html">game_compile()</a></code> </p>
         </td>
-        <td><p>Compile a game defined with new_game</p></td>
+        <td><p>Compile a game defined with <code>new_game</code></p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="game_copy.html">game_copy()</a></code> </p>
         </td>
         <td><p>Make a deep copy of a game</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="game_fix_actions.html">game_fix_actions()</a></code> </p>
+        </td>
+        <td><p>Fix move probabilities of actions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="game_fix_action_preferences.html">game_fix_action_preferences()</a></code> </p>
+        </td>
+        <td><p>Set add a large amount of utility if a player plays a particular action</p></td>
       </tr><tr>
         
         <td>
@@ -197,9 +230,15 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="game_prefer_outcomes.html">game_prefer_outcomes()</a></code> </p>
+        </td>
+        <td><p>Set add a large amount of utility if a player plays a particular action</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="game_set_options.html">game_set_options()</a></code> </p>
         </td>
-        <td><p>Change options of the game object</p></td>
+        <td><p>Change options of an already created game object</p></td>
       </tr><tr>
         
         <td>
@@ -227,15 +266,22 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="is_true.html">is_true()</a></code> </p>
+        </td>
+        <td><p>Returns logical vector replacing NA by FALSE</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="make_game_options.html">make_game_options()</a></code> </p>
         </td>
-        <td><p>Specify the game options in <code>new_game</code></p></td>
+        <td><p>Specify the game options inside <code>new_game</code></p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="make_game_params.html">make_game_params()</a></code> </p>
         </td>
-        <td><p>Specify the game parameters</p></td>
+        <td><p>Specify the game parameters
+This function is only to be used inside <code>new_game</code>. To change the parameters of an existing game call <code>game_change_params</code>.</p></td>
       </tr><tr>
         
         <td>
@@ -278,6 +324,12 @@
           <p><code><a href="pref_ineqAv.html">pref_ineqAv()</a></code> </p>
         </td>
         <td><p>Fehr-Schmidt inequality aversion.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pref_lossAv.html">pref_lossAv()</a></code> </p>
+        </td>
+        <td><p>'Linear loss aversion preferences with a single reference point</p></td>
       </tr><tr>
         
         <td>
