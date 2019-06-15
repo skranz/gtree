@@ -381,7 +381,7 @@ get_outcomes = function(game,reduce.cols=TRUE) {
 #' @param combine if 0 generate separate tables for each equilibrium. If 1 bind the tables of each variable over all equilibria. If 2 (default) also collapse the rows that are the same for different equilibria and add a column eq.inds that contains all equilibrium numbers as a comma separated string
 #' @param eq.ind Vector of integers specifying the indices of all equilibria that shall be considered. By default all equilibria.
 #' @param ignore.keys A character vector of variables that will always be removed from the key variables, without any check whether they are neccessary or not.
-eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, ...) {
+eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game$eq.li), ignore.keys = NULL, eq.li = game$eq.li[eq.ind], ...) {
   if (is.null(game$eq.li))
     stop("Please first solve your game.")
 
@@ -389,7 +389,7 @@ eq_tables = function(game,reduce.tables = TRUE, combine=2, eq.ind=seq_along(game
     game$unknown.vars.at.actions = find.unknown.vars.at.actions(game$tg)
   }
 
-  eq.li.tables(game$eq.li[eq.ind], tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.keys), ignore.li = game$unknown.vars.at.actions,  ...)
+  eq.li.tables(eq.li, tg = game$tg, combine=combine,reduce.tables = reduce.tables, ignore.keys = union(names(game$vg$params), ignore.keys), ignore.li = game$unknown.vars.at.actions,  ...)
 }
 
 #' Return the computed equilibria using the internal representation
