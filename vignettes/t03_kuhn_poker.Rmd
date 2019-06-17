@@ -12,7 +12,7 @@ library(gtree)
 
 ## Kuhn Poker Description
 
-Joseph Kuhn (1950) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_poker) in conventional poker terms as follows:
+[H.W. Kuhn](https://en.wikipedia.org/wiki/Harold_W._Kuhn) (1951) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_poker) in conventional poker terms as follows:
 
 + Each player antes 1.
 
@@ -224,4 +224,4 @@ We see that player 1 will also check if he has a `2`. Given the resulting equili
 
 ## References
 
-Kuhn, H. W. (1950). "Simplified Two-Person Poker". In Kuhn, H. W.; Tucker, A. W. (eds.). Contributions to the Theory of Games. 1. Princeton University Press. pp. 97–103.
+H. W. Kuhn (1951). 9. A SIMPLIFIED TWO-PERSON POKER. In Harold William Kuhn, Albert William Tucker (Eds.), Contributions to the Theory of Games (AM-24), Volume I (pp. 97–104). Princeton: Princeton 
