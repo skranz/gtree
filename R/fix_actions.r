@@ -75,7 +75,7 @@ fix.vg.action = function(vg,var, fix, tremble.prob = NULL) {
     vg$stages[[stage.num]] = stage
   } else {
     nstage = stage(paste0(stage$name,"_nature_",var),player = stage$player, condition = stage$condition, observe = var, nature = nature)
-    vg$stages = replace.by.sublist(vg$stages, stage.num, list(stage, nstage))
+    vg$stages = name.by.name(replace.by.sublist(vg$stages, stage.num, list(stage, nstage)))
   }
   vg
 }

@@ -225,3 +225,4 @@ We see that player 1 will also check if he has a `2`. Given the resulting equili
 ## References
 
 H. W. Kuhn (1951). 9. A SIMPLIFIED TWO-PERSON POKER. In Harold William Kuhn, Albert William Tucker (Eds.), Contributions to the Theory of Games (AM-24), Volume I (pp. 97–104). Princeton: Princeton 
+

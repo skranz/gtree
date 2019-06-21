@@ -13,7 +13,7 @@ vg.add.tremble = function(vg, action = NULL, stage = NULL, tremble.prob = 0.0001
     }
     return(add.tremble.to.stage(s, tremble.prob))
   })
-  vg$stages = do.call(c, stages.li)
+  vg$stages = name.by.name(do.call(c, stages.li))
   vg
 }
 

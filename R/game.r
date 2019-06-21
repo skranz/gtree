@@ -163,7 +163,7 @@ new_game = function(gameId, params=game_params(), options=make_game_options(), s
     gameId = gameId,
     variant = variant,
     params = params,
-    stages = stages,
+    stages = name.by.name(stages),
     kel = keyErrorLog(stop=TRUE)
   ))
   # Extract additional information
