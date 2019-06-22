@@ -5,7 +5,8 @@
 \title{Return solved equilibrium in a table format}
 \usage{
 eq_tables(game, reduce.tables = TRUE, combine = 2,
-  eq.ind = seq_along(game$eq.li), ignore.keys = NULL, ...)
+  eq.ind = seq_along(game$eq.li), ignore.keys = NULL,
+  eq.li = game$eq.li[eq.ind], ...)
 }
 \arguments{
 \item{reduce.tables}{(default = TRUE). Shall we try to reduce the rows and columns of the key tables be reduced to get a subset of neccessary keys that perfectly predict the chosen value of an action?}

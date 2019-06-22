@@ -100,7 +100,7 @@
 <div id="kuhn-poker-description" class="section level2">
 <h2 class="hasAnchor">
 <a href="#kuhn-poker-description" class="anchor"></a>Kuhn Poker Description</h2>
-<p>Joseph Kuhn (1950) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the <a href="https://en.wikipedia.org/wiki/Kuhn_poker">Kuhn Poker game</a> in conventional poker terms as follows:</p>
+<p><a href="https://en.wikipedia.org/wiki/Harold_W._Kuhn">H.W. Kuhn</a> (1951) developed a very simple poker game that is tractable for game theoretic analysis. Wikipedia describes the <a href="https://en.wikipedia.org/wiki/Kuhn_poker">Kuhn Poker game</a> in conventional poker terms as follows:</p>
 <ul>
 <li><p>Each player antes 1.</p></li>
 <li><p>Each player is dealt one of the three cards, and the third is put aside unseen.</p></li>
@@ -570,14 +570,10 @@ NA
 <p>Let us now solve the game using the <code>gambit-logit</code> solver, which is the default solver for finding a mixed strategy equilibrium:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">game <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## 
-## Written to C:\Users\skranz\AppData\Local\Temp\RtmpemUFmM/Kuhn-Poker___payoff.efg
-## 
-## Solve with command gambit-logit -q -e ... done in 0.9236829 secs</code></pre>
 <p>Let us first take a look at the expected equilibrium outcomes:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">game <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -635,9 +631,9 @@ call(0.29),fold(0.71)
 <h2 class="hasAnchor">
 <a href="#exploring-conditional-expected-equilibrium-outcomes" class="anchor"></a>Exploring conditional expected equilibrium outcomes</h2>
 <p>To get better insight into the equilibria let us show the conditional expected outcomes in the case that player 1 gets as card either 1,2 or 3:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -744,9 +740,9 @@ call(0.17),fold(0.83)
 <p>You may recall from fully mixed equilibria in simple bimatrix games, that in equilibrium each player chooses mixing probabilities that make the other player indifferent. This indifference requirement also plays a role in our Kuhn-Poker equilibrium, but the game is a bit more complex.</p>
 <p>If you wanted to completely solve the game, you could already start sitting down and doing it per hand (take a look at the references on the Wikipedia page). It might be helpful, however, to first build more intution at the conditional equilibrium outcomes.</p>
 <p>First consder the cases that player 1 has the highest card and either bets or checks:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card1=</span><span class="dv">3</span>, <span class="dt">cb1=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card1=</span><span class="dv">3</span>, <span class="dt">cb1=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -826,9 +822,9 @@ bet(0.17),check(0.83)
 <p>We see that player 1 gets the same payoff from betting or checking. Of course, it must always be the case that a player is indifferent between all moves over which he mixes in an equilibrium.</p>
 <p>We also see why player 1 is indifferent. Having the highest card player 1 will always win the pot. The only question is whether he can taunt player 2 into increasing the pot. If player 1 bets player 2 will call and thus increase the pot only with ca. 17% probability (see <code>fc2</code>). If player 1 checks, player 2 will also increase the pot with ca. 17% probability by betting.</p>
 <p>How do we come to these probabilites of player 2’s actions? Let us dive into the expected equilibrium outcomes conditional on the the different values of <code>card2</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card2"</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card2"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -932,9 +928,9 @@ call(0.3),fold(0.7)
 </table>
 <p>Like for player 1, player 2 has a negative expected payoff with a <code>2</code> while her expected wins are larger with <code>3</code> than her losses with a <code>1</code>.</p>
 <p>Player 2 only mixes between <code>bet</code> and <code>check</code> if she has a <code>1</code>. Let us explore this case in more detail:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card2=</span><span class="dv">1</span>, <span class="dt">cb2=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="dt">card2=</span><span class="dv">1</span>, <span class="dt">cb2=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"bet"</span>,<span class="st">"check"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span><span class="kw">select</span>(card2, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>,cb2,fc2, cb1, fc1)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -1018,14 +1014,14 @@ check
 <a href="#alternative-strategies" class="anchor"></a>Alternative strategies</h2>
 <p>We may be interested in different strategies. For example, a consider a naive player 1 who thinks: “Obviously, it must be optimal to always bet if I have the highest card, and to never bet if I have the lowest card. That is what I will do.”</p>
 <p>What would be the resulting equilibrium strategies under this restriction? We include this behavior by adding 1000 units to player 1’s utility if he follows this rule using the function <code>game_prefer_outcomes</code>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_prefer_outcomes.html">game_prefer_outcomes</a></span>(<span class="dt">player1 =</span><span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
-<a class="sourceLine" id="cb12-3" title="3">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "check"</span>, <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb12-4" title="4">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "bet"</span>, <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb12-5" title="5">    <span class="dv">0</span></a>
-<a class="sourceLine" id="cb12-6" title="6">  ))</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_prefer_outcomes.html">game_prefer_outcomes</a></span>(<span class="dt">player1 =</span><span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/case_distinction.html">case_distinction</a></span>(</a>
+<a class="sourceLine" id="cb11-3" title="3">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "check"</span>, <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb11-4" title="4">    card1 <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">&amp;</span><span class="st"> </span>cb1 <span class="op">==</span><span class="st"> "bet"</span>, <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb11-5" title="5">    <span class="dv">0</span></a>
+<a class="sourceLine" id="cb11-6" title="6">  ))</a></code></pre></div>
 <p>Using some knowledge about the internal structure of the <code>game</code> object, we can have a look at the newly generated formulas for the utility functions:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">game<span class="op">$</span>pref<span class="op">$</span>utils</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">game<span class="op">$</span>pref<span class="op">$</span>utils</a></code></pre></div>
 <pre><code>## [[1]]
 ## payoff_1 + case_distinction(card1 == 1 &amp; cb1 == "check", 1000, 
 ##     card1 == 3 &amp; cb1 == "bet", 1000, 0)
@@ -1033,14 +1029,10 @@ check
 ## [[2]]
 ## payoff_2</code></pre>
 <p>But let us look at the resulting equilibrium outcomes</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>()  <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
-<pre><code>## 
-## Written to C:\Users\skranz\AppData\Local\Temp\RtmpemUFmM/Kuhn-Poker___payoff.efg
-## 
-## Solve with command gambit-logit -q -e ... done in 1.22612 secs</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">mixed=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/eq_expected_outcomes.html">eq_expected_outcomes</a></span>()  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="st">  </span><span class="kw">select</span>(payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2)</a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -1093,9 +1085,9 @@ fold(1)
 </table>
 <p>We see that player 1 has a lower expected payoff if he wants to follow this rule than in the original equilibrium.</p>
 <p>More details are available from the following conditional expected outcomes:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>,<span class="st">"cb1"</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2, is.eqo)  </a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/eq_cond_expected_outcomes.html">eq_cond_expected_outcomes</a></span>(<span class="st">"card1"</span>,<span class="st">"cb1"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">select</span>(card1, payoff_<span class="dv">1</span>,payoff_<span class="dv">2</span>, cb1, fc1, cb2,fc2, is.eqo)  </a></code></pre></div>
 <style> table.data-frame-table {    border-collapse: collapse;  display: block; overflow-x: auto;}
  td.data-frame-td {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%;}
  td.data-frame-td-bottom {font-family: Verdana,Geneva,sans-serif; margin: 0px 3px 1px 3px; padding: 1px 3px 1px 3px; border-left: solid 1px black; border-right: solid 1px black; text-align: left;font-size: 80%; border-bottom: solid 1px black;}
@@ -1284,7 +1276,7 @@ FALSE
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Kuhn, H. W. (1950). “Simplified Two-Person Poker”. In Kuhn, H. W.; Tucker, A. W. (eds.). Contributions to the Theory of Games. 1. Princeton University Press. pp. 97–103.</p>
+<p>H. W. Kuhn (1951). 9. A SIMPLIFIED TWO-PERSON POKER. In Harold William Kuhn, Albert William Tucker (Eds.), Contributions to the Theory of Games (AM-24), Volume I (pp. 97–104). Princeton: Princeton</p>
 </div>
   </div>
 

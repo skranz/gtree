@@ -4,7 +4,7 @@
 \alias{pref_envy}
 \title{Fehr-Schmidt inequality aversion with envy only}
 \usage{
-pref_envy(alpha = 0.75, player = 1:numPlayers, numPlayers = 2, ...)
+pref_envy(alpha = 0, player = 1:numPlayers, numPlayers = 2, ...)
 }
 \arguments{
 \item{alpha}{the degree of envy}

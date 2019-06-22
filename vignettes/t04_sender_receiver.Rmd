@@ -101,16 +101,32 @@ Recall the definition of a *subgame*, e.g. from [Wikipedia](https://en.wikipedia
 
 Even though the moves of player 1 start at singleton information sets (Condition 1), candidate subgames starting at these nodes violate Condition 3.
 
-## Using the gambit-logit solver from gtree
+## Find a mixed strategy equilibrium using the gambit-logit solver from gtree
 
-If we cannot reduce the number of relevant strategy profiles by subgames, our internal gtree solver cannot practically solve games with so many strategy profiles. However, Gambit has solvers that can find at least one equilibrium of this game. Here we let `gambit-logit` do its magic (you can fetch a cup of coffee until its finished):
+If we cannot reduce the number of relevant strategy profiles by subgames, our internal gtree solver cannot practically solve games with so many strategy profiles. However, Gambit has solvers that can find at least one equilibrium of this game. Here we let [gambit-logit](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) solver do its magic.
+
+To make the vignette build quicker I reduce the size of the game, but you can change maxVal to 9. (Takes then around 2 minutes to solve on my notebook).
 ```{r}
 game %>%
   game_change_param(maxVal = 4) %>%
   game_print_size_info() %>%
-  game_gambit_solve(mixed=TRUE,gambit.command = "gambit-logit -q -e")
+  game_gambit_solve("gambit-logit -q -e")
 
 game %>%  eq_tables()
 ```
 The results seem intutive: Player 2 only accepts if and only if the shown card is at least a 6. Player 1 always shows a card that is at least 6 if he has one.
 
+
+## Find a quantal response equilibrium
+
+You may first take a look at the [Wikipedia page for quantal response equilibria](https://en.wikipedia.org/wiki/Quantal_response_equilibrium). The following code uses the [gambit-logit](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) solver to compute a logit agent quantal response equilibrium using the parameter `lambda=3`.
+
+```{r}
+game %>%
+  game_change_param(maxVal = 4) %>%
+  game_print_size_info() %>%
+  game_gambit_solve("gambit-logit -q -e -m 3") %>%
+  eq_tables()
+```
+
+The [python code](https://nbviewer.jupyter.org/github/gambitproject/gambit/blob/master/contrib/samples/sendrecv.ipynb) called `gambit-logit` without the option `-e`. It then returns a table of (approximated) equilibria for many values of `lambda` up to the maximum specified by the option `-m`. I have currently not implemented a feature in `gtree` to automatically parse that whole table. But if there is interest, just let me know, via Github issue or email.

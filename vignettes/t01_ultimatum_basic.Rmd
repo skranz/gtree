@@ -202,7 +202,7 @@ pref = pref_custom(
 
 game %>%
   game_set_preferences(pref) %>%
-  game_solve_spe(game) %>% 
+  game_solve_spe() %>% 
   eq_tables()
 ```
 We see that with inequality aversion with an envy parameter of `alpha=1` and a guilt parameter of `beta=0.5` there is a unique SPE in which the proposer offers half of the cake.
@@ -211,9 +211,28 @@ Some common preference clases that are only transformations of material payoffs 
 
 ```{r}
 game %>%
-  game_set_preferences(pref_ineqAv(alpha=1,beta=0, player=1:2)) %>%
-  game_solve(game) %>% 
+  game_set_preferences(pref_ineqAv(alpha=1,beta=0)) %>%
+  game_solve() %>% 
   eq_tables()
 ```
 
 We will discuss later how one can specify heterogenous preferences via different preference types.
+
+## Finding a logit quantal response equilibrium using Gambit
+
+The internal `gtree` solver can only find pure strategy subgame perfect equilibria. To effectively use `gtree` you should also install [Gambit](http://www.gambit-project.org/) on your computer. Then best add the Gambit directory to your system PATH. Otherwise adapt the following call to globably specify the gambit directory:
+
+```{r eval=FALSE}
+options(gtree.gambit.dir="C:/your/gambit/path")
+```
+
+The following code uses the [gambit-logit](https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria) command line solver to find a [logit quantal response equilibrium](https://en.wikipedia.org/wiki/Quantal_response_equilibrium) using a parameter `lambda = 2` assuming inequality aversion preferences.
+
+```{r}
+game %>%
+  game_set_preferences(pref_ineqAv(alpha=1,beta=0.5, player=1:2)) %>%
+  game_gambit_solve(qre.lambda=2) %>% 
+  eq_tables()
+```
+
+

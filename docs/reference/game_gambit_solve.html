@@ -136,7 +136,7 @@ use this function.</p>
     </div>
 
     <pre class="usage"><span class='fu'>game_gambit_solve</span>(<span class='no'>game</span>, <span class='kw'>gambit.command</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mixed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>just.spe</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>just.spe</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>qre.lambda</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>gambit.dir</span> <span class='kw'>=</span> <span class='fu'>first.non.null</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"gtree.gambit.dir"</span>), <span class='st'>""</span>),
   <span class='kw'>efg.dir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>efg.file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Logic'>isTRUE</a></span>(<span class='no'>game</span>$<span class='no'>options</span>$<span class='no'>verbose</span>
   <span class='kw'>&gt;=</span> <span class='fl'>1</span>), <span class='kw'>add.q.flag</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
@@ -161,6 +161,10 @@ If left as NULL a default gambit command line solver with appropriate arguments 
     <tr>
       <th>just.spe</th>
       <td><p>if TRUE compute only SPE. If FALSE all NE will be computed.</p></td>
+    </tr>
+    <tr>
+      <th>qre.lambda</th>
+      <td><p>if not NULL compute a <a href='https://en.wikipedia.org/wiki/Quantal_response_equilibrium'>logit QRE equilibrium</a> using the <a href='https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria'>gambit-logit</a> solver and the specified value of lambda.</p></td>
     </tr>
     <tr>
       <th>gambit.dir</th>

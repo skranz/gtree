@@ -348,7 +348,7 @@
 ##  [1] 1 0 0 0 0 0 1 0 1 0 1 0 1 0 1
 ## 
 ## attr(,"solve.time")
-## Time difference of 0.2911952 secs</code></pre>
+## Time difference of 0.342927 secs</code></pre>
 <p>It is a list with a matrix for each equilibrium. Each row corresponds to one possible outcome of the game and the column describe for each action the equilibrium choice probability on the corresponding outcome path. The last column specifies the total probality of the particular outcome in the equilibrium.</p>
 <p>The attribute <code>info.set.probs</code> shows the most compact equilibrium representation. It is just a numerical vector that describes the move probability for every possible move in every information set. This is similar to the equilibrium representation that you get if you manually call a Gambit solver on an <code>.efg</code> file (except that Gambit has a different default ordering of the information sets). The information sets are further described in the <code>game</code> object. In principle you can access the information, e.g. by typing</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">game<span class="op">$</span>tg<span class="op">$</span>ise.df</a></code></pre></div>
@@ -387,17 +387,88 @@ u_i = \pi_i
 <a class="sourceLine" id="cb28-7" title="7"></a>
 <a class="sourceLine" id="cb28-8" title="8">game <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb28-9" title="9"><span class="st">  </span><span class="kw"><a href="../reference/game_set_preferences.html">game_set_preferences</a></span>(pref) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb28-10" title="10"><span class="st">  </span><span class="kw"><a href="../reference/game_solve_spe.html">game_solve_spe</a></span>(game) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb28-10" title="10"><span class="st">  </span><span class="kw"><a href="../reference/game_solve_spe.html">game_solve_spe</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb28-11" title="11"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
-<pre><code>## Error in mixed | !just.spe: operations are possible only for numeric, logical or complex types</code></pre>
+<pre><code>## $offer
+## # A tibble: 1 x 2
+##   offer eq.inds
+##   &lt;int&gt; &lt;chr&gt;  
+## 1     2 1      
+## 
+## $accept
+## # A tibble: 5 x 3
+## # Groups:   offer [5]
+##   offer accept eq.inds
+##   &lt;int&gt; &lt;lgl&gt;  &lt;chr&gt;  
+## 1     0 FALSE  1      
+## 2     1 FALSE  1      
+## 3     2 TRUE   1      
+## 4     3 TRUE   1      
+## 5     4 TRUE   1</code></pre>
 <p>We see that with inequality aversion with an envy parameter of <code>alpha=1</code> and a guilt parameter of <code>beta=0.5</code> there is a unique SPE in which the proposer offers half of the cake.</p>
 <p>Some common preference clases that are only transformations of material payoffs are included into gtree. All functions start with the prefix <code>pref_</code>. The following code verifies that guilt is not essential for positive offers by the proposer.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">game <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_set_preferences.html">game_set_preferences</a></span>(<span class="kw"><a href="../reference/pref_ineqAv.html">pref_ineqAv</a></span>(<span class="dt">alpha=</span><span class="dv">1</span>,<span class="dt">beta=</span><span class="dv">0</span>, <span class="dt">player=</span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw">game_solve</span>(game) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_set_preferences.html">game_set_preferences</a></span>(<span class="kw"><a href="../reference/pref_ineqAv.html">pref_ineqAv</a></span>(<span class="dt">alpha=</span><span class="dv">1</span>,<span class="dt">beta=</span><span class="dv">0</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw">game_solve</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb30-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
-<pre><code>## Error in mixed | !just.spe: operations are possible only for numeric, logical or complex types</code></pre>
+<pre><code>## $offer
+## # A tibble: 1 x 2
+##   offer eq.inds
+##   &lt;int&gt; &lt;chr&gt;  
+## 1     2 1      
+## 
+## $accept
+## # A tibble: 5 x 3
+## # Groups:   offer [5]
+##   offer accept eq.inds
+##   &lt;int&gt; &lt;lgl&gt;  &lt;chr&gt;  
+## 1     0 FALSE  1      
+## 2     1 FALSE  1      
+## 3     2 TRUE   1      
+## 4     3 TRUE   1      
+## 5     4 TRUE   1</code></pre>
 <p>We will discuss later how one can specify heterogenous preferences via different preference types.</p>
+</div>
+<div id="finding-a-logit-quantal-response-equilibrium-using-gambit" class="section level2">
+<h2 class="hasAnchor">
+<a href="#finding-a-logit-quantal-response-equilibrium-using-gambit" class="anchor"></a>Finding a logit quantal response equilibrium using Gambit</h2>
+<p>The internal <code>gtree</code> solver can only find pure strategy subgame perfect equilibria. To effectively use <code>gtree</code> you should also install <a href="http://www.gambit-project.org/">Gambit</a> on your computer. Then best add the Gambit directory to your system PATH. Otherwise adapt the following call to globably specify the gambit directory:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">gtree.gambit.dir=</span><span class="st">"C:/your/gambit/path"</span>)</a></code></pre></div>
+<p>The following code uses the <a href="https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria">gambit-logit</a> command line solver to find a <a href="https://en.wikipedia.org/wiki/Quantal_response_equilibrium">logit quantal response equilibrium</a> using a parameter <code>lambda = 2</code> assuming inequality aversion preferences.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">game <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/game_set_preferences.html">game_set_preferences</a></span>(<span class="kw"><a href="../reference/pref_ineqAv.html">pref_ineqAv</a></span>(<span class="dt">alpha=</span><span class="dv">1</span>,<span class="dt">beta=</span><span class="fl">0.5</span>, <span class="dt">player=</span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">qre.lambda=</span><span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
+<pre><code>## 
+## Written to C:\Users\skranz\AppData\Local\Temp\RtmpiQtdyA/UltimatumGame___ineq100_50.efg
+## 
+## Solve with command gambit-logit -q -e -m 2 ... done in 0.3220451 secs</code></pre>
+<pre><code>## $offer
+## # A tibble: 5 x 3
+## # Groups:   offer [5]
+##   offer      .prob eq.inds
+##   &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;  
+## 1     0 0.0165     1      
+## 2     1 0.0263     1      
+## 3     2 0.955      1      
+## 4     3 0.00217    1      
+## 5     4 0.00000495 1      
+## 
+## $accept
+## # A tibble: 10 x 4
+## # Groups:   offer, accept [10]
+##    offer accept    .prob eq.inds
+##    &lt;int&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1     0 FALSE  1.000    1      
+##  2     0 TRUE   0.000262 1      
+##  3     1 FALSE  0.887    1      
+##  4     1 TRUE   0.113    1      
+##  5     2 FALSE  0.0159   1      
+##  6     2 TRUE   0.984    1      
+##  7     3 FALSE  0.0159   1      
+##  8     3 TRUE   0.984    1      
+##  9     4 FALSE  0.0159   1      
+## 10     4 TRUE   0.984    1</code></pre>
 </div>
   </div>
 
@@ -413,6 +484,7 @@ u_i = \pi_i
       <li><a href="#conditional-expected-equilibrium-outcomes">Conditional expected equilibrium outcomes</a></li>
       <li><a href="#internal-representation-of-equilibria">Internal representation of equilibria</a></li>
       <li><a href="#setting-different-preferences">Setting different preferences</a></li>
+      <li><a href="#finding-a-logit-quantal-response-equilibrium-using-gambit">Finding a logit quantal response equilibrium using Gambit</a></li>
       </ul>
 </div>
       </div>

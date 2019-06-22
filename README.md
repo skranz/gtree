@@ -2,7 +2,28 @@
 
 Author: Sebastian Kranz, Ulm University
 
-gtree is an R package that allows you to specify extensive form games using stages, similar as one specifies economic experiments with [ztree](https://www.ztree.uzh.ch/en.html) or [otree](https://otree.readthedocs.io/en/latest/). The game is internally converted to a formal game tree and one can find its equilibria using a [Gambit](http://www.gambit-project.org/) solver or an internal solver. The equilibria are presented in a format that facilitates comparison with experimental results. One can also conveniently study the effects of non-standard preferences characterized e.g. by inequality aversion or loss aversion.
+[gtree](skranz.github.io/gtree) is an R package that allows you to specify extensive form games using stages, similar as one specifies economic experiments with [ztree](https://www.ztree.uzh.ch/en.html) or [otree](https://otree.readthedocs.io/en/latest/). The game is internally converted to a formal game tree and one can find its equilibria using a [Gambit](http://www.gambit-project.org/) solver or an internal solver. The equilibria are presented in a format that facilitates comparison with experimental results. One can also conveniently study the effects of non-standard preferences characterized e.g. by inequality aversion or loss aversion.
+
+Detailed documentation can be found on [skranz.github.io/gtree](skranz.github.io/gtree).
+
+## Install gtree
+
+To install gtree will all R dependencies simply run
+```r
+install.packages("gtree",repos = c("https://skranz-repo.github.io/drat/",getOption("repos")))
+```
+(My packages are hosted on a custom [drat](https://cran.r-project.org/web/packages/drat/index.html) powered R repositorium. While CRAN ist great, I find it too time consuming to maintain all my packages there and `devtools::install_github` does not handle custom dependencies as easily.)
+
+## Install Gambit
+
+To effectively use gtree, you should also install Gambit from the [Gambit project page](http://www.gambit-project.org/). The easiest is to add the installation directory to your PATH, then `gtree` can directly use it.
+
+Otherwise adapt the following call to globably specify the gambit directory:
+```
+options(gtree.gambit.dir="Your/gambit/path")
+```
+
+## Example
 
 Here is an example of a game definition:
 
@@ -119,4 +140,10 @@ game %>%
 
 While the responder's behavior does not change, the proposer will now only offer 0. Sure the offer will be rejected with 10% probability, but in 90% of cases the proposer gets the whole cake for herself.
 
-Take a look at the different tutorials for more information about gtree.
+Take a look at the different [tutorials](https://skranz.github.io/gtree/articles/) for more examples and features.
+
+## Shiny apps to play games
+
+The companion package [gtreeWebPlay](https://github.com/skranz/gtreeWebPlay) allows to create [shiny](https://shiny.rstudio.com/) apps that allow a single player to play the game. The player plays against *bots*. A bot could e.g. follow an equilibrium strategy `bot_eq` or allow the current player to play against randomly drawn strategies of earlier users of the app `bot_pop`.
+
+Currently there is no implementation for multiple human players to play against each other. To run controlled computerized experiments in which subjects directly play with, use e.g. [ztree](https://www.ztree.uzh.ch/en.html) or [otree](https://otree.readthedocs.io/en/latest/) instead.

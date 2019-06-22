@@ -185,7 +185,27 @@
 ## 10     9 TRUE   1      
 ## 11    10 TRUE   1</code></pre>
 <p>While the responder’s behavior does not change, the proposer will now only offer 0. Sure the offer will be rejected with 10% probability, but in 90% of cases the proposer gets the whole cake for herself.</p>
-<p>Take a look at the different tutorials for more information about gtree.</p>
+<p>Take a look at the different tutorials for more examples and features.</p>
+<div id="install-gtree" class="section level2">
+<h2 class="hasAnchor">
+<a href="#install-gtree" class="anchor"></a>Install gtree</h2>
+<p>To install gtree will all R dependencies simply run</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"gtree"</span>,<span class="dt">repos =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"https://skranz-repo.github.io/drat/"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">getOption</a></span>(<span class="st">"repos"</span>)))</a></code></pre></div>
+<p>(My packages are hosted on a custom <a href="https://cran.r-project.org/web/packages/drat/index.html">drat</a> powered R repositorium. While CRAN ist great, I find it too time consuming to maintain all my packages there and <code><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">devtools::install_github</a></code> does not handle custom dependencies as easily.)</p>
+</div>
+<div id="install-gambit" class="section level2">
+<h2 class="hasAnchor">
+<a href="#install-gambit" class="anchor"></a>Install Gambit</h2>
+<p>To fully use gtree, you should also install Gambit from the <a href="http://www.gambit-project.org/">Gambit project page</a>. The easiest is to add the installation directory to your PATH, then <code>gtree</code> can directly use it.</p>
+<p>Otherwise adapt the following call to globably specify the gambit directory:</p>
+<pre><code><a href="https://www.rdocumentation.org/packages/base/topics/options">options(gtree.gambit.dir="Your/gambit/path")</a></code></pre>
+</div>
+<div id="shiny-apps-to-play-games" class="section level2">
+<h2 class="hasAnchor">
+<a href="#shiny-apps-to-play-games" class="anchor"></a>Shiny apps to play games</h2>
+<p>The companion package <a href="https://github.com/skranz/gtreeWebPlay">gtreeWebPlay</a> allows to create <a href="https://shiny.rstudio.com/">shiny</a> apps that allow a single player to play the game. The player plays against <em>bots</em>. A bot could e.g. follow an equilibrium strategy <code>bot_eq</code> or allow the current player to play against randomly drawn strategies of earlier users of the app <code>bot_pop</code>.</p>
+<p>Currently there is no implementation for multiple human players to play against each other. To run controlled computerized experiments in which subjects directly play with, use e.g. <a href="https://www.ztree.uzh.ch/en.html">ztree</a> or <a href="https://otree.readthedocs.io/en/latest/">otree</a> instead.</p>
+</div>
 </div>
   </div>
 

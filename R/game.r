@@ -246,6 +246,7 @@ game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gam
 #' If left as NULL a default gambit command line solver with appropriate arguments will be chosen, depending on your arguments for mixed and just.spe
 #' @param mixed relevant if no explicit gambit.command is given. If FALSE (default) only pure strategy equilibria will be computed, otherwise try to compute one mixed equilibrium.
 #' @param just.spe if TRUE compute only SPE. If FALSE all NE will be computed.
+#' @param qre.lambda if not NULL compute a \href{https://en.wikipedia.org/wiki/Quantal_response_equilibrium}{logit QRE equilibrium} using the \href{https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria}{gambit-logit} solver and the specified value of lambda.
 #' @param add.q.flag The gambit command line solver should always be called with the option "-q" for gtree to be able to parse the returned output. If add.q.flag is TRUE we will add this flag if you have not yet added it to your \code{gambit.command}
 #' @param gambit.dir The directory where to find the Gambit command line solvers. Ideally, you put this directory into the search path of your system and can keep the default \code{gambit.dir = ""}. To globally change the default directory adapt the following code \code{options(gtree.gambit.dir = "/PATH/TO/GAMBIT")}
 #' @param efg.dir To solve via Gambit we first write the game tree into an .efg file. If \code{efg.dir} is NULL (default), the file will be written to a temporary directory. But you can also specify a custom directory here, e.g. if you want to take a look at the file.
@@ -254,7 +255,7 @@ game_solve_spe = game_solve = function(game, mixed=FALSE, just.spe=TRUE, use.gam
 #' @family eq
 #' @family Gambit
 #' @export
-game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,gambit.dir=first.non.null(getOption("gtree.gambit.dir"),""),efg.dir = NULL, efg.file=NULL,  verbose=isTRUE(game$options$verbose>=1), add.q.flag = TRUE,  ...) {
+game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=TRUE,qre.lambda=NULL,gambit.dir=first.non.null(getOption("gtree.gambit.dir"),""),efg.dir = NULL, efg.file=NULL,  verbose=isTRUE(game$options$verbose>=1), add.q.flag = TRUE, ...) {
   restore.point("game_solve_with_gambit")
   game_compile(game, verbose=verbose)
 
@@ -263,6 +264,10 @@ game_gambit_solve = function(game,gambit.command = NULL, mixed=FALSE, just.spe=T
   }
   if (!is.null(efg.dir)) {
     game_write_efg(game,file.with.dir = file.path(efg.dir, efg.file))
+  }
+
+  if (!is.null(qre.lambda)) {
+    gambit.command = paste0("gambit-logit -q -e -m ", qre.lambda)
   }
 
   if (!is.null(gambit.command)) {

@@ -5,7 +5,7 @@
 \title{Solve equilibria of a game using Gambit}
 \usage{
 game_gambit_solve(game, gambit.command = NULL, mixed = FALSE,
-  just.spe = TRUE,
+  just.spe = TRUE, qre.lambda = NULL,
   gambit.dir = first.non.null(getOption("gtree.gambit.dir"), ""),
   efg.dir = NULL, efg.file = NULL, verbose = isTRUE(game$options$verbose
   >= 1), add.q.flag = TRUE, ...)
@@ -20,6 +20,8 @@ If left as NULL a default gambit command line solver with appropriate arguments 
 \item{mixed}{relevant if no explicit gambit.command is given. If FALSE (default) only pure strategy equilibria will be computed, otherwise try to compute one mixed equilibrium.}
 
 \item{just.spe}{if TRUE compute only SPE. If FALSE all NE will be computed.}
+
+\item{qre.lambda}{if not NULL compute a \href{https://en.wikipedia.org/wiki/Quantal_response_equilibrium}{logit QRE equilibrium} using the \href{https://gambitproject.readthedocs.io/en/latest/tools.html#gambit-logit-compute-quantal-response-equilbria}{gambit-logit} solver and the specified value of lambda.}
 
 \item{gambit.dir}{The directory where to find the Gambit command line solvers. Ideally, you put this directory into the search path of your system and can keep the default \code{gambit.dir = ""}. To globally change the default directory adapt the following code \code{options(gtree.gambit.dir = "/PATH/TO/GAMBIT")}}
 

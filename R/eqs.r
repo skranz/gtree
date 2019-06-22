@@ -33,13 +33,14 @@ eq.li.tables = function(eq.li, tg,combine=1, add.eq.ind = combine, reduce.tables
     if (combine>1) {
       comb2 = lapply(vars, function(var) {
         dat = comb[[var]]
+        has.prob = has.col(dat,".prob")
         cols = setdiff(colnames(dat),c("eq.ind", ignore.li[[var]]))
         dat = dat %>%
           group_by_at(cols) %>%
           summarize(eq.inds = paste0(sort(unique(eq.ind)), collapse=","))
         if (reduce.tables) {
           dat = reduce.key.table.with.probs(dat, var=var, keep.keys = c(keep.keys, "eq.inds"))
-          cols = setdiff(colnames(dat),"eq.inds") %>% c("eq.inds")
+          cols = setdiff(colnames(dat),c(".prob","eq.inds")) %>% c(if (has.prob) ".prob", "eq.inds")
           dat = dat[,cols]
         }
         dat

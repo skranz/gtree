@@ -203,7 +203,7 @@ pref_custom = function(..., params=NULL, label="custom") {
 #' @param numPlayers number of players in game per default 2
 #'
 #' @family Preferences
-pref_ineqAv = function(alpha=0.75,beta=0.5,player=1:numPlayers, numPlayers=2,...) {
+pref_ineqAv = function(alpha=0,beta=0,player=1:numPlayers, numPlayers=2,...) {
   restore.point("pref_ineqAv")
 
   utils_general = vector("list", length(player))
@@ -239,7 +239,7 @@ pref_ineqAv = function(alpha=0.75,beta=0.5,player=1:numPlayers, numPlayers=2,...
 #' @param numPlayers number of players in game per default 2
 #'
 #' @family Preferences
-pref_envy = function(alpha=0.75,player=1:numPlayers, numPlayers=2,...) {
+pref_envy = function(alpha=0,player=1:numPlayers, numPlayers=2,...) {
   restore.point("pref_envy")
   pref = pref_ineqAv(alpha=alpha, beta=0, player=player, numPlayers=numPlayers)
   pref$type = "envy"
