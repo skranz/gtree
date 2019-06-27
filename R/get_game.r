@@ -63,10 +63,6 @@ get.efg.dir = function(gameId, project.dir = get.project.dir()) {
 	file.path(project.dir,"games",gameId,"gambit")
 }
 
-get.pages.dir = function(gameId, project.dir = get.project.dir()) {
-	file.path(project.dir,"games",gameId,"pages")
-}
-
 # Create a directory structure for a new game
 #
 # includes the subdirectories eq, gambit and pages
