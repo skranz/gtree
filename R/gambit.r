@@ -95,7 +95,7 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
   res  = system(com, intern=TRUE)
   status = attr(res,"status")
   if (isTRUE(status==1)) {
-    stop(res)
+    stop(paste0("Error when running Gambit command ", com,":\n\n",res))
   }
 
   # no equilibrium found
