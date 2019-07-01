@@ -461,15 +461,16 @@ cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.n
   xs.col.order(ceo.df,tg)
 }
 
-reduce.key.table.with.probs = function(table, var=colnames(table)[NCOL(table)-(colnames(table)[NCOL(table)]==prob.col)], keep.keys=NULL, prob.col = ".prob", sep="°") {
+reduce.key.table.with.probs = function(table, var=colnames(table)[NCOL(table)-(colnames(table)[NCOL(table)]==prob.col)], keep.keys=NULL, prob.col = ".prob", sep="°", ignore.eq.inds = has.col(table, "eq.inds")) {
   if (!has.col(table, prob.col))
-    return(reduce.key.table(table, var, keep.keys))
+    return(reduce.key.table(table, var, keep.keys, ignore.eq.inds=ignore.eq.inds))
   restore.point("reduce.key.table.with.probs")
 
 
   class = class(table[[var]])
   table[[var]] = paste0(table[[var]],sep,table[[prob.col]] )
-  res = reduce.key.table(table, var, keep.keys)
+  table[[".prob"]] = NA_real_
+  res = reduce.key.table(table, var, keep.keys, ignore.eq.inds=ignore.eq.inds)
   vals = str.left.of(res[[var]],sep) %>% as(class)
   probs = as.numeric(str.right.of(res[[var]], sep))
   res[[var]] = vals
@@ -482,26 +483,27 @@ reduce.key.table.with.probs = function(table, var=colnames(table)[NCOL(table)-(c
 # a key-value table
 #
 # @param table the key value table
-# @param var the column name that holds the value.
-#        By default the last column.
+# @param var the column name that holds the value. By default the last column.
 # @param keep.keys a character vector of key columns that
 #        shall never be removed.
 # @export
-reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=NULL) {
+reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=NULL, no.key.col=NULL, ignore.eq.inds = has.col(table, "eq.inds")) {
   restore.point("reduce.key.table")
 
   if (NROW(table)<1) return(table)
+
+  eq.inds.col = ifelse(has.col(table,"eq.inds") & ignore.eq.inds, "eq.inds",NULL)
 
   # All variables have the same number
   if (n_distinct(table[[var]])==1) {
     if (length(keep.keys)==0) {
       return(table[1,var])
     } else {
-      return(unique(table[,c(keep.keys,var)]))
+      return(unique(table[,c(keep.keys,var, eq.inds.col)]))
     }
   }
 
-  keys = setdiff(colnames(table), var)
+  keys = setdiff(colnames(table), c(var, eq.inds.col))
   if (length(keys)<=1) return(unique(table))
 
 
@@ -513,7 +515,7 @@ reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=N
       return(table)
 
     if (is.multi.perfect.predictor(keep.keys,var, table))
-      return( unique(table[,c(keep.keys,var)]) )
+      return( unique(table[,c(keep.keys,var, eq.inds.col)]) )
 
 
     perf.pred = remaining.keys[sapply(remaining.keys, function(key) {
@@ -522,7 +524,7 @@ reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=N
 
     if (length(perf.pred)==0) return(table)
 
-    return( unique(table[,c(c(keep.keys, perf.pred[1]),var)]) )
+    return( unique(table[,c(c(keep.keys, perf.pred[1]),var, eq.inds.col)]) )
   }
 
   perf.pred = keys[sapply(keys, function(key) {
@@ -541,7 +543,7 @@ reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=N
     perf.pred = perf.pred[which.min(len)]
   }
   rows = !duplicated(table[[perf.pred]])
-  return(table[rows,c(perf.pred, var)])
+  return(table[rows,c(perf.pred, var, eq.inds.col)])
 }
 
 # Is x a perfect predictor for y

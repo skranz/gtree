@@ -88,7 +88,7 @@ gambit.solve.eq = function(tg, mixed=FALSE, just.spe=TRUE, efg.file=tg.efg.file.
 	#solver = "gambit-enumpure -q -P -D"
   start.time = Sys.time()
 
-	com = paste0(gambit.dir, solver," ",efg.file.with.dir)
+	com = paste0(gambit.dir, solver,' "',efg.file.with.dir,'"')
   if (verbose)
     cat("\nSolve with command", solver, "...")
 
