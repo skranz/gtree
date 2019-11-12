@@ -6,6 +6,11 @@ example.eval.set.on.df = function() {
 
 }
 
+unnest_ = function(df, var, ...) {
+  code = paste0("unnest(df,",var,")")
+  eval(parse(text=code))
+}
+
 eval.set.to.df = function(call, df, var, expand=TRUE, params=NULL) {
   restore.point("my.eval.set.on.df")
 
