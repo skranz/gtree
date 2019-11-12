@@ -34,7 +34,7 @@ We specify the game in gtree as follows:
 ```{r}
 library(gtree)
 game = org.game = new_game(
-  gameId = "Kuhn-Poker",
+  gameId = "KuhnPoker",
   params = list(numPlayers=2),
   options = make_game_options(verbose=FALSE),
   stages = list(

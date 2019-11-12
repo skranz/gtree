@@ -31,7 +31,7 @@ Wikipedia describes the [Kuhn Poker game](https://en.wikipedia.org/wiki/Kuhn_pok
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "Kuhn-Poker",
+  gameId = "KuhnPoker",
   params = list(numPlayers=2),
   options = make_game_options(verbose=1),
   stages = list(

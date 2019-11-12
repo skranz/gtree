@@ -1,4 +1,4 @@
-EFG 2 R "Sender-Receiver" { "pl1" "pl2" }
+EFG 2 R "SenderReceiver" { "pl1" "pl2" }
 c "" 13 "" { "orange_1" 0.5 "orange_2" 0.5 } 0
 c "" 14 "" { "blue_1" 0.5 "blue_2" 0.5 } 0
 p "" 1 1 "" { "reveal_orange" "reveal_blue" } 0

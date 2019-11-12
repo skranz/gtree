@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gtree</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -104,7 +104,8 @@
 <ul>
 <li><p>Each player antes 1.</p></li>
 <li><p>Each player is dealt one of the three cards, and the third is put aside unseen.</p></li>
-<li>Player one can check or bet 1.
+<li>
+<p>Player one can check or bet 1.</p>
 <ul>
 <li>If player one checks then player two can check or bet 1.
 <ul>
@@ -133,7 +134,7 @@
 <p>We specify the game in gtree as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(gtree)</a>
 <a class="sourceLine" id="cb1-2" title="2">game =<span class="st"> </span>org.game =<span class="st"> </span><span class="kw"><a href="../reference/new_game.html">new_game</a></span>(</a>
-<a class="sourceLine" id="cb1-3" title="3">  <span class="dt">gameId =</span> <span class="st">"Kuhn-Poker"</span>,</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="dt">gameId =</span> <span class="st">"KuhnPoker"</span>,</a>
 <a class="sourceLine" id="cb1-4" title="4">  <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">numPlayers=</span><span class="dv">2</span>),</a>
 <a class="sourceLine" id="cb1-5" title="5">  <span class="dt">options =</span> <span class="kw"><a href="../reference/make_game_options.html">make_game_options</a></span>(<span class="dt">verbose=</span><span class="ot">FALSE</span>),</a>
 <a class="sourceLine" id="cb1-6" title="6">  <span class="dt">stages =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
@@ -554,7 +555,7 @@ NA
 <a class="sourceLine" id="cb3-2" title="2"><span class="st">  </span><span class="kw">game_print_size_info</span>()</a></code></pre></div>
 <pre><code>## 
 ## Compute subgames...... 1  subgames found.
-## Kuhn-Poker
+## KuhnPoker
 ## 
 ## Size Information:
 ##   - 30 possible outcomes

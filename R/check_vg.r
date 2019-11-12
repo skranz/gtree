@@ -6,8 +6,8 @@ check.vg = function(vg) {
 	restore.point("check.vg")
 
   gameId = vg$gameId
-  if (any(grepl("[\\. \\-]",gameId))) {
-    stop("You gameId should only contain letters, digits or _, please don't insert spaces or other special keys.")
+  if (any(grepl("[\\. ]",gameId))) {
+    stop("Your gameId should only contain letters, digits or _, please don't insert spaces or other special keys.")
   }
 
   # All action variables

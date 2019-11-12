@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gtree</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -237,12 +237,16 @@
 ## 2     1 1      
 ## 
 ## $accept
-## # A tibble: 3 x 2
-##   accept eq.inds
-##   &lt;lgl&gt;  &lt;chr&gt;  
-## 1 FALSE  1      
-## 2 TRUE   2      
-## 3 TRUE   1,2</code></pre>
+## # A tibble: 6 x 3
+## # Groups:   offer [5]
+##   offer accept eq.inds
+##   &lt;int&gt; &lt;lgl&gt;  &lt;chr&gt;  
+## 1     0 FALSE  1      
+## 2     0 TRUE   2      
+## 3     1 TRUE   1,2    
+## 4     2 TRUE   1,2    
+## 5     3 TRUE   1,2    
+## 6     4 TRUE   1,2</code></pre>
 <p>We have a list with a <code>tibble</code> for every action variable.</p>
 <ul>
 <li><p>The first table describes the equilibrium offers: In the first equilibrium the offer is 1 and in the 2nd it is 0.</p></li>
@@ -348,19 +352,19 @@
 ##  [1] 1 0 0 0 0 0 1 0 1 0 1 0 1 0 1
 ## 
 ## attr(,"solve.time")
-## Time difference of 0.342927 secs</code></pre>
+## Time difference of 0.358598 secs</code></pre>
 <p>It is a list with a matrix for each equilibrium. Each row corresponds to one possible outcome of the game and the column describe for each action the equilibrium choice probability on the corresponding outcome path. The last column specifies the total probality of the particular outcome in the equilibrium.</p>
 <p>The attribute <code>info.set.probs</code> shows the most compact equilibrium representation. It is just a numerical vector that describes the move probability for every possible move in every information set. This is similar to the equilibrium representation that you get if you manually call a Gambit solver on an <code>.efg</code> file (except that Gambit has a different default ordering of the information sets). The information sets are further described in the <code>game</code> object. In principle you can access the information, e.g. by typing</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">game<span class="op">$</span>tg<span class="op">$</span>ise.df</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 9
-##   .info.set.ind .info.set  .player .var   .num.moves .num.nodes .lev.num
-##           &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;       &lt;int&gt;      &lt;int&gt;    &lt;int&gt;
-## 1             1 1_offer_1        1 offer           5          1        1
-## 2             2 2_accept_1       2 accept          2          1        2
-## 3             3 2_accept_2       2 accept          2          1        2
-## 4             4 2_accept_3       2 accept          2          1        2
-## 5             5 2_accept_4       2 accept          2          1        2
-## 6             6 2_accept_5       2 accept          2          1        2
+##   .info.set.ind .info.set .player .var  .num.moves .num.nodes .lev.num
+##           &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;    &lt;int&gt;
+## 1             1 1_offer_1       1 offer          5          1        1
+## 2             2 2_accept~       2 acce~          2          1        2
+## 3             3 2_accept~       2 acce~          2          1        2
+## 4             4 2_accept~       2 acce~          2          1        2
+## 5             5 2_accept~       2 acce~          2          1        2
+## 6             6 2_accept~       2 acce~          2          1        2
 ## # ... with 2 more variables: .info.set.move.ind.start &lt;dbl&gt;,
 ## #   .move.vals &lt;list&gt;</code></pre>
 <p>Yet, there should not be any need to dig so deeply into the internal game representation of <code>gtree</code>.</p>
@@ -440,9 +444,9 @@ u_i = \pi_i
 <a class="sourceLine" id="cb33-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/game_gambit_solve.html">game_gambit_solve</a></span>(<span class="dt">qre.lambda=</span><span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb33-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/eq_tables.html">eq_tables</a></span>()</a></code></pre></div>
 <pre><code>## 
-## Written to C:\Users\skranz\AppData\Local\Temp\RtmpiQtdyA/UltimatumGame___ineq100_50.efg
+## Written to C:\Users\skranz\AppData\Local\Temp\Rtmpyc94RJ/UltimatumGame___ineq100_50.efg
 ## 
-## Solve with command gambit-logit -q -e -m 2 ... done in 0.3220451 secs</code></pre>
+## Solve with command gambit-logit -q -e -m 2 ... done in 0.1210768 secs</code></pre>
 <pre><code>## $offer
 ## # A tibble: 5 x 3
 ## # Groups:   offer [5]

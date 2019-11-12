@@ -20,7 +20,7 @@ Here is the implementation of the game using `gtree` (the exact payoffs were tak
 ```{r}
 library(gtree)
 game = new_game(
-  gameId = "Sender-Receiver",
+  gameId = "SenderReceiver",
   params = list(numPlayers=2, maxVal=9),
   options = make_game_options(verbose=FALSE),
   stages = list(
