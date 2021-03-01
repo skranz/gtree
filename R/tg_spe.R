@@ -489,10 +489,13 @@ spo.to.speu = function(spo.df, tg=NULL, add.outcomes = FALSE, as.data.table = FA
 	# perform computation with a
 	# data.table because of substantial speed gains
 	spo.df = setDT(spo.df)
-	speu = group_by(spo.df, sp) %>%
+
+	speu = spo.df %>%
+	  lazy_dt() %>%
+	  group_by(sp) %>%
 		s_summarise(code)
 	if (as.data.table)
-	  return(speu)
+	  return(as.data.table(speu))
 
 	return(as_tibble(speu))
 
