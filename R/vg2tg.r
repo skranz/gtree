@@ -159,8 +159,8 @@ compute.tg.et.oco.etc = function(tg) {
   # in order to convert correctly
   # to efg files
   order.cols = paste0(".row.", seq_len(num.lev))
-
-  df = arrange_(df,.dots = order.cols)
+  #df = arrange_(df,.dots = order.cols)
+  df = s_arrange(df,.dots = order.cols)
 
   # Drop unnecessary cols to save memory
   drop.cols = c(".info.set.ind",".node.ind",".info.set.move.ind",".player",paste0(".player_", 1:tg$numPlayers)
