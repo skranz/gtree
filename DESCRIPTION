@@ -1,8 +1,8 @@
 Package: gtree
 Type: Package
 Title: gtree basic functionality to model and solve games 
-Version: 0.1.0
-Date: 2019-11-12
+Version: 0.1.1
+Date: 2021-03-01
 Author: Sebastian Kranz
 Maintainer: Sebastian Kranz <sebastian.kranz@uni-ulm.de>
 Description:
