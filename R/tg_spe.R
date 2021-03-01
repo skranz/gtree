@@ -367,7 +367,7 @@ sp.to.moves = function(sp, spi, ise.df, wide=TRUE) {
   }
 
   org.sp = sp
-  moves.df = data_frame(
+  moves.df = tibble(
     sp = rep(sp,times=NCOL(moves)),
   	.info.set.ind = rep(spi$.info.set.ind, each = length(org.sp)),
     .move.ind = as.vector(moves),
@@ -494,7 +494,7 @@ spo.to.speu = function(spo.df, tg=NULL, add.outcomes = FALSE, as.data.table = FA
 	if (as.data.table)
 	  return(speu)
 
-	return(as_data_frame(speu))
+	return(as_tibble(speu))
 
 }
 
@@ -701,7 +701,7 @@ solve.nature.super.sg = function(tg) {
 
 		cei = as.integer(eqo.grid[grid.row,])
 		names(cei) = NULL
-		row.eqo.df = data_frame(.eqo.ind=1,.outcomes=eqo.outcomes, child.eqo.inds=list(cei))
+		row.eqo.df = tibble(.eqo.ind=1,.outcomes=eqo.outcomes, child.eqo.inds=list(cei))
 	})
 	eqo.df = bind_rows(li)
 	eqo.df$.eqo.ind = seq_len(NROW(eqo.df))

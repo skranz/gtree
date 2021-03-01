@@ -35,7 +35,7 @@ eval.set.to.df = function(call, df, var, expand=TRUE, params=NULL) {
     return(df)
   }
 
-  sdf = as_data_frame(unique(df[,vars,drop=FALSE]))
+  sdf = as_tibble(unique(df[,vars,drop=FALSE]))
 
   # compute set for each row of df
   sets = lapply(seq.int(NROW(sdf)), function(i) {

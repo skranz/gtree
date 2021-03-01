@@ -274,7 +274,7 @@ compute.efg.move.inds = function(tg,efg.txt = readLines(efg.file), efg.file=file
   player = as.integer(str.left.of(efg.txt," "))
   info.set.ind = as.integer(str.right.of(efg.txt," "))
 
-  df = as_data_frame(nlist(player, info.set.ind))
+  df = as_tibble(nlist(player, info.set.ind))
 
   # Only first encounter of an information set is relevant
   # for gambit's output order

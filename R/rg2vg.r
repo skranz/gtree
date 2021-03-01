@@ -232,7 +232,7 @@ eval.strategyMethodDomain = function(action,vg, stage.num, kel) {
 	}
 
 	if (!is.call(smd) & !is.expression(smd)) {
-		kel$error(paste0("You must either leave the strategyMethodDomain empty, specify a single action name or enter a r formula that evaluates to a list or data frame and has the domain variables as names. Examples:<br>list(offer = 1:5)<br>data_frame(cost=c('low','high','unknown'),observed=c(TRUE,TRUE,FALSE))"))
+		kel$error(paste0("You must either leave the strategyMethodDomain empty, specify a single action name or enter a r formula that evaluates to a list or data frame and has the domain variables as names. Examples:<br>list(offer = 1:5)<br>tibble(cost=c('low','high','unknown'),observed=c(TRUE,TRUE,FALSE))"))
 	}
 
 	# smd is now a call

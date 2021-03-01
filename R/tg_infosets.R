@@ -175,7 +175,7 @@ compute.tg.subgames = function(tg) {
 	rows = which(ise.df$.lev.num == lev.num & ise.df$.num.nodes == 1)
 
 	if (length(rows)>0) {
-		sgi.df1 = data_frame(.lev.num = lev.num, .root.info.set.ind = ise.df$.info.set.ind[rows],.info.set.ind = .root.info.set.ind)
+		sgi.df1 = tibble(.lev.num = lev.num, .root.info.set.ind = ise.df$.info.set.ind[rows],.info.set.ind = .root.info.set.ind)
 	} else {
 		sgi.df1 = NULL
 	}
@@ -214,7 +214,7 @@ compute.tg.subgames = function(tg) {
 	}
 	# add super subgame
 	if (size1<NROW(ise.df)) {
-		super.df = data_frame(.lev.num = 0,.root.info.set.ind=0, .info.set.ind = ise.df$.info.set.ind)
+		super.df = tibble(.lev.num = 0,.root.info.set.ind=0, .info.set.ind = ise.df$.info.set.ind)
 		sgi.df = rbind(super.df, sgi.df)
 	}
 
@@ -320,7 +320,7 @@ find.lev.descendant.info.sets = function(lev, tg, subgames.only=TRUE, add.roots 
 				mutate(.contained = sum(is.na(.match)) == 0 & length(unique(.match)) == 1) %>%
 				ungroup(pinfo.set.ind=)
 
-			# return a data_frame with the
+			# return a tibble with the
 			# indices of the parent info set and the
 			# descendant info sets
 			match.df = dlev.df %>%
@@ -331,7 +331,7 @@ find.lev.descendant.info.sets = function(lev, tg, subgames.only=TRUE, add.roots 
 
 
 			if (add.roots) {
-				match.df = rbind(data_frame(pinfo.set.ind=.info.set.inds, .info.set.ind = .info.set.inds, .contained=TRUE),match.df) %>%
+				match.df = rbind(tibble(pinfo.set.ind=.info.set.inds, .info.set.ind = .info.set.inds, .contained=TRUE),match.df) %>%
 					arrange(pinfo.set.ind, .info.set.ind)
 			}
 
@@ -374,7 +374,7 @@ compute.sg.outcomes = function(sg.df, tg, add.to.sg.df = TRUE) {
 			cols = setdiff(lev$know.var.li[[kvg]],c(lev$var,"variant","numPlayers"))
 			# if no cols are observed the subgame is the whole game
 			if (length(cols)==0) {
-				all.df = data_frame(.root.info.set.ind = .info.set.inds, .outcomes=list(seq_len(NROW(tg$oco.df))) )
+				all.df = tibble(.root.info.set.ind = .info.set.inds, .outcomes=list(seq_len(NROW(tg$oco.df))) )
 				return(all.df)
 			}
 
@@ -386,7 +386,7 @@ compute.sg.outcomes = function(sg.df, tg, add.to.sg.df = TRUE) {
 			# non-contained outcomes will have an NA
 			oco.match = match(ocols.id, cols.id)
 
-			df = data_frame(.root.info.set.ind=.info.set.inds[oco.match],.outcome=tg$oco.df$.outcome)
+			df = tibble(.root.info.set.ind=.info.set.inds[oco.match],.outcome=tg$oco.df$.outcome)
 			df %>%
 				group_by(.root.info.set.ind) %>%
 				summarize(.outcomes = list(.outcome))
@@ -397,7 +397,7 @@ compute.sg.outcomes = function(sg.df, tg, add.to.sg.df = TRUE) {
 
 	# manually add outcomes of super subgame
 	if (sg.df$.root.info.set.ind[1]==0) {
-		df0 = data_frame(.root.info.set.ind = 0, .outcomes=list(tg$oco.df$.outcome))
+		df0 = tibble(.root.info.set.ind = 0, .outcomes=list(tg$oco.df$.outcome))
 		if (NROW(df)>0) {
 			df = rbind(df0, df)
 		} else {

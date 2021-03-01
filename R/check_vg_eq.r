@@ -117,7 +117,7 @@ check.vg.rules.eq = function(vg, rules, util.funs = NULL, check.all=FALSE, find.
   # Create a table that references to all possible deviations
   dev.ref = bind_rows(lapply(dev.li, function(dev) {
     if (NROW((dev))==0) return(NULL)
-    as_data_frame(list(stage.num = dev$.stage.num,.info.set=dev$.info.set,row=1:NROW(dev), group=paste0(dev$.stage.num,"-",dev$.info.set)))
+    as_tibble(list(stage.num = dev$.stage.num,.info.set=dev$.info.set,row=1:NROW(dev), group=paste0(dev$.stage.num,"-",dev$.info.set)))
   }))
 
 
@@ -347,7 +347,7 @@ play.vg.rules  = function(vg, rules=vg$rules, extra.par = list(), make.stage.li 
   #rules.vars = sapply(rules, function(rule) rule$var)
 
   if (is.null(play))
-    play = as_data_frame(c(list(.prob=1),vg$params, extra.par))
+    play = as_tibble(c(list(.prob=1),vg$params, extra.par))
 
   numPlayers = vg$params$numPlayers
 
@@ -363,7 +363,7 @@ play.vg.rules  = function(vg, rules=vg$rules, extra.par = list(), make.stage.li 
   if (add.info.sets) {
     # Initialize know.li elements with one column
     know.li = lapply(1:numPlayers, function(i) {
-      as_data_frame(list(numPlayers=rep(TRUE, NROW(play))))
+      as_tibble(list(numPlayers=rep(TRUE, NROW(play))))
     })
   }
 
@@ -547,7 +547,7 @@ add.call.players.to.df =  function(call,df,numPlayers) {
 
 
 
-  sdf = as_data_frame(unique(df[,vars,drop=FALSE]))
+  sdf = as_tibble(unique(df[,vars,drop=FALSE]))
 
   for (i in players) {
     sdf[[paste0(".player_",i)]] = FALSE

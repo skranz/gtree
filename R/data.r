@@ -195,7 +195,7 @@ game.strat.method.domain.vars = function(vg=get.vg(variant=variant,gameId=gameId
   res = bind_rows(lapply(vg$stages, function(stage){
     bind_rows(lapply(stage$actions, function(action) {
       if (!is.empty(action$strategyMethodDomain))
-        as_data_frame(list(action=action$name, domainvar=action$strategyMethodDomain))
+        as_tibble(list(action=action$name, domainvar=action$strategyMethodDomain))
     }))
   }))
   unique(res)

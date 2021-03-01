@@ -26,8 +26,8 @@ example.fix.actions = function() {
 	gameId = "UG2"
 	tg = get.tg(gameId = gameId, never.load = !FALSE)
 
-	fix.df = data_frame(offer=c(0:1), accept=0)
-  fix.df2 = data_frame(offer=3, accept=1)
+	fix.df = tibble(offer=c(0:1), accept=0)
+  fix.df2 = tibble(offer=3, accept=1)
   fix.li = list(fix.df, fix.df2)
 
   tg.fix = fix.tg.actions(tg, fix.li=fix.li)

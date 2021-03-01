@@ -72,10 +72,10 @@ vg.to.tg = function(vg, branching.limit = 10000, add.sg=TRUE, add.spi=FALSE, add
   # DO NOT ADD PARAMETERS ANYMORE TO
   # stage.df to save memory
 
-  tg$stage.df = data_frame(numPlayers=tg$params$numPlayers,.prob=1)
+  tg$stage.df = tibble(numPlayers=tg$params$numPlayers,.prob=1)
 
 
-  #tg$stage.df = as_data_frame(as.data.frame(tg$params,stringsAsFactors = FALSE))
+  #tg$stage.df = as_tibble(as.data.frame(tg$params,stringsAsFactors = FALSE))
   #tg$stage.df$.prob = 1
 
   # TO DO: Remove parameters from know.li
@@ -159,6 +159,7 @@ compute.tg.et.oco.etc = function(tg) {
   # in order to convert correctly
   # to efg files
   order.cols = paste0(".row.", seq_len(num.lev))
+
   df = arrange_(df,.dots = order.cols)
 
   # Drop unnecessary cols to save memory
@@ -319,8 +320,8 @@ compute.tg.stage = function(stage.num, tg, vg, kel) {
     ))
     know.li = lapply(seq_along(know.li), function(i) {
       mat = as.matrix(bind_rows(list(
-        as_data_frame(know.li[[i]]),
-        as_data_frame(tg$know.li[[i]][stage$ignore.rows,,drop=FALSE])
+        as_tibble(know.li[[i]]),
+        as_tibble(tg$know.li[[i]][stage$ignore.rows,,drop=FALSE])
       )))
       mat[is.na(mat)] = FALSE
       mat
@@ -396,7 +397,7 @@ tg.compute.stage.players = function(tg, stage, vg.stage, kel) {
 
 
 
-  sdf = as_data_frame(unique(df[,vars,drop=FALSE]))
+  sdf = as_tibble(unique(df[,vars,drop=FALSE]))
 
   for (i in tg$players) {
     sdf[[paste0(".player_",i)]] = FALSE
@@ -469,7 +470,7 @@ tg.update.stage.knowledge = function(tg, lev, vg.stage, kel) {
     kel$error("Your observe formula depends on the variables {{unknown}}, which have not been defined earlier.", unknown=unknown)
   }
 
-  sdf = as_data_frame(unique(df[,vars,drop=FALSE]))
+  sdf = as_tibble(unique(df[,vars,drop=FALSE]))
 
   for (row in seq.int(NROW(sdf))) {
     # compute set of observed vars
@@ -793,7 +794,7 @@ eval.randomVar.to.df = function(set.call, prob.call, df, var, kel, prob.col = ".
     return(df)
   }
 
-  sdf = as_data_frame(unique(df[,vars,drop=FALSE]))
+  sdf = as_tibble(unique(df[,vars,drop=FALSE]))
   # just a single variable combination
   if (NROW(sdf)==1) {
     set = eval.or.return(set.call,sdf)

@@ -118,7 +118,7 @@ eq.tables = function(eq, tg,  reduce.tables=TRUE, keep.keys=NULL, ignore.keys = 
 
     }
     if (!is.null(eq.ind))
-      key.df = cbind(as_data_frame(list(eq.ind=eq.ind)), key.df)
+      key.df = cbind(as_tibble(list(eq.ind=eq.ind)), key.df)
     key.df
   })
 
@@ -346,7 +346,7 @@ expected.outcomes = function(eqo.df=NULL,tg, group.vars=c("eq.ind", "eqo.ind"), 
 		})
 		names(vals) = vars
 		vals = vals[sapply(vals, function(val) !is.null(val))]
-		as_data_frame(c(as.list(df[1,group.vars, drop=FALSE]),vals))
+		as_tibble(c(as.list(df[1,group.vars, drop=FALSE]),vals))
 	}
 
 
@@ -414,7 +414,7 @@ cond.expected.outcomes = function(ceqo.df, factor.vars=NULL) {
 # we set the probabilities of the conditioned variable values to 1
 cond.eq.outcome = function(eq, cond, tg=NULL, oco.df=tg$oco.df, eq.ind = first.non.null(attr(eq,"eq.ind"),NA), eo.df = eq.outcome(eq=eq, oco.df=oco.df, tg=tg), cond.ind=1L) {
   restore.point("cond.eq.outcome")
-	cond.df = as_data_frame(cond)
+	cond.df = as_tibble(cond)
 
 	# multiple rows, call function repeatedly
 	if (NROW(cond.df)>1) {
@@ -548,7 +548,7 @@ reduce.key.table = function(table, var=colnames(table)[NCOL(table)], keep.keys=N
 
 # Is x a perfect predictor for y
 # Every value of x must have the same value y
-is.perfect.predictor = function(x,y, df = as_data_frame(list(x=x,y=y))) {
+is.perfect.predictor = function(x,y, df = as_tibble(list(x=x,y=y))) {
   dupl = duplicated(df)
   nx = df[[1]][!dupl]
   n_distinct(nx) == length(nx)

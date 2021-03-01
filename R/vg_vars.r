@@ -72,7 +72,7 @@ compute.vg.vars.info = function(vg) {
   vars = c(names(vg$params), stage.vars)
 
 
-  var.info = as_data_frame(list(
+  var.info = as_tibble(list(
     var = vars,
     is.param = vars %in% names(vg$params),
     is.compute = vars %in% compute.vars,

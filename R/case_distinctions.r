@@ -7,8 +7,8 @@ example.case_distinction = function() {
   cases(a<=3,b, a==5,c, d)
 
 
-  multi_size_cases(data_frame(b,c), a<=5,
-                   data_frame(c),a>5)
+  multi_size_cases(tibble(b,c), a<=5,
+                   tibble(c),a>5)
 
   cond = c(TRUE, FALSE)
 
@@ -54,14 +54,14 @@ example.multi_size_cases = function() {
   b = 1:4
   c = b*10
 
-  multi_size_cases(data_frame(b,c), a<=5,
-                   data_frame(c),a>5)
+  multi_size_cases(tibble(b,c), a<=5,
+                   tibble(c),a>5)
 
   cond = c(TRUE, FALSE)
 
 }
 
-# returns a list of data_frames for each condition
+# returns a list of tibbles for each condition
 multi_size_cases = function(...) {
   args = list(...)
 

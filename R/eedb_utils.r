@@ -54,7 +54,7 @@ identical.rows.groups.old = function(df) {
     return(numeric(0))
 
 	if (is.matrix(df))
-		df = as_data_frame(df)
+		df = as_tibble(df)
 
   cols = colnames(df)
   dupl = duplicated(df)

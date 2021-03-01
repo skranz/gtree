@@ -28,7 +28,7 @@ make.tg.action.keys = function(tg) {
 
 example.find.perfect.predictor.cols = function() {
   T = 100
-  dat = data_frame(a=sample(0:1, T, replace = TRUE), b=runif(T,-1,1), c=b^2, y=(1-c)>0.5)
+  dat = tibble(a=sample(0:1, T, replace = TRUE), b=runif(T,-1,1), c=b^2, y=(1-c)>0.5)
   df = select(df,b,y)
   is.perfect.predictor(df = select(dat,b,y))
   is.perfect.predictor(df = select(dat,c,y))
@@ -46,7 +46,7 @@ find.perfect.predictor.cols = function(df, var) {
 }
 
 # Is a numeric x a monotone predictor for y
-is.monotone.predictor = function(x,y, df = as_data_frame(list(x=x,y=y))) {
+is.monotone.predictor = function(x,y, df = as_tibble(list(x=x,y=y))) {
   ord = order(df[[1]])
   df = df[ord,]
   is.highest = which(!is.true(lead(df[[2]]) == df[[2]]))
