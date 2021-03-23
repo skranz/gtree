@@ -1,6 +1,6 @@
 # gtree: Game-Theoretic Representation of Economic Experiments
 
-Author: Sebastian Kranz, Ulm University
+Author: Sebastian Kranz, Ulm University 
 
 [gtree](skranz.github.io/gtree) is an R package that allows you to specify extensive form games using stages, similar as one specifies economic experiments with [ztree](https://www.ztree.uzh.ch/en.html) or [otree](https://otree.readthedocs.io/en/latest/). The game is internally converted to a formal game tree and one can find its equilibria using a [Gambit](http://www.gambit-project.org/) solver or an internal solver. The equilibria are presented in a format that facilitates comparison with experimental results. One can also conveniently study the effects of non-standard preferences characterized e.g. by inequality aversion or loss aversion.
 
